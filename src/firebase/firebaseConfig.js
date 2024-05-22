@@ -3,6 +3,7 @@ import {initializeApp} from 'firebase/app';
 import {getAnalytics} from 'firebase/analytics';
 import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
 import {getFirestore, setDoc, doc} from 'firebase/firestore';
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -25,6 +26,7 @@ export const FIREBASE_AUTH = getAuth(FIREBASE_APP);
 export const FIREBASE_DB = getFirestore(FIREBASE_APP);
 // const analytics = getAnalytics(app);
 
+
 // async function signUp(email, password, role) {
 //   try {
 //     const userCredential = await createUserWithEmailAndPassword(
@@ -45,3 +47,4 @@ export const FIREBASE_DB = getFirestore(FIREBASE_APP);
 
 // // Example usage
 // signUp('admin@admin.com', 'admin123', 'admin');
+
