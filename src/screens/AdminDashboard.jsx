@@ -2,26 +2,26 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, Button, StyleSheet} from 'react-native';
 import {signOut} from 'firebase/auth';
-import RoleBasedComponent from '../components/RoleBasedComponent';
+// import RoleBasedComponent from '../components/RoleBasedComponent';
 import {getDoc, doc} from 'firebase/firestore';
 import {FIREBASE_DB, FIREBASE_AUTH} from '../firebase/firebaseConfig';
 
 const AdminDashboard = ({navigation}) => {
   const [userRole, setUserRole] = useState('');
 
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      const user = FIREBASE_AUTH.currentUser;
-      if (user) {
-        const userDoc = await getDoc(doc(FIREBASE_DB, 'users', user.uid));
-        if (userDoc.exists()) {
-          setUserRole(userDoc.data().role);
-        }
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUserRole = async () => {
+  //     const user = FIREBASE_AUTH.currentUser;
+  //     if (user) {
+  //       const userDoc = await getDoc(doc(FIREBASE_DB, 'users', user.uid));
+  //       if (userDoc.exists()) {
+  //         setUserRole(userDoc.data().role);
+  //       }
+  //     }
+  //   };
 
-    fetchUserRole();
-  }, []);
+  //   fetchUserRole();
+  // }, []);
 
   const handleLogout = async () => {
     try {
@@ -33,7 +33,7 @@ const AdminDashboard = ({navigation}) => {
   };
 
   return (
-    <RoleBasedComponent userRole={userRole}>
+    <>
       <View style={styles.container}>
         <Text style={styles.title}>Admin Dashboard</Text>
         <Button
@@ -58,7 +58,7 @@ const AdminDashboard = ({navigation}) => {
         />
         <Button title="Logout" onPress={handleLogout} />
       </View>
-    </RoleBasedComponent>
+    </>
   );
 };
 
