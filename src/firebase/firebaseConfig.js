@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from 'firebase/app';
 import {getAnalytics} from 'firebase/analytics';
-import {getAuth} from 'firebase/auth';
-import {getFirestore} from 'firebase/firestore';
+import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
+import {getFirestore, setDoc, doc} from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -24,3 +24,24 @@ export const FIREBASE_APP = initializeApp(firebaseConfig);
 export const FIREBASE_AUTH = getAuth(FIREBASE_APP);
 export const FIREBASE_DB = getFirestore(FIREBASE_APP);
 // const analytics = getAnalytics(app);
+
+// async function signUp(email, password, role) {
+//   try {
+//     const userCredential = await createUserWithEmailAndPassword(
+//       FIREBASE_AUTH,
+//       email,
+//       password,
+//     );
+//     const user = userCredential.user;
+//     console.log('User signed up:', user);
+
+//     // Save the user role in Firestore
+//     await setDoc(doc(FIREBASE_DB, 'users', user.uid), {email, role});
+//     console.log('User signed up and role assigned:', role);
+//   } catch (error) {
+//     console.error('Error signing up:', error);
+//   }
+// }
+
+// // Example usage
+// signUp('admin@admin.com', 'admin123', 'admin');

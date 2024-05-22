@@ -39,8 +39,19 @@ const AdminLogin = ({navigation}) => {
       );
       const user = userCredential.user;
       console.log('User signed in:', user);
-      if (user) {
-        navigation.navigate('AdminDashboard');
+      const userDoc = await getDoc(doc(FIREBASE_DB, 'users', user.uid));
+
+      const userData = userDoc.data();
+      if (userDoc.exists()) {
+        // navigation.navigate('AdminDashboard');
+        console.log('userRole:', userData);
+        if (userData.role === 'admin') {
+          // Admin-specific logic
+          console.log('Welcome, Admin!');
+        } else {
+          // Normal user logic
+          console.log('Welcome, User!');
+        }
       } else {
         alert('user not found');
       }
