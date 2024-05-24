@@ -26,7 +26,6 @@ export const FIREBASE_AUTH = getAuth(FIREBASE_APP);
 export const FIREBASE_DB = getFirestore(FIREBASE_APP);
 // const analytics = getAnalytics(app);
 
-
 // async function signUp(email, password, role) {
 //   try {
 //     const userCredential = await createUserWithEmailAndPassword(
@@ -47,4 +46,3 @@ export const FIREBASE_DB = getFirestore(FIREBASE_APP);
 
 // // Example usage
 // signUp('admin@admin.com', 'admin123', 'admin');
-

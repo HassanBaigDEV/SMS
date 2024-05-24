@@ -2,8 +2,8 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import AdminLogin from '../screens/auth/AdminLogin';
-import AdminDashboard from '../screens/AdminDashboard';
+import Login from '../screens/auth/Login';
+import AdminDashboard from '../screens/admin/AdminDashboard';
 // import ManageStudents from './screens/ManageStudents'; // To be created
 // import ManageTeachers from './screens/ManageTeachers'; // To be created
 // import ManageFees from './screens/ManageFees'; // To be created
@@ -15,10 +15,10 @@ const Stack = createStackNavigator();
 const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="AdminLogin">
+      <Stack.Navigator initialRouteName="AdminDashboard">
         <Stack.Screen
           name="AdminLogin"
-          component={AdminLogin}
+          component={Login}
           options={{headerShown: false}}
         />
         <Stack.Screen

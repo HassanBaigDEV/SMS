@@ -2,13 +2,23 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, TextInput, Button, StyleSheet} from 'react-native';
 import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
-import {signInWithEmailAndPassword} from 'firebase/auth';
+import {signInWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth';
 import {doc, getDoc} from 'firebase/firestore';
 import 'firebase/firestore';
 
-const AdminLogin = ({navigation}) => {
+const Login = ({navigation}) => {
+  const [user, setUser] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    onAuthStateChanged(FIREBASE_AUTH, user => {
+      console.log('USER IS STILL LOGGED IN: ', user);
+      if (user) {
+        setUser(user);
+      }
+    });
+  }, [user]);
 
   // useEffect(() => {
   //   const adminData = {
@@ -37,13 +47,15 @@ const AdminLogin = ({navigation}) => {
         email,
         password,
       );
-      const user = userCredential.user;
+      setUser(userCredential.user);
+      const uid = userCredential.user.uid;
       console.log('User signed in:', user);
-      const userDoc = await getDoc(doc(FIREBASE_DB, 'users', user.uid));
+      const userDoc = await getDoc(doc(FIREBASE_DB, 'users', uid));
 
       const userData = userDoc.data();
       if (userDoc.exists()) {
         // navigation.navigate('AdminDashboard');
+
         console.log('userRole:', userData);
         if (userData.role === 'admin') {
           // Admin-specific logic
@@ -78,7 +90,7 @@ const AdminLogin = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Admin Login</Text>
+      <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -119,4 +131,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AdminLogin;
+export default Login;

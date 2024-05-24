@@ -4,7 +4,7 @@ import {View, Text, Button, StyleSheet} from 'react-native';
 import {signOut} from 'firebase/auth';
 // import RoleBasedComponent from '../components/RoleBasedComponent';
 import {getDoc, doc} from 'firebase/firestore';
-import {FIREBASE_DB, FIREBASE_AUTH} from '../firebase/firebaseConfig';
+import {FIREBASE_DB, FIREBASE_AUTH} from '../../firebase/firebaseConfig';
 
 const AdminDashboard = ({navigation}) => {
   const [userRole, setUserRole] = useState('');
