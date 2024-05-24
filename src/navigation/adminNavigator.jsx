@@ -4,6 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import Login from '../screens/auth/Login';
 import AdminDashboard from '../screens/admin/AdminDashboard';
+import AddClassForm from '../screens/admin/AddClassForm';
 // import ManageStudents from './screens/ManageStudents'; // To be created
 // import ManageTeachers from './screens/ManageTeachers'; // To be created
 // import ManageFees from './screens/ManageFees'; // To be created
@@ -25,6 +26,11 @@ const Navigator = () => {
           name="AdminDashboard"
           component={AdminDashboard}
           options={{title: 'Dashboard'}}
+        />
+        <Stack.Screen
+          name="AddClass"
+          component={AddClassForm}
+          options={{title: 'Add Class'}}
         />
         {/* <Stack.Screen
           name="ManageStudents"

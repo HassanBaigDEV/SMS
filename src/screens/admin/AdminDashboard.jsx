@@ -1,6 +1,6 @@
 // screens/AdminDashboard.js
 import React, {useEffect, useState} from 'react';
-import {View, Text, Button, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {signOut} from 'firebase/auth';
 // import RoleBasedComponent from '../components/RoleBasedComponent';
 import {getDoc, doc} from 'firebase/firestore';
@@ -36,27 +36,28 @@ const AdminDashboard = ({navigation}) => {
     <>
       <View style={styles.container}>
         <Text style={styles.title}>Admin Dashboard</Text>
-        <Button
-          title="Manage Students"
-          onPress={() => navigation.navigate('ManageStudents')}
-        />
-        <Button
-          title="Manage Teachers"
-          onPress={() => navigation.navigate('ManageTeachers')}
-        />
-        <Button
-          title="Manage Fees"
-          onPress={() => navigation.navigate('ManageFees')}
-        />
-        <Button
-          title="Upload Timetable"
-          onPress={() => navigation.navigate('UploadTimetable')}
-        />
-        <Button
-          title="Upload Syllabus"
-          onPress={() => navigation.navigate('UploadSyllabus')}
-        />
-        <Button title="Logout" onPress={handleLogout} />
+        <TouchableOpacity onPress={() => navigation.navigate('ManageStudents')}>
+          <Text>Manage Students</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('AddClass')}>
+          <Text>Add Class</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('ManageTeachers')}>
+          <Text>Manage Teachers</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('ManageFees')}>
+          <Text>Manage Fees</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('UploadTimetable')}>
+          <Text>Upload Timetable</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('UploadSyllabus')}>
+          <Text>Upload Syllabus</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text>Logout</Text>
+        </TouchableOpacity>
       </View>
     </>
   );
