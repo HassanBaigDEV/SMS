@@ -52,10 +52,10 @@ const Dropdown = ({label, data, onSelect}) => {
 
 const styles = StyleSheet.create({
   dropdown: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
+    // padding: 10,
+    // borderWidth: 1,
+    // borderColor: '#ccc',
+    // borderRadius: 4,
   },
   dropdownText: {
     color: '#000',

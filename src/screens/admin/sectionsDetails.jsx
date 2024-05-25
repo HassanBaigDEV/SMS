@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import {collection, getDocs, doc, setDoc} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../firebase/firebaseConfig';
+import Dropdown from '../../components/Dropdown';
 
 const SectionDetails = ({route}) => {
   const {classId, sectionId} = route.params;
@@ -20,6 +21,7 @@ const SectionDetails = ({route}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [newStudentRollNo, setNewStudentRollNo] = useState('');
   const [newStudentName, setNewStudentName] = useState('');
+  const [allStudents, setAllStudents] = useState([]);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -37,6 +39,41 @@ const SectionDetails = ({route}) => {
 
     fetchStudents();
   }, [classId, sectionId]);
+
+  //   useEffect(() => {
+  //     const fetchAllStudents = async () => {
+  //       const studentsCollection = collection(FIREBASE_DB, 'students');
+  //       const studentSnapshot = await getDocs(studentsCollection);
+  //       const studentList = studentSnapshot.docs
+  //         .map(doc => ({
+  //           id: doc.id,
+  //           ...doc.data(),
+  //         }))
+  //         .filter(
+  //           student => student.registrationNumber === Number(newStudentRollNo),
+  //         );
+  //       setAllStudents(studentList);
+  //     };
+
+  //     fetchAllStudents();
+  //   }, [newStudentRollNo]);
+  useEffect(() => {
+    const fetchAllStudents = async () => {
+      const studentsCollection = collection(FIREBASE_DB, 'students');
+      const studentSnapshot = await getDocs(studentsCollection);
+      const studentList = studentSnapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .filter(student =>
+          student.registrationNumber.toString().includes(newStudentRollNo),
+        );
+      setAllStudents(studentList);
+    };
+
+    fetchAllStudents();
+  }, [newStudentRollNo]);
 
   const handleAddStudent = async () => {
     if (newStudentRollNo.trim() === '' || newStudentName.trim() === '') {
@@ -57,9 +94,19 @@ const SectionDetails = ({route}) => {
       setModalVisible(false);
       setNewStudentRollNo('');
       setNewStudentName('');
-      //   fetchStudents();
+      // fetchStudents();
     } catch (error) {
       Alert.alert('Error', error.message);
+    }
+  };
+
+  const handleSelectStudent = rollNo => {
+    setNewStudentRollNo(rollNo);
+    const foundStudent = allStudents.find(
+      student => student.registrationNumber === Number(rollNo),
+    );
+    if (foundStudent) {
+      setNewStudentName(foundStudent.studentName);
     }
   };
 
@@ -91,16 +138,41 @@ const SectionDetails = ({route}) => {
               style={styles.input}
               placeholder="Roll No"
               value={newStudentRollNo}
-              onChangeText={setNewStudentRollNo}
+              onChangeText={text => setNewStudentRollNo(text)}
             />
+            <View style={styles.input}>
+              <Dropdown
+                label="Select Student"
+                data={allStudents.map(student => ({
+                  label: student.studentName,
+                  value: student.registrationNumber.toString(),
+                }))}
+                onSelect={handleSelectStudent}
+              />
+            </View>
             <TextInput
-              style={styles.input}
+              style={{display: 'none'}}
               placeholder="Name"
               value={newStudentName}
-              onChangeText={setNewStudentName}
+              editable={false}
             />
-            <Button title="Add" onPress={handleAddStudent} />
-            <Button title="Cancel" onPress={() => setModalVisible(false)} />
+            <Button
+              title="Add"
+              style={{
+                marginTop: 10,
+                color: '#007BFF',
+              }}
+              onPress={handleAddStudent}
+            />
+            <Button
+              title="Cancel"
+              style={{marginTop: 10, color: 'red'}}
+              onPress={() => {
+                setModalVisible(false);
+                setNewStudentRollNo('');
+                setNewStudentName('');
+              }}
+            />
           </View>
         </View>
       </Modal>
@@ -122,6 +194,7 @@ const styles = StyleSheet.create({
   addStudentButton: {
     color: '#007BFF',
     marginBottom: 20,
+    marginTop: 20,
   },
   studentItem: {
     padding: 15,
@@ -130,13 +203,15 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
+
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
     backgroundColor: '#fff',
+    margin: 20,
+    width: '80%',
     padding: 20,
     borderRadius: 10,
   },
