@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {signOut} from 'firebase/auth';
 // import RoleBasedComponent from '../components/RoleBasedComponent';
-import {getDoc, doc} from 'firebase/firestore';
+import {getDocs, doc, collection} from 'firebase/firestore';
 import {FIREBASE_DB, FIREBASE_AUTH} from '../../firebase/firebaseConfig';
 
 const AdminDashboard = ({navigation}) => {
@@ -57,6 +57,12 @@ const AdminDashboard = ({navigation}) => {
         </TouchableOpacity>
         <TouchableOpacity onPress={handleLogout}>
           <Text>Logout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('ClassList');
+          }}>
+          <Text>Classes</Text>
         </TouchableOpacity>
       </View>
     </>

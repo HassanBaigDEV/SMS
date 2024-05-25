@@ -1,24 +1,30 @@
 // AddClassForm.js
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   TextInput,
-  Button,
   StyleSheet,
   Text,
   Alert,
   TouchableOpacity,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import {getFirestore, doc, setDoc, getDoc} from 'firebase/firestore';
-import {FIREBASE_DB} from './firebase';
+import {doc, setDoc, getDoc} from 'firebase/firestore';
+import {FIREBASE_DB} from '../../firebase/firebaseConfig';
 import {classes} from '../../data/classes';
+import Dropdown from '../../components/Dropdown';
 
 const AddClassForm = () => {
   const [selectedClass, setSelectedClass] = useState(classes[0].class);
   const [subjects, setSubjects] = useState(classes[0].subjects.join(', '));
   const [section, setSection] = useState('');
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const classData = classes.find(c => c.class === selectedClass);
+    if (classData) {
+      setSubjects(classData.subjects.join(', '));
+    }
+  }, [selectedClass]);
 
   const handleAddClass = async () => {
     if (
@@ -67,19 +73,18 @@ const AddClassForm = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Class Name</Text>
-      <Picker
-        selectedValue={selectedClass}
-        onValueChange={itemValue => handleClassChange(itemValue)}
-        style={styles.picker}>
-        {classes.map((cls, index) => (
-          <Picker.Item key={index} label={cls.class} value={cls.class} />
-        ))}
-      </Picker>
+      <Dropdown
+        label="Select Class"
+        data={classes.map(cls => ({label: cls.class, value: cls.class}))}
+        onSelect={handleClassChange}
+      />
+
       <Text style={styles.label}>Subjects (comma separated)</Text>
       <TextInput
         style={styles.input}
         value={subjects}
         onChangeText={setSubjects}
+        editable={false}
         placeholder="e.g., English, Math, Science"
       />
       <Text style={styles.label}>Section</Text>

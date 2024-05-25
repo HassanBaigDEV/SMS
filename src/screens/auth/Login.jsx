@@ -60,6 +60,7 @@ const Login = ({navigation}) => {
         if (userData.role === 'admin') {
           // Admin-specific logic
           console.log('Welcome, Admin!');
+          navigation.navigate('AdminDashboard');
         } else {
           // Normal user logic
           console.log('Welcome, User!');
