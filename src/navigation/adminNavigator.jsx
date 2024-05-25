@@ -10,6 +10,8 @@ import ClassDetails from '../screens/admin/classDetails';
 import SubjectsList from '../screens/admin/subjectsList';
 import SectionsList from '../screens/admin/sectionsList';
 import SectionDetails from '../screens/admin/sectionsDetails';
+import CreateStudentForm from '../screens/admin/CreateStudentForm';
+import AddTeacherForm from '../screens/admin/AddTeacherForm.jsx';
 // import ManageStudents from './screens/ManageStudents'; // To be created
 // import ManageTeachers from './screens/ManageTeachers'; // To be created
 // import ManageFees from './screens/ManageFees'; // To be created
@@ -61,6 +63,16 @@ const Navigator = () => {
           name="SectionDetails"
           component={SectionDetails}
           options={{title: 'Section Details'}}
+        />
+        <Stack.Screen
+          name="addStudent"
+          component={CreateStudentForm}
+          options={{title: 'Add Student'}}
+        />
+        <Stack.Screen
+          name="addTeacher"
+          component={AddTeacherForm}
+          options={{title: 'Add Teacher'}}
         />
 
         {/* <Stack.Screen

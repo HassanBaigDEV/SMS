@@ -64,6 +64,12 @@ const AdminDashboard = ({navigation}) => {
           }}>
           <Text>Classes</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('addStudent')}>
+          <Text>Add Student</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('addTeacher')}>
+          <Text>Add Teacher</Text>
+        </TouchableOpacity>
       </View>
     </>
   );

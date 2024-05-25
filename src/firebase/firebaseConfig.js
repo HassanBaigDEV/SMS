@@ -24,25 +24,38 @@ const firebaseConfig = {
 export const FIREBASE_APP = initializeApp(firebaseConfig);
 export const FIREBASE_AUTH = getAuth(FIREBASE_APP);
 export const FIREBASE_DB = getFirestore(FIREBASE_APP);
+//create a second app
+const secondaryApp = initializeApp(firebaseConfig, 'secondary');
 // const analytics = getAnalytics(app);
 
-// async function signUp(email, password, role) {
-//   try {
-//     const userCredential = await createUserWithEmailAndPassword(
-//       FIREBASE_AUTH,
-//       email,
-//       password,
-//     );
-//     const user = userCredential.user;
-//     console.log('User signed up:', user);
+export const signUp = async (email, password, role) => {
+  console.log('sssssssssssssssss', email, password, role);
+  try {
+    secondaryApp
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(async function (firebaseUser) {
+        console.log('User ' + firebaseUser.uid + ' created successfully!');
+        await setDoc(doc(FIREBASE_DB, 'users', firebaseUser.uid), {
+          email,
+          role,
+        });
+        //I don't know if the next statement is necessary
+        secondaryApp.auth().signOut();
+      });
+    // const userCredential = await createUserWithEmailAndPassword(
+    //   email,
+    //   password,
+    // );
+    // const user = userCredential.user;
+    // console.log('User signed up:', user);
 
-//     // Save the user role in Firestore
-//     await setDoc(doc(FIREBASE_DB, 'users', user.uid), {email, role});
-//     console.log('User signed up and role assigned:', role);
-//   } catch (error) {
-//     console.error('Error signing up:', error);
-//   }
-// }
+    // Save the user role in Firestore
+    console.log('User signed up and role assigned:', role);
+  } catch (error) {
+    console.error('Error signing up:', error);
+  }
+};
 
 // // Example usage
 // signUp('admin@admin.com', 'admin123', 'admin');
