@@ -100,6 +100,11 @@ const CreateStudentForm = () => {
         />
         <Text style={styles.label}> Gender </Text>
         <TextInput style={styles.input} value={gender} onChangeText={setGender} />
+        <TextInput
+          style={styles.input}
+          value={gender}
+          onChangeText={setGender}
+        />
         <Text style={styles.label}>Father's Name</Text>
         <TextInput
           style={styles.input}
