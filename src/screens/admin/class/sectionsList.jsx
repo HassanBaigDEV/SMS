@@ -2,17 +2,17 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import {collection, getDocs} from 'firebase/firestore';
-import {FIREBASE_DB} from '../../firebase/firebaseConfig';
+import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
 
 const SectionsList = ({route, navigation}) => {
-  const {classId} = route.params;
+  const {classId, year} = route.params;
   const [sections, setSections] = useState([]);
 
   useEffect(() => {
     const fetchSections = async () => {
       const sectionsCollection = collection(
         FIREBASE_DB,
-        `classes/${classId}/sections`,
+        `classes/${classId}/${year}`,
       );
       const sectionSnapshot = await getDocs(sectionsCollection);
       const sectionList = sectionSnapshot.docs.map(doc => ({
@@ -23,7 +23,7 @@ const SectionsList = ({route, navigation}) => {
     };
 
     fetchSections();
-  }, [classId]);
+  });
 
   const renderItem = ({item}) => (
     <TouchableOpacity
@@ -36,11 +36,28 @@ const SectionsList = ({route, navigation}) => {
 
   return (
     <View style={styles.container}>
-      <FlatList
+      {/* <TouchableOpacity
+        onPress={() => navigation.navigate('AddClass', {classId})}>
+        <Text style={styles.addClassButton}>Add New Student</Text>
+      </TouchableOpacity> */}
+      {/* <FlatList
         data={sections}
         renderItem={renderItem}
         keyExtractor={item => item.id}
-      />
+      /> */}
+      <TouchableOpacity onPress={() => {}}>
+        <Text>Subjects</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate('SectionDetails', {
+            students: sections,
+            classId: classId,
+            year: year,
+          });
+        }}>
+        <Text>Students</Text>
+      </TouchableOpacity>
     </View>
   );
 };

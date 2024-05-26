@@ -10,12 +10,15 @@ import {
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {doc, setDoc, getDoc} from 'firebase/firestore';
-import {FIREBASE_DB} from '../../firebase/firebaseConfig';
-import {classes} from '../../data/classes';
-import Dropdown from '../../components/Dropdown';
+import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
+import {classes} from '../../../data/classes';
+import Dropdown from '../../../components/Dropdown';
 
-const AddClassForm = () => {
-  const [selectedClass, setSelectedClass] = useState(classes[0].class);
+const AddClassForm = ({route, navigation}) => {
+  const {classId} = route.params;
+  console.log('classId', classId);
+
+  const [selectedClass, setSelectedClass] = useState(classId);
   const [subjects, setSubjects] = useState(classes[0].subjects.join(', '));
   const [section, setSection] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,12 +52,13 @@ const AddClassForm = () => {
         Alert.alert('Error', 'Section already exists!');
         setLoading(false);
       } else {
-        await setDoc(sectionRef, {subjects: subjectsArray});
+        await setDoc(sectionRef, {subjects: subjectsArray, students: []});
         Alert.alert('Success', 'Class and section added successfully!');
         setSelectedClass(classes[0].class);
         setSubjects(classes[0].subjects.join(', '));
         setSection('');
         setLoading(false);
+        navigation.navigate('SectionsList', {classId: selectedClass});
       }
     } catch (error) {
       Alert.alert('Error', error.message);
@@ -73,10 +77,16 @@ const AddClassForm = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Class Name</Text>
-      <Dropdown
+      {/* <Dropdown
         label="Select Class"
         data={classes.map(cls => ({label: cls.class, value: cls.class}))}
         onSelect={handleClassChange}
+      /> */}
+      <TextInput
+        style={styles.input}
+        value={selectedClass}
+        onChangeText={handleClassChange}
+        editable={false}
       />
 
       <Text style={styles.label}>Subjects (comma separated)</Text>
