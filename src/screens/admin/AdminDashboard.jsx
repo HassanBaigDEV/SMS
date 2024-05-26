@@ -36,7 +36,7 @@ const AdminDashboard = ({navigation}) => {
     <>
       <View style={styles.container}>
         <Text style={styles.title}>Admin Dashboard</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('ManageStudents')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Students')}>
           <Text>Manage Students</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('AddClass')}>
@@ -64,9 +64,9 @@ const AdminDashboard = ({navigation}) => {
           }}>
           <Text>Classes</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('addStudent')}>
+        {/* <TouchableOpacity onPress={() => navigation.navigate('addStudent')}>
           <Text>Add Student</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity onPress={() => navigation.navigate('addTeacher')}>
           <Text>Add Teacher</Text>
         </TouchableOpacity>

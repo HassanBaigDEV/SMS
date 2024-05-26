@@ -2,7 +2,7 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import {doc, getDoc} from 'firebase/firestore';
-import {FIREBASE_DB} from '../../firebase/firebaseConfig';
+import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
 
 const SubjectsList = ({route, navigation}) => {
   const {classId} = route.params;

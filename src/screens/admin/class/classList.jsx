@@ -1,9 +1,9 @@
 // ClassList.js
 import React, {useState, useEffect} from 'react';
 import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
-import {classes} from '../../data/classes';
+import {classes} from '../../../data/classes';
 import {collection, getDocs} from 'firebase/firestore';
-import {FIREBASE_DB} from '../../firebase/firebaseConfig';
+import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
 
 const ClassList = ({navigation}) => {
   const renderItem = ({item}) => (

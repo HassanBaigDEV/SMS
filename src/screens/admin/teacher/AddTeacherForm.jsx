@@ -2,9 +2,9 @@
 import React, {useState} from 'react';
 import {View, Text, TextInput, Button, StyleSheet, Alert} from 'react-native';
 import {setDoc, collection, doc} from 'firebase/firestore';
-import {FIREBASE_DB} from '../../firebase/firebaseConfig';
+import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
 // import {signUp} from '../../firebase/firebaseConfig';
-import {signUp} from '../../utils/signUp';
+import {signUp} from '../../../utils/signUp';
 
 const AddTeacherForm = () => {
   const [idNumber, setIdNumber] = useState('');
