@@ -23,6 +23,9 @@ import SectionsList from '../screens/admin/class/sectionsList.jsx';
 import SectionDetails from '../screens/admin/class/sectionsDetails.jsx';
 import CreateStudentForm from '../screens/admin/CreateStudentForm.jsx';
 import AddTeacherForm from '../screens/admin/teacher/AddTeacherForm.jsx';
+import TeacherList from '../screens/admin/teacher/TeacherList.jsx';
+import TeacherDetail from '../screens/admin/teacher/TeacherDetails.jsx';
+import EditTeacher from '../screens/admin/teacher/EditTeacher.jsx';
 
 const Stack = createStackNavigator();
 
@@ -112,7 +115,7 @@ const AdminNavigator = () => {
         options={{title: 'Add Student'}}
       />
       <Stack.Screen
-        name="addTeacher"
+        name="AddTeacher"
         component={AddTeacherForm}
         options={{title: 'Add Teacher'}}
       />
@@ -130,6 +133,21 @@ const AdminNavigator = () => {
         name="EditStudent"
         component={EditStudent}
         options={{title: 'Edit Student'}}
+      />
+      <Stack.Screen
+        name="TeacherList"
+        component={TeacherList}
+        options={{title: 'Teachers'}}
+      />
+      <Stack.Screen
+        name="TeacherDetails"
+        component={TeacherDetail}
+        options={{title: 'Teacher Details'}}
+      />
+      <Stack.Screen
+        name="EditTeacher"
+        component={EditTeacher}
+        options={{title: 'Edit Teacher'}}
       />
       {/* <Stack.Screen
           name="ManageStudents"

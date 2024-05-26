@@ -52,40 +52,44 @@ const AddTeacherForm = () => {
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Teacher Name</Text>
+      <Text style={styles.label}>Teacher Name*</Text>
       <TextInput
         style={styles.input}
         value={teacherName}
         onChangeText={setTeacherName}
+        required
       />
 
-      <Text style={styles.label}>Email</Text>
+      <Text style={styles.label}>Email*</Text>
       <TextInput
         style={styles.input}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        required
       />
 
-      <Text style={styles.label}>Password</Text>
+      <Text style={styles.label}>Password*</Text>
       <TextInput
         style={styles.input}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        required
       />
 
-      <Text style={styles.label}>Subject</Text>
+      {/* <Text style={styles.label}>Subject</Text>
       <TextInput
         style={styles.input}
         value={subject}
         onChangeText={setSubject}
-      />
+      /> */}
 
       <Text style={styles.label}>Class Assigned</Text>
       <TextInput
         style={styles.input}
         value={classAssigned}
+        placeholder="Format Class 5"
         onChangeText={setClassAssigned}
       />
 

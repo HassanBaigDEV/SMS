@@ -42,7 +42,7 @@ const AdminDashboard = ({navigation}) => {
         <TouchableOpacity onPress={() => navigation.navigate('AddClass')}>
           <Text>Add Class</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('ManageTeachers')}>
+        <TouchableOpacity onPress={() => navigation.navigate('TeacherList')}>
           <Text>Manage Teachers</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('ManageFees')}>

@@ -1,4 +1,4 @@
-// ManageTeachers.js
+// TeacherList.js
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -11,7 +11,7 @@ import {
 import {collection, getDocs} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
 
-const ManageTeachers = ({navigation}) => {
+const TeacherList = ({navigation}) => {
   const [teachers, setTeachers] = useState([]);
 
   useEffect(() => {
@@ -24,6 +24,7 @@ const ManageTeachers = ({navigation}) => {
           ...doc.data(),
         }));
         setTeachers(teacherList);
+        // console.log('Fetched teachers:', teacherList);
       } catch (error) {
         console.error('Error fetching teachers:', error);
       }
@@ -34,12 +35,13 @@ const ManageTeachers = ({navigation}) => {
 
   const renderTeacher = ({item}) => (
     <TouchableOpacity
-      onPress={() =>
-        navigation.navigate('TeacherDetail', {teacherId: item.id})
+      onPress={
+        () => navigation.navigate('TeacherDetails', {teacherId: item.id})
+        // console.log(item.idNumber)
       }>
       <View style={styles.teacherItem}>
-        <Text style={styles.teacherName}>{item.name}</Text>
-        <Text>{item.assignedClass}</Text>
+        <Text style={styles.teacherName}>{item.teacherName}</Text>
+        <Text>{item.classAssigned}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -53,7 +55,7 @@ const ManageTeachers = ({navigation}) => {
       />
       <Button
         title="Add Teacher"
-        onPress={() => navigation.navigate('EditTeacher', {isNew: true})}
+        onPress={() => navigation.navigate('AddTeacher')}
       />
     </View>
   );
@@ -76,4 +78,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ManageTeachers;
+export default TeacherList;
