@@ -19,6 +19,7 @@ import AddTeacherForm from '../screens/admin/AddTeacherForm.jsx';
 // import UploadSyllabus from './screens/UploadSyllabus'; // To be created
 
 import StudentLogin from '../screens/auth/studentLogin.jsx';
+import StudentDashboard from '../screens/student/studentDashboard.jsx';
 
 const Stack = createStackNavigator();
 
@@ -30,12 +31,12 @@ const StudentNavigator = () => {
         component={StudentLogin}
         options={{ headerShown: false }}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         name="StudentDashboard"
         component={StudentDashboard}
         options={{ headerShown: false }}
-      />
-      <Stack.Screen
+      /> 
+      {/* <Stack.Screen
         name="Marks"
         component={Marks}
         options={{ title: 'Marks' }}
@@ -54,7 +55,7 @@ const StudentNavigator = () => {
         name="Syllabus"
         component={Syllabus}
         options={{ title: 'Syllabus' }}
-      /> */}
+      />  */}
     </Stack.Navigator>
   );
 };
@@ -141,6 +142,8 @@ const AdminNavigator = () => {
     </Stack.Navigator>
   );
 };
+
+
 
 
 
