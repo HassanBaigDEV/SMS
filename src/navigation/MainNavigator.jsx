@@ -27,6 +27,7 @@ import AddTeacherForm from '../screens/admin/teacher/AddTeacherForm.jsx';
 import TeacherList from '../screens/admin/teacher/TeacherList.jsx';
 import TeacherDetail from '../screens/admin/teacher/TeacherDetails.jsx';
 import EditTeacher from '../screens/admin/teacher/EditTeacher.jsx';
+import StudentAgeRecord from '../screens/admin/student/StudentAgeRecod.jsx';
 
 const Stack = createStackNavigator();
 
@@ -149,6 +150,11 @@ const AdminNavigator = () => {
         name="EditTeacher"
         component={EditTeacher}
         options={{title: 'Edit Teacher'}}
+      />
+      <Stack.Screen
+        name="StudentAgeRecord"
+        component={StudentAgeRecord}
+        options={{title: 'Student Age Record'}}
       />
       {/* <Stack.Screen
           name="ManageStudents"

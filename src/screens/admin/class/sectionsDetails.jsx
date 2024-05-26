@@ -20,6 +20,7 @@ import {
   getDoc,
   addDoc,
 } from 'firebase/firestore';
+import {subjectByClass} from '../../../data/classes';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
 import Dropdown from '../../../components/Dropdown';
 
@@ -125,30 +126,12 @@ const SectionDetails = ({route}) => {
     }
 
     try {
-      // Replace with the actual year
-      // const studentsCollection = collection(
-      //   FIREBASE_DB,
-      //   `classes/${classId}/${year}`,
-      // );
-      // const studentDocRef = doc(
-      //   studentsCollection,
-      //   newStudentRollNo.toString(),
-      // );
-      // console && console.log('studentDocRef', studentDocRef);
-      // await setDoc(studentDocRef, {
-      //   registrationNumber: parseInt(newStudentRollNo),
-      //   studentName: newStudentName,
-      //   marks: {
-      //     firstTerm: null,
-      //     midTerm: null,
-      //     finalTerm: null,
-      //   },
-      // });
-      // await addDoc(collection(FIREBASE_DB, `classes/class 5/2019`), {
-      //   registrationNumber: parseInt(newStudentRollNo),
-
-      //   // Other student data (name, age, etc.)
-      // });
+      let subjectsArray = subjectByClass[`${classId}`];
+      const subjects = subjectsArray || [];
+      const marks = subjects.reduce((acc, subject) => {
+        acc[subject] = {firstTerm: null, midTerm: null, finalTerm: null};
+        return acc;
+      }, {});
       console.log(`classes/${classId}/${year}`);
       await setDoc(
         doc(
@@ -159,13 +142,26 @@ const SectionDetails = ({route}) => {
         {
           registrationNumber: parseInt(newStudentRollNo),
           studentName: newStudentName,
-          marks: {
-            firstTerm: null,
-            midTerm: null,
-            finalTerm: null,
-          },
+
+          marks,
         },
       );
+      // let subjectsArray = subjectByClass[`${classId}`];
+      const studentRef = doc(FIREBASE_DB, `students/${newStudentRollNo}`);
+      // const subjects = subjectsArray || [];
+
+      const studentData = {
+        registrationNumber: newStudentRollNo,
+        studentName: newStudentName,
+        admissionClass: classId,
+        classEnrolled: `classes/${classId}/${year}`,
+        marks: {
+          [year]: marks,
+        },
+        dateOfAdmission: new Date().toISOString(), // Example date field
+      };
+
+      await setDoc(studentRef, studentData, {merge: true});
       // await setDoc(studentRef, studentData);
       Alert.alert('Success', 'Student added successfully');
       // Clear the input fields and close the modal
@@ -250,12 +246,12 @@ const SectionDetails = ({route}) => {
     </View>
   );
 
-  const toggleYearExpansion = year => {
-    setExpandedYears(prev => ({
-      ...prev,
-      [year]: !prev[year],
-    }));
-  };
+  // const toggleYearExpansion = year => {
+  //   setExpandedYears(prev => ({
+  //     ...prev,
+  //     [year]: !prev[year],
+  //   }));
+  // };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Section {sectionId}</Text>
