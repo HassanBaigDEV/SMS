@@ -92,6 +92,7 @@ const Navigator = () => {
           component={EditStudent}
           options={{title: 'Edit Student'}}
         />
+
         {/* <Stack.Screen
           name="ManageStudents"
           component={ManageStudents}

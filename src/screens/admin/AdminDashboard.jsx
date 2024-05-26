@@ -76,6 +76,12 @@ const AdminDashboard = ({navigation}) => {
           }}>
           <Text>Student Age Record</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('FeeStatus');
+          }}>
+          <Text>Fee Status</Text>
+        </TouchableOpacity>
       </View>
     </>
   );

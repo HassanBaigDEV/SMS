@@ -28,6 +28,8 @@ import TeacherList from '../screens/admin/teacher/TeacherList.jsx';
 import TeacherDetail from '../screens/admin/teacher/TeacherDetails.jsx';
 import EditTeacher from '../screens/admin/teacher/EditTeacher.jsx';
 import StudentAgeRecord from '../screens/admin/student/StudentAgeRecod.jsx';
+import FeeStatusForm from '../screens/admin/feeStatus/FeeStatusForm.jsx';
+import FeeStatus from '../screens/admin/feeStatus/index.jsx';
 
 const Stack = createStackNavigator();
 
@@ -42,8 +44,8 @@ const StudentNavigator = () => {
       <Stack.Screen
         name="StudentDashboard"
         component={StudentDashboard}
-        options={{ headerShown: false }}
-      /> 
+        options={{headerShown: false}}
+      />
       {/* <Stack.Screen
         name="Marks"
         component={Marks}
@@ -156,6 +158,16 @@ const AdminNavigator = () => {
         component={StudentAgeRecord}
         options={{title: 'Student Age Record'}}
       />
+      <Stack.Screen
+        name="FeeStatusForm"
+        component={FeeStatusForm}
+        options={{title: 'Fee Status'}}
+      />
+      <Stack.Screen
+        name="FeeStatus"
+        component={FeeStatus}
+        options={{title: 'Fee Status'}}
+      />
       {/* <Stack.Screen
           name="ManageStudents"
           component={ManageStudents}
@@ -185,12 +197,10 @@ const AdminNavigator = () => {
   );
 };
 
-
-
 const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="StudentNavigator">
+      <Stack.Navigator initialRouteName="AdminNavigator">
         <Stack.Screen
           name="StudentNavigator"
           component={StudentNavigator}
