@@ -57,7 +57,7 @@ const TeacherDetail = ({route, navigation}) => {
       <Text style={styles.label}>Name: {teacher.teacherName}</Text>
       <Text style={styles.label}>Emcccail: {teacher.email}</Text>
       <Text style={styles.label}>Assigned Class: {teacher.classAssigned}</Text>
-      <Text style={styles.label}>Other Details: {teacher.otherDetails}</Text>
+      <Text style={styles.label}>Subject: {teacher.subject}</Text>
       <View style={styles.buttonContainer}>
         <Button title="Edit" onPress={handleEditTeacher} />
         <Button title="Delete" onPress={handleDeleteTeacher} />

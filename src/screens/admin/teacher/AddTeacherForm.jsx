@@ -1,18 +1,29 @@
-// AddTeacherForm.js
 import React, {useState} from 'react';
-import {View, Text, TextInput, Button, StyleSheet, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  ScrollView,
+} from 'react-native';
 import {setDoc, collection, doc} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
-// import {signUp} from '../../firebase/firebaseConfig';
 import {signUp} from '../../../utils/signUp';
+import {years} from '../../../data/academicYear';
 
 const AddTeacherForm = () => {
   const [idNumber, setIdNumber] = useState('');
   const [teacherName, setTeacherName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [subject, setSubject] = useState('');
-  const [classAssigned, setClassAssigned] = useState('');
+  const [academicDetails, setAcademicDetails] = useState(
+    years.reduce((acc, year) => {
+      acc[year] = {classAssigned: '', subject: ''};
+      return acc;
+    }, {}),
+  );
 
   const handleAddTeacher = async () => {
     try {
@@ -25,25 +36,36 @@ const AddTeacherForm = () => {
         teacherName,
         email,
         password,
-        subject,
-        classAssigned,
+        academicYear: academicDetails,
       });
       // Clear form fields
       setIdNumber('');
       setTeacherName('');
       setEmail('');
       setPassword('');
-      setSubject('');
-      setClassAssigned('');
-
-      // Alert.alert('Success', 'Teacher added successfully!');
+      setAcademicDetails(
+        years.reduce((acc, year) => {
+          acc[year] = {classAssigned: '', subject: ''};
+          return acc;
+        }, {}),
+      );
     } catch (error) {
       Alert.alert('Error', error.message);
     }
   };
 
+  const handleInputChange = (year, field, value) => {
+    setAcademicDetails(prevState => ({
+      ...prevState,
+      [year]: {
+        ...prevState[year],
+        [field]: value,
+      },
+    }));
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.label}>ID Number</Text>
       <TextInput
         style={styles.input}
@@ -78,23 +100,30 @@ const AddTeacherForm = () => {
         required
       />
 
-      {/* <Text style={styles.label}>Subject</Text>
-      <TextInput
-        style={styles.input}
-        value={subject}
-        onChangeText={setSubject}
-      /> */}
-
-      <Text style={styles.label}>Class Assigned</Text>
-      <TextInput
-        style={styles.input}
-        value={classAssigned}
-        placeholder="Format Class 5"
-        onChangeText={setClassAssigned}
-      />
+      {years.map(year => (
+        <View key={year} style={styles.yearSection}>
+          <Text style={styles.yearLabel}>{year}</Text>
+          <Text style={styles.label}>Class Assigned</Text>
+          <TextInput
+            style={styles.input}
+            value={academicDetails[year].classAssigned}
+            placeholder="Format Class 5"
+            onChangeText={text =>
+              handleInputChange(year, 'classAssigned', text)
+            }
+          />
+          <Text style={styles.label}>Subject</Text>
+          <TextInput
+            style={styles.input}
+            value={academicDetails[year].subject}
+            placeholder="Subject"
+            onChangeText={text => handleInputChange(year, 'subject', text)}
+          />
+        </View>
+      ))}
 
       <Button title="Add Teacher" onPress={handleAddTeacher} />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -114,6 +143,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 4,
+  },
+  yearSection: {
+    marginBottom: 20,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+  },
+  yearLabel: {
+    fontWeight: 'bold',
+    marginBottom: 10,
+    fontSize: 16,
   },
 });
 

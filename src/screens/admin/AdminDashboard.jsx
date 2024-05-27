@@ -82,6 +82,16 @@ const AdminDashboard = ({navigation}) => {
           }}>
           <Text>Fee Status</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('FeeStatusForm', {
+              student: null,
+              year: null,
+              newStudent: null,
+            });
+          }}>
+          <Text>Fee Status Form</Text>
+        </TouchableOpacity>
       </View>
     </>
   );

@@ -37,7 +37,7 @@ const Header = ({title}) => {
         start={{x: 0, y: 0}}
         end={{x: 1, y: 0}}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <BackButton source={require('../assests/icons/chevron-left.png')} />
+          <BackButton source={require('../assets/icons/chevron-left.png')} />
         </TouchableOpacity>
         <Text
           style={{
