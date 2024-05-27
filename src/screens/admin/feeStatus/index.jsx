@@ -8,10 +8,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
+  Alert,
+  ScrollView,
 } from 'react-native';
 import {getDocs, collection} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
 import FeeStatusForm from './FeeStatusForm'; // Import the FeeStatusForm component
+import Header from '../../../components/header';
 
 const FeeStatus = ({navigation}) => {
   const [students, setStudents] = useState([]);
@@ -33,19 +36,16 @@ const FeeStatus = ({navigation}) => {
         ...doc.data(),
       }));
       setStudents(studentList);
-      //   console.log('students:', studentList);
     } catch (error) {
       console.error('Error fetching students:', error);
     }
   };
 
-  const handleSearch = () => {
-    // fetchStudents();
-    // Filter the students based on search term (registration number)
+  const handleSearch = async () => {
+    await fetchStudents();
     const filteredStudents = students.filter(student =>
       student.registrationNumber.toString().includes(searchTerm.trim()),
     );
-    console.log('filteredStudents:', students);
     setStudents(filteredStudents);
   };
 
@@ -56,7 +56,7 @@ const FeeStatus = ({navigation}) => {
       setYears(feeYears);
       setModalVisible(true);
     } else {
-      //   Alert.alert('No fee status available');
+      setModalVisible(true);
     }
   };
 
@@ -67,67 +67,77 @@ const FeeStatus = ({navigation}) => {
   const renderItem = ({item}) => (
     <TouchableOpacity onPress={() => handleShowYears(item)}>
       <View style={styles.item}>
-        <Text>{item.studentName}</Text>
-        {/* Display fee status details here */}
+        <Text style={styles.itemText}>{item.studentName}</Text>
       </View>
     </TouchableOpacity>
   );
 
-  const openStatusForm = student => {
-    // Navigate to FeeStatusForm page with pre-populated fields
-    // Pass student details as props to FeeStatusForm component
-    // gett the current year
-    let _year = new Date().getFullYear().toString();
-    console.log('Current Year:', student);
-    // console.log('Student:', student);
+  const openStatusForm = () => {
+    const currentYear = new Date().getFullYear().toString();
     navigation.navigate('FeeStatusForm', {
-      year: _year,
-      newStudent: student,
+      year: currentYear,
+      student: student,
     });
-    // console.log('Student:', student);
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        placeholder="Search by Student Registration Number"
-      />
-      <Button title="Search" onPress={handleSearch} />
-      <FlatList
-        data={students}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-      />
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={handleCloseModal}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Fee Status Years</Text>
-            <FlatList
-              data={years}
-              keyExtractor={item => item}
-              renderItem={({item}) => (
-                <TouchableOpacity
-                  style={styles.yearItem}
-                  onPress={() =>
-                    navigation.navigate('FeeStatusForm', {student, year: item})
-                  }>
-                  <Text style={styles.yearText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-            />
-            <Button title="Add Fee Status" onPress={openStatusForm} />
-            <Button title="Close" onPress={handleCloseModal} />
+    <>
+      <Header title="Fee Status" />
+      <ScrollView style={styles.container}>
+        <TextInput
+          style={styles.input}
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          placeholder="Search by Student Registration Number"
+          placeholderTextColor="#888"
+        />
+        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+          <Text style={styles.searchButtonText}>Search</Text>
+        </TouchableOpacity>
+        <FlatList
+          data={students}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+        />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={handleCloseModal}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Fee Status Years</Text>
+              <FlatList
+                data={years}
+                keyExtractor={item => item}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    style={styles.yearItem}
+                    onPress={() =>
+                      navigation.navigate('FeeStatusForm', {
+                        student,
+                        year: item,
+                      })
+                    }>
+                    <Text style={styles.yearText}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={openStatusForm}>
+                <Text style={styles.addButtonText}>Add Fee Status</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={handleCloseModal}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </ScrollView>
+    </>
   );
 };
 
@@ -135,19 +145,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 4,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+  },
+  searchButton: {
+    backgroundColor: 'rgba(142, 9, 168, 0.675)',
     padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
     marginBottom: 20,
   },
+  searchButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
   item: {
-    padding: 10,
+    padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#ddd',
+    backgroundColor: '#fff',
+    marginBottom: 10,
+    borderRadius: 8,
+  },
+  itemText: {
+    fontSize: 16,
   },
   modalContainer: {
     flex: 1,
@@ -163,16 +191,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
   },
   yearItem: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#ddd',
   },
   yearText: {
+    fontSize: 16,
+  },
+  addButton: {
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+    width: '100%',
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  closeButton: {
+    backgroundColor: '#f44336',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+    width: '100%',
+  },
+  closeButtonText: {
+    color: '#fff',
     fontSize: 16,
   },
 });

@@ -15,6 +15,7 @@ import {
   Button,
   Image,
 } from 'react-native';
+
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
 import {
   collection,
@@ -23,10 +24,14 @@ import {
   where,
   setDoc,
   doc,
+  Platform,
 } from 'firebase/firestore';
+import {getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
 import Header from '../../../components/header';
 import {years} from '../../../data/academicYear';
 import {subjectByClass} from '../../../data/classes';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {set} from 'firebase/database';
 
 const ClassDetails = ({route, navigation}) => {
   const {classId} = route.params;
@@ -41,6 +46,55 @@ const ClassDetails = ({route, navigation}) => {
   const [newStudentRollNo, setNewStudentRollNo] = useState('');
   const [newStudentName, setNewStudentName] = useState('');
   const [allStudents, setAllStudents] = useState([]);
+  const [image, setImage] = useState(null);
+  const [transferred, setTransferred] = useState(0);
+  const [subjectModalVisible, setSubjectModalVisible] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+
+  const _storage = getStorage();
+
+  const chooseImage = async () => {
+    launchImageLibrary({mediaType: 'photo'}, async response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        const source = {uri: response.assets[0].uri};
+        console.log(source);
+        await uploadImage(source.uri);
+      }
+    });
+  };
+  const uploadImage = async uri => {
+    const filename = uri.substring(uri.lastIndexOf('/') + 1);
+    console.log('filename', filename);
+    console.log('uploadUri', uri);
+    const storageRef = ref(_storage, `images/${filename}`);
+    console.log('storageRef', storageRef);
+    uploadBytes(storageRef, uri).then(snapshot => {
+      console.log('Uploaded a blob or file!', snapshot);
+      getDownloadURL(storageRef).then(url => {
+        console.log('url', url);
+        saveImageURLToFirestore(url);
+        setImageUrl(url);
+        setImage(filename);
+      });
+    });
+  };
+  const saveImageURLToFirestore = async url => {
+    try {
+      await setDoc(doc(FIREBASE_DB, 'syllabus', `${classId}`), {
+        [selectedYear]: {
+          syllabus: url,
+        },
+      });
+      console.log('Image URL saved to Firestore!');
+    } catch (e) {
+      console.error('Error saving image URL to Firestore: ', e);
+    }
+  };
 
   useEffect(() => {
     if (selectedYear) {
@@ -172,12 +226,14 @@ const ClassDetails = ({route, navigation}) => {
     </TouchableOpacity>
   );
 
-  const handleEditTeacher = subject => {
-    navigation.navigate('EditTeacherAssignment', {
-      classId,
-      subject,
-      year: selectedYear,
-    });
+  const handleEditSubject = subject => {
+    setSelectedSubject(subject);
+    setSubjectModalVisible(true);
+    // navigation.navigate('EditTeacherAssignment', {
+    //   classId,
+    //   subject,
+    //   year: selectedYear,
+    // });
   };
 
   const getTeacherForSubject = subject => {
@@ -247,7 +303,7 @@ const ClassDetails = ({route, navigation}) => {
                 <Text style={styles.teacherText}>
                   {getTeacherForSubject(subject)}
                 </Text>
-                <TouchableOpacity onPress={() => handleEditTeacher(subject)}>
+                <TouchableOpacity onPress={() => handleEditSubject(subject)}>
                   <Image
                     source={require('../../../assets/icons/pencil.png')}
                     style={styles.editIcon}
@@ -258,6 +314,9 @@ const ClassDetails = ({route, navigation}) => {
           </Animated.View>
         )}
       </ScrollView>
+      <View>
+        <Button title="Choose Image" onPress={chooseImage} />
+      </View>
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => setModalVisible(true)}>
@@ -300,6 +359,55 @@ const ClassDetails = ({route, navigation}) => {
               <Button
                 title="Cancel"
                 onPress={() => setModalVisible(false)}
+                color="#FF0000"
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+      {/* modal for uploading image and assigning teacher */}
+      <Modal
+        visible={subjectModalVisible}
+        transparent={true}
+        animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Assign Teacher</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Teacher"
+              value={getTeacherForSubject(selectedSubject)}
+              editable={false}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Subject"
+              value={selectedSubject}
+              onChangeText={text => setSelectedSubject(text)}
+            />
+            {/* <Text>Syllabus:</Text>
+            <Text>
+              {image ? (
+                <Image
+                  source={{uri: image}}
+                  style={{width: 200, height: 200, marginVertical: 10}}
+                />
+              ) : (
+                'No image selected'
+              )}
+            </Text> */}
+            <View>
+              <Button title="Choose Image" onPress={chooseImage} />
+            </View>
+            <View style={styles.modalButtons}>
+              <Button
+                title="Assign"
+                onPress={() => setSubjectModalVisible(false)}
+                color="#007BFF"
+              />
+              <Button
+                title="Cancel"
+                onPress={() => setSubjectModalVisible(false)}
                 color="#FF0000"
               />
             </View>

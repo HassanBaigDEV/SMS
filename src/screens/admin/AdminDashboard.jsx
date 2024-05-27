@@ -45,9 +45,9 @@ const AdminDashboard = ({navigation}) => {
         <TouchableOpacity onPress={() => navigation.navigate('TeacherList')}>
           <Text>Manage Teachers</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('ManageFees')}>
+        {/* <TouchableOpacity onPress={() => navigation.navigate('ManageFees')}>
           <Text>Manage Fees</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => navigation.navigate('UploadTimetable')}>
           <Text>Upload Timetable</Text>
@@ -81,16 +81,6 @@ const AdminDashboard = ({navigation}) => {
             navigation.navigate('FeeStatus');
           }}>
           <Text>Fee Status</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('FeeStatusForm', {
-              student: null,
-              year: null,
-              newStudent: null,
-            });
-          }}>
-          <Text>Fee Status Form</Text>
         </TouchableOpacity>
       </View>
     </>

@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   editIcon: {
     width: 23,
     height: 23,
-    tintColor: '#007BFF',
+    tintColor: 'rgb(0, 123, 255)',
   },
   deleteButtonText: {
     color: '#fff',

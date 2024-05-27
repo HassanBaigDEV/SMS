@@ -1,18 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TextInput, Button, Alert, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import {addFeeStatus} from '../../../utils/feeStatus';
-
-// Function to add fee status, adjust the import as necessary
+import Header from '../../../components/header';
 
 const FeeStatusForm = ({route, navigation}) => {
   const {student, year, newStudent} = route.params;
-  // const [registrationNumber, setRegistrationNumber] = useState('');
-  // const [studentName, setStudentName] = useState('');
-  // const [amountDue, setAmountDue] = useState('');
-  // const [amountPaid, setAmountPaid] = useState('');
-  // const [payableAmount, setPayableAmount] = useState('');
-  // const [paymentDate, setPaymentDate] = useState('');
-  // const [remarks, setRemarks] = useState('');
 
   const [feeDetails, setFeeDetails] = useState({
     registrationNumber: '',
@@ -23,41 +25,43 @@ const FeeStatusForm = ({route, navigation}) => {
     paymentDate: '',
     remarks: '',
   });
-  useEffect(() => {
-    // console.log('student:', student);
-  }, [student]);
 
   useEffect(() => {
+    console.log('student:', student);
+    console.log('newStudent:', newStudent);
+
     if (student) {
-      // console.log('student:', student.feeStatus[year].amountDue);
-      setFeeDetails({
-        ...feeDetails,
-        registrationNumber: student.registrationNumber,
-        studentName: student.studentName,
-        amountDue: student.feeStatus[year].amountDue.toString(),
-        amountPaid: student.feeStatus[year].amountPaid.toString(),
-        payableAmount: student.feeStatus[year].payableAmount.toString(),
-        paymentDate: student.feeStatus[year].paymentDate.toString(),
-        remarks: student.feeStatus[year].remarks.toString(),
-      });
-    } else if (newStudent) {
-      console.log('newStudent:', newStudent.registrationNumber);
-      setFeeDetails({
-        ...feeDetails,
-        registrationNumber: newStudent.registrationNumber,
-        studentName: newStudent.studentName,
-      });
+      const feeStatusForYear = student.feeStatus?.[year];
+      if (feeStatusForYear) {
+        setFeeDetails({
+          registrationNumber: student.registrationNumber,
+          studentName: student.studentName,
+          amountDue: feeStatusForYear.amountDue?.toString() || '',
+          amountPaid: feeStatusForYear.amountPaid?.toString() || '',
+          payableAmount: feeStatusForYear.payableAmount?.toString() || '',
+          paymentDate: feeStatusForYear.paymentDate?.toString() || '',
+          remarks: feeStatusForYear.remarks?.toString() || '',
+        });
+      } else {
+        setFeeDetails({
+          registrationNumber: student.registrationNumber,
+          studentName: student.studentName,
+          amountDue: '',
+          amountPaid: '',
+          payableAmount: '',
+          paymentDate: '',
+          remarks: '',
+        });
+      }
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigation]);
+  }, [student, year]);
 
   const handleAddFeeStatus = async () => {
     try {
       console.log('feeDetails:', feeDetails);
       await addFeeStatus(feeDetails, feeDetails.registrationNumber);
       Alert.alert('Success', 'Fee status added successfully.');
-      // Clear form fields after successful submission
       setFeeDetails({
         registrationNumber: '',
         studentName: '',
@@ -71,8 +75,8 @@ const FeeStatusForm = ({route, navigation}) => {
       Alert.alert('Error', error.message);
     }
   };
+
   const handleChange = (name, value) => {
-    // let _arr = {...feeDetails};
     setFeeDetails(prevState => ({
       ...prevState,
       [name]: value.toString(),
@@ -81,137 +85,106 @@ const FeeStatusForm = ({route, navigation}) => {
 
   return (
     <>
-      {student ? (
-        <View style={styles.container}>
-          <Text style={styles.label}>Registration Number:</Text>
-          <TextInput
-            style={styles.input}
-            value={student.registrationNumber}
-            editable={false}
-          />
-          <Text style={styles.label}>Student Name:</Text>
-          <TextInput
-            style={styles.input}
-            value={student.studentName}
-            editable={false}
-          />
-          <Text style={styles.label}>Amount Due:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.amountDue}
-            onChangeText={text => handleChange('amountDue', text)}
-            placeholder="Enter amount due"
-            keyboardType="numeric"
-          />
-          <Text style={styles.label}>Amount Paid:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.amountPaid}
-            onChangeText={text => handleChange('amountPaid', text)}
-            placeholder="Enter amount paid"
-            keyboardType="numeric"
-          />
-          <Text style={styles.label}>Payable Amount:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.payableAmount}
-            onChangeText={text => handleChange('payableAmount', text)}
-            placeholder="Enter payable amount"
-            keyboardType="numeric"
-          />
-          <Text style={styles.label}>Payment Date:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.paymentDate}
-            onChangeText={text => handleChange('paymentDate', text)}
-            placeholder="Enter payment date"
-          />
-          <Text style={styles.label}>Remarks:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.remarks}
-            onChangeText={text => handleChange('remarks', text)}
-            placeholder="Enter remarks"
-          />
-          <Button title="Update Fee Status" onPress={handleAddFeeStatus} />
-        </View>
-      ) : (
-        <View style={styles.container}>
-          <Text style={styles.label}>Registration Number:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.registrationNumber}
-            // onChangeText={text => handleChange('registrationNumber', text)}
-            // placeholder="Enter registration number"
-          />
-          <Text style={styles.label}>Student Name:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.studentName}
-            onChangeText={text => handleChange('studentName', text)}
-            placeholder="Enter student name"
-          />
-          <Text style={styles.label}>Amount Due:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.amountDue}
-            onChangeText={text => handleChange('amountDue', text)}
-            placeholder="Enter amount due"
-            keyboardType="numeric"
-          />
-          <Text style={styles.label}>Amount Paid:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.amountPaid}
-            onChangeText={text => handleChange('amountPaid', text)}
-            placeholder="Enter amount paid"
-            keyboardType="numeric"
-          />
-          <Text style={styles.label}>Payable Amount:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.payableAmount}
-            onChangeText={text => handleChange('payableAmount', text)}
-            placeholder="Enter payable amount"
-            keyboardType="numeric"
-          />
-          <Text style={styles.label}>Payment Date:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.paymentDate}
-            onChangeText={text => handleChange('paymentDate', text)}
-            placeholder="Enter payment date"
-          />
-          <Text style={styles.label}>Remarks:</Text>
-          <TextInput
-            style={styles.input}
-            value={feeDetails.remarks}
-            onChangeText={text => handleChange('remarks', text)}
-            placeholder="Enter remarks"
-          />
-          <Button title="Add Fee Status" onPress={handleAddFeeStatus} />
-        </View>
-      )}
+      <Header title="Fee Status Form" />
+      <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : null}>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          <View style={styles.formContainer}>
+            <Text style={styles.label}>Registration Number:</Text>
+            <TextInput
+              style={styles.input}
+              value={student?.registrationNumber}
+              placeholder="Enter registration number"
+              editable={false}
+            />
+            <Text style={styles.label}>Student Name:</Text>
+            <TextInput
+              style={styles.input}
+              value={student?.studentName}
+              placeholder="Enter student name"
+              editable={false}
+            />
+            <Text style={styles.label}>Amount Due:</Text>
+            <TextInput
+              style={styles.input}
+              value={feeDetails.amountDue}
+              onChangeText={text => handleChange('amountDue', text)}
+              placeholder="Enter amount due"
+              keyboardType="numeric"
+            />
+            <Text style={styles.label}>Amount Paid:</Text>
+            <TextInput
+              style={styles.input}
+              value={feeDetails.amountPaid}
+              onChangeText={text => handleChange('amountPaid', text)}
+              placeholder="Enter amount paid"
+              keyboardType="numeric"
+            />
+            <Text style={styles.label}>Payable Amount:</Text>
+            <TextInput
+              style={styles.input}
+              value={feeDetails.payableAmount}
+              onChangeText={text => handleChange('payableAmount', text)}
+              placeholder="Enter payable amount"
+              keyboardType="numeric"
+            />
+            <Text style={styles.label}>Payment Date:</Text>
+            <TextInput
+              style={styles.input}
+              value={feeDetails.paymentDate}
+              onChangeText={text => handleChange('paymentDate', text)}
+              placeholder="Enter payment date"
+            />
+            <Text style={styles.label}>Remarks:</Text>
+            <TextInput
+              style={styles.input}
+              value={feeDetails.remarks}
+              onChangeText={text => handleChange('remarks', text)}
+              placeholder="Enter remarks"
+            />
+          </View>
+        </ScrollView>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddFeeStatus}>
+          <Text style={styles.addButtonText}>Add Fee Status</Text>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollViewContent: {
+    flexGrow: 1,
+    justifyContent: 'space-between',
+  },
+  formContainer: {
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
   },
   label: {
     fontSize: 16,
-    marginBottom: 10,
+    marginBottom: 8,
+    color: '#333',
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 4,
-    padding: 10,
-    marginBottom: 20,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    backgroundColor: '#fff',
+  },
+  addButton: {
+    backgroundColor: 'rgb(0, 123, 255)',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    margin: 20,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 

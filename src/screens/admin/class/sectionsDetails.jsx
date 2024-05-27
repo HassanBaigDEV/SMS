@@ -115,9 +115,9 @@ const SectionDetails = ({route}) => {
   //     );
   //   setAllStudents(studentList);
   // };
-  useEffect(() => {
-    fetchAllStudents();
-  });
+  // useEffect(() => {
+  //   fetchAllStudents();
+  // });
 
   const handleAddStudent = async () => {
     if (newStudentRollNo.trim() === '' || newStudentName.trim() === '') {
