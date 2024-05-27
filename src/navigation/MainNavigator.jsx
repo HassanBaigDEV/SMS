@@ -101,72 +101,72 @@ const AdminNavigator = () => {
       <Stack.Screen
         name="SubjectsList"
         component={SubjectsList}
-        options={{title: 'Subjects'}}
+        options={{title: 'Subjects', headerShown: false}}
       />
       <Stack.Screen
         name="SectionsList"
         component={SectionsList}
-        options={{title: 'Sections'}}
+        options={{title: 'Sections', headerShown: false}}
       />
       <Stack.Screen
         name="SectionDetails"
         component={SectionDetails}
-        options={{title: 'Section Details'}}
+        options={{title: 'Section Details', headerShown: false}}
       />
       <Stack.Screen
         name="addStudent"
         component={CreateStudentForm}
-        options={{title: 'Add Student'}}
+        options={{title: 'Add Student', headerShown: false}}
       />
       <Stack.Screen
         name="AddTeacher"
         component={AddTeacherForm}
-        options={{title: 'Add Teacher'}}
+        options={{title: 'Add Teacher', headerShown: false}}
       />
       <Stack.Screen
         name="Students"
         component={StudentList}
-        options={{title: 'Students'}}
+        options={{title: 'Students', headerShown: false}}
       />
       <Stack.Screen
         name="StudentDetails"
         component={StudentDetail}
-        options={{title: 'Student Details'}}
+        options={{title: 'Student Details', headerShown: false}}
       />
       <Stack.Screen
         name="EditStudent"
         component={EditStudent}
-        options={{title: 'Edit Student'}}
+        options={{title: 'Edit Student', headerShown: false}}
       />
       <Stack.Screen
         name="TeacherList"
         component={TeacherList}
-        options={{title: 'Teachers'}}
+        options={{title: 'Teachers', headerShown: false}}
       />
       <Stack.Screen
         name="TeacherDetails"
         component={TeacherDetail}
-        options={{title: 'Teacher Details'}}
+        options={{title: 'Teacher Details', headerShown: false}}
       />
       <Stack.Screen
         name="EditTeacher"
         component={EditTeacher}
-        options={{title: 'Edit Teacher'}}
+        options={{title: 'Edit Teacher', headerShown: false}}
       />
       <Stack.Screen
         name="StudentAgeRecord"
         component={StudentAgeRecord}
-        options={{title: 'Student Age Record'}}
+        options={{title: 'Student Age Record', headerShown: false}}
       />
       <Stack.Screen
         name="FeeStatusForm"
         component={FeeStatusForm}
-        options={{title: 'Fee Status'}}
+        options={{title: 'Fee Status', headerShown: false}}
       />
       <Stack.Screen
         name="FeeStatus"
         component={FeeStatus}
-        options={{title: 'Fee Status'}}
+        options={{title: 'Fee Status', headerShown: false}}
       />
       {/* <Stack.Screen
           name="ManageStudents"

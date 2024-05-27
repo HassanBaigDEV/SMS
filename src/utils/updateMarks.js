@@ -7,6 +7,7 @@ export const handleUpdateMarks = async (
   registrationNumber,
   year,
   newMarks,
+  remarks,
 ) => {
   try {
     const studentRef = doc(FIREBASE_DB, `students/${registrationNumber}`);
@@ -35,10 +36,13 @@ export const handleUpdateMarks = async (
         [year]: {
           ...currentMarks[year],
           ...newMarks,
+          yearlyRemarks: remarks,
         },
       };
 
-      await updateDoc(studentRef, {marks: updatedMarks});
+      await updateDoc(studentRef, {
+        marks: updatedMarks,
+      });
       Alert.alert('Success', 'Marks updated successfully.');
     } else {
       Alert.alert('Error', 'Student not found.');
@@ -49,10 +53,16 @@ export const handleUpdateMarks = async (
 };
 
 //example usage
-handleUpdateMarks('Class 4', 589, 2020, {
-  English: {
-    firstterm: 50,
-    midTerm: 100,
-    finalTerm: 10,
-  },
-});
+// handleUpdateMarks(
+//   'Class 4',
+//   589,
+//   2020,
+//   {
+//     English: {
+//       firstTerm: 50,
+//       midTerm: 100,
+//       finalTerm: 10,
+//     },
+//   },
+//   'average performance',
+// );

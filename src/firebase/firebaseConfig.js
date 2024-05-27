@@ -57,5 +57,20 @@ export const signUp = async (email, password, role) => {
   }
 };
 
+// import {handleUpdateMarks} from '../utils/updateMarks';
+// handleUpdateMarks(
+//   'Class 4',
+//   589,
+//   2020,
+//   {
+//     English: {
+//       firstTerm: 50,
+//       midTerm: 100,
+//       finalTerm: 10,
+//     },
+//   },
+//   'average performance',
+// );
+
 // // Example usage
 // signUp('admin@admin.com', 'admin123', 'admin');

@@ -1,8 +1,17 @@
 // EditTeacher.js
 import React, {useState, useEffect} from 'react';
-import {View, Text, TextInput, Button, Alert, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  Alert,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
 import {doc, getDoc, setDoc, updateDoc, collection} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
+import {years} from '../../../data/academicYear';
 
 const EditTeacher = ({route, navigation}) => {
   const {teacherId, isNew} = route.params;
@@ -10,7 +19,10 @@ const EditTeacher = ({route, navigation}) => {
   const [teacherData, setTeacherData] = useState({
     teacherName: '',
     email: '',
-    classAssigned: '',
+    academicYear: years.reduce((acc, year) => {
+      acc[year] = {classAssigned: '', subject: ''};
+      return acc;
+    }, {}),
   });
 
   useEffect(() => {
@@ -42,6 +54,19 @@ const EditTeacher = ({route, navigation}) => {
     });
   };
 
+  const handleYearInputChange = (year, field, value) => {
+    setTeacherData(prevState => ({
+      ...prevState,
+      academicYear: {
+        ...prevState.academicYear,
+        [year]: {
+          ...prevState.academicYear[year],
+          [field]: value,
+        },
+      },
+    }));
+  };
+
   const handleSave = async () => {
     try {
       const teacherRef = isNew
@@ -61,7 +86,7 @@ const EditTeacher = ({route, navigation}) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.label}>Edit Teacher Details</Text>
 
       <TextInput
@@ -76,23 +101,34 @@ const EditTeacher = ({route, navigation}) => {
         value={teacherData.email}
         onChangeText={text => handleInputChange('email', text)}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Assigned Class"
-        value={teacherData.classAssigned}
-        onChangeText={text => handleInputChange('classAssigned', text)}
-      />
-      {/* <TextInput
-        style={styles.input}
-        placeholder="Other Details"
-        value={teacherData.otherDetails}
-        onChangeText={text => handleInputChange('otherDetails', text)}
-      /> */}
+
+      {years.map(year => (
+        <View key={year} style={styles.yearSection}>
+          <Text style={styles.yearLabel}>{year}</Text>
+          <Text style={styles.label}>Class Assigned</Text>
+          <TextInput
+            style={styles.input}
+            value={teacherData?.academicYear[year]?.classAssigned || ''}
+            placeholder="Format Class 5"
+            onChangeText={text =>
+              handleYearInputChange(year, 'classAssigned', text)
+            }
+          />
+          <Text style={styles.label}>Subject</Text>
+          <TextInput
+            style={styles.input}
+            value={teacherData?.academicYear[year]?.subject || ''}
+            placeholder="Subject"
+            onChangeText={text => handleYearInputChange(year, 'subject', text)}
+          />
+        </View>
+      ))}
+
       <View style={styles.buttonContainer}>
         <Button title="Save" onPress={handleSave} />
         <Button title="Cancel" onPress={() => navigation.goBack()} />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -113,6 +149,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 4,
+  },
+  yearSection: {
+    marginBottom: 20,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+  },
+  yearLabel: {
+    fontWeight: 'bold',
+    marginBottom: 10,
+    fontSize: 16,
   },
   buttonContainer: {
     flexDirection: 'row',

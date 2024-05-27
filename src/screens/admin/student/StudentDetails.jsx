@@ -1,26 +1,22 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, Button, Alert, StyleSheet} from 'react-native';
 import {
-  doc,
-  getDoc,
-  deleteDoc,
-  updateDoc,
-  arrayRemove,
-  collection,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore';
+  View,
+  Text,
+  Button,
+  Alert,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+} from 'react-native';
+import {doc, getDoc, deleteDoc, collection, getDocs} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
-import {years} from '../../../data/academicYear';
+import Header from '../../../components/header';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const StudentDetail = ({route, navigation}) => {
   const {registrationNumber} = route.params;
-
   const [student, setStudent] = useState(null);
   const [students, setStudents] = useState([]);
-  const classIds = ['class 1', 'class 2', 'class 5'];
-  const currentYear = new Date().getFullYear().toString();
 
   const fetchStudents = async () => {
     try {
@@ -31,14 +27,18 @@ const StudentDetail = ({route, navigation}) => {
         ...doc.data(),
       }));
 
-      // console.log('Fetched students:', studentList); // Log the fetched students
       setStudents(studentList);
 
-      studentList.map(student => {
-        if (student.registrationNumber == registrationNumber) {
-          setStudent(student);
-        }
-      });
+      const foundStudent = studentList.find(
+        student => student.registrationNumber == registrationNumber,
+      );
+      if (foundStudent) {
+        let _date = new Date(foundStudent.dateOfBirth);
+        let _date2 = new Date(foundStudent.dateOfAdmission);
+        foundStudent.dateOfBirth = _date.toDateString();
+        foundStudent.dateOfAdmission = _date2.toDateString();
+        setStudent(foundStudent);
+      }
     } catch (error) {
       console.error('Error fetching students:', error);
     }
@@ -49,88 +49,10 @@ const StudentDetail = ({route, navigation}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [registrationNumber, navigation]);
 
-  //   const handleDeleteStudent = async () => {
-  //     try {
-  //       // Delete the student document from the students collection
-  //       const regNo = registrationNumber.toString();
-
-  //       //   await deleteDoc(doc(FIREBASE_DB, 'students', regNo));
-
-  //       // Delete references in classes and sections
-  //       const classesCollection = collection(FIREBASE_DB, 'classes');
-  //       const classSnapshot = await getDocs(classesCollection);
-  //       const classList = classSnapshot.docs.map(doc => doc.id);
-
-  //       for (const classId of classList) {
-  //         const sectionsCollection = collection(
-  //           FIREBASE_DB,
-  //           `classes/${classId}/sections`,
-  //         );
-  //         const sectionSnapshot = await getDocs(sectionsCollection);
-  //         const sectionList = sectionSnapshot.docs.map(doc => doc.id);
-
-  //         for (const sectionId of sectionList) {
-  //           const sectionDocRef = doc(
-  //             FIREBASE_DB,
-  //             `classes/${classId}/sections/${sectionId}`,
-  //           );
-
-  //           // Remove the student from the section's students array
-  //           await updateDoc(sectionDocRef, {
-  //             students: arrayRemove(regNo), // Remove the student by registration number
-  //           });
-  //         }
-  //       }
-
-  //       //   // Update the local students state
-  //       const updatedStudents = students.filter(
-  //         student => student.id != registrationNumber,
-  //       );
-  //       setStudents(updatedStudents);
-
-  //       Alert.alert('Success', 'Student deleted successfully');
-  //       navigation.goBack();
-  //     } catch (error) {
-  //       console.error('Error deleting student:', error);
-  //       Alert.alert('Error', 'Error deleting student');
-  //     }
-  //   };
-
   const handleDeleteStudent = async () => {
     try {
-      // Delete the student document from the students collection
       const regNo = registrationNumber.toString();
       await deleteDoc(doc(FIREBASE_DB, 'students', regNo));
-
-      // Delete references in all class/year documents
-      //   for (const classId of classIds) {
-      //     const path = `classes/${classId}/${currentYear}`;
-      //     const classDocRef = doc(FIREBASE_DB, path, regNo);
-      //     const classDoc = await getDoc(classDocRef);
-
-      //     const collectionRef = collection(FIREBASE_DB, path);
-      //     console.log(collectionRef.listDocuments());
-
-      //     if (classDoc) {
-      //       await deleteDoc(classDocRef);
-      //       console.log(`Deleted document: ${classDocRef.id}`);
-      //     } else {
-      //       console.log(`Document does not exist: ${classDocRef.id}`);
-      //     }
-      //   }
-
-      //   Alert.alert('Success', 'Student deleted successfully');
-      //   navigation.goBack();
-      //   const reg = '1234';
-      //   const collectionRef = collection(FIREBASE_DB, `classes/class 5/2024`);
-
-      //   // Create a query against the collection.
-      //   const q = query(collectionRef, where('registrationNumber', '==', reg));
-
-      //   const querySnapshot = await getDocs(q);
-      //   querySnapshot.forEach(doc => {
-      //     console.log(doc.id, ' => ', doc.data());
-      //   });
 
       Alert.alert('Success', 'Student deleted successfully');
       navigation.goBack();
@@ -146,33 +68,75 @@ const StudentDetail = ({route, navigation}) => {
 
   if (!student) {
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
+      <View style={styles.loadingContainer}>
+        {/* <Text style={styles.loadingText}>Loading...</Text> */}
+        <ActivityIndicator size="large" color="#007BFF" />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>
-        Registration Number: {student.registrationNumber}
-      </Text>
-      <Text style={styles.label}>Name: {student.studentName}</Text>
-      <Text style={styles.label}>Date of Birth: {student.dateOfBirth}</Text>
-      <Text style={styles.label}>
-        Date of Admission: {student.dateOfAdmission}
-      </Text>
-      <Text style={styles.label}>Gender: {student.gender}</Text>
-      <Text style={styles.label}>Father's Name: {student.fatherName}</Text>
-      <Text style={styles.label}>Occupation: {student.occupation}</Text>
-      <Text style={styles.label}>Residence: {student.residence}</Text>
-      <Text style={styles.label}>Email: {student.email}</Text>
-      <Text style={styles.label}>Remarks: {student.remarks}</Text>
-      <View style={styles.buttonContainer}>
-        <Button title="Edit" onPress={handleEditStudent} />
-        <Button title="Delete" onPress={handleDeleteStudent} />
+    <>
+      <Header title="Student Details" />
+      <View style={styles.container}>
+        {/* <Text style={styles.title}>Student Details</Text> */}
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>Registration Number:</Text>
+          <Text style={styles.value}>{student.registrationNumber}</Text>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>Name:</Text>
+          <Text style={styles.value}>{student.studentName}</Text>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>Date of Birth:</Text>
+          <Text style={styles.value}>{student.dateOfBirth}</Text>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>Date of Admission:</Text>
+          <Text style={styles.value}>{student.dateOfAdmission}</Text>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>Gender:</Text>
+          <Text style={styles.value}>{student.gender}</Text>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>Father's Name:</Text>
+          <Text style={styles.value}>{student.fatherName}</Text>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>Occupation:</Text>
+          <Text style={styles.value}>{student.occupation}</Text>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>Residence:</Text>
+          <Text style={styles.value}>{student.residence}</Text>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>Email:</Text>
+          <Text style={styles.value}>{student.email}</Text>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.label}>Remarks:</Text>
+          <Text style={styles.value}>{student.remarks}</Text>
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleEditStudent}>
+            <Image
+              source={require('../../../assets/icons/pen.png')}
+              style={styles.trashButton}
+            />
+          </TouchableOpacity>
+          {/* <Button title="Edit" onPress={handleEditStudent} color="#007BFF" /> */}
+          <TouchableOpacity onPress={handleDeleteStudent}>
+            <Image
+              source={require('../../../assets/icons/bin.png')}
+              style={styles.trashButton}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </>
   );
 };
 
@@ -180,16 +144,57 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#f9f9f9',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#666',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  detailContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    marginBottom: 10,
     backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   label: {
     fontSize: 16,
-    marginBottom: 10,
+    color: '#555',
+    fontWeight: '500',
+  },
+  value: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '400',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
+  },
+  trashButton: {
+    width: 30,
+    height: 30,
+    // tintColor: '#66a0de',
   },
 });
 

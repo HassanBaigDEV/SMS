@@ -85,36 +85,36 @@ const SectionDetails = ({route}) => {
   //   // fetchStudents();
   // }, [classId]);
 
-  //   useEffect(() => {
-  //     const fetchAllStudents = async () => {
-  //       const studentsCollection = collection(FIREBASE_DB, 'students');
-  //       const studentSnapshot = await getDocs(studentsCollection);
-  //       const studentList = studentSnapshot.docs
-  //         .map(doc => ({
-  //           id: doc.id,
-  //           ...doc.data(),
-  //         }))
-  //         .filter(
-  //           student => student.registrationNumber === Number(newStudentRollNo),
-  //         );
-  //       setAllStudents(studentList);
-  //     };
+  useEffect(() => {
+    const fetchAllStudents = async () => {
+      const studentsCollection = collection(FIREBASE_DB, 'students');
+      const studentSnapshot = await getDocs(studentsCollection);
+      const studentList = studentSnapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .filter(
+          student => student.registrationNumber === Number(newStudentRollNo),
+        );
+      setAllStudents(studentList);
+    };
 
-  //     fetchAllStudents();
-  //   }, [newStudentRollNo]);
-  const fetchAllStudents = async () => {
-    const studentsCollection = collection(FIREBASE_DB, 'students');
-    const studentSnapshot = await getDocs(studentsCollection);
-    const studentList = studentSnapshot.docs
-      .map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      .filter(student =>
-        student.registrationNumber.toString().includes(newStudentRollNo),
-      );
-    setAllStudents(studentList);
-  };
+    fetchAllStudents();
+  }, [newStudentRollNo]);
+  // const fetchAllStudents = async () => {
+  //   const studentsCollection = collection(FIREBASE_DB, 'students');
+  //   const studentSnapshot = await getDocs(studentsCollection);
+  //   const studentList = studentSnapshot.docs
+  //     .map(doc => ({
+  //       id: doc.id,
+  //       ...doc.data(),
+  //     }))
+  //     .filter(student =>
+  //       student.registrationNumber.toString().includes(newStudentRollNo),
+  //     );
+  //   setAllStudents(studentList);
+  // };
   useEffect(() => {
     fetchAllStudents();
   });
