@@ -91,12 +91,12 @@ const AdminNavigator = () => {
       <Stack.Screen
         name="ClassList"
         component={ClassList}
-        options={{title: 'Classes'}}
+        options={{title: 'Classes', headerShown: false}}
       />
       <Stack.Screen
         name="ClassDetails"
         component={ClassDetails}
-        options={{title: 'Class Details'}}
+        options={{title: 'Class Details', headerShown: false}}
       />
       <Stack.Screen
         name="SubjectsList"

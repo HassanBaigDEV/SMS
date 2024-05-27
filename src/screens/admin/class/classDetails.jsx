@@ -2,22 +2,27 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {years} from '../../../data/academicYear';
+import {ScrollView} from 'react-native-gesture-handler';
+import Header from '../../../components/header';
 
 const ClassDetails = ({route, navigation}) => {
   const {classId} = route.params;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Class {classId}</Text>
-      {/* mapp years in touchable */}
-      {years.map(year => (
-        <TouchableOpacity
-          onPress={() => navigation.navigate('SectionsList', {classId, year})}>
-          <Text style={styles.item}>{year} </Text>
-        </TouchableOpacity>
-      ))}
+    <>
+      <Header title={`Class ${classId}`} />
+      <ScrollView style={styles.container}>
+        {/* mapp years in touchable */}
+        {years.map(year => (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('SectionsList', {classId, year})
+            }>
+            <Text style={styles.item}>{year} </Text>
+          </TouchableOpacity>
+        ))}
 
-      {/* <TouchableOpacity
+        {/* <TouchableOpacity
         onPress={() => navigation.navigate('SubjectsList', {classId})}>
         <Text style={styles.item}>Subjects </Text>
       </TouchableOpacity>
@@ -25,7 +30,8 @@ const ClassDetails = ({route, navigation}) => {
         onPress={() => navigation.navigate('SectionsList', {classId})}>
         <Text style={styles.item}>Students </Text>
       </TouchableOpacity> */}
-    </View>
+      </ScrollView>
+    </>
   );
 };
 
