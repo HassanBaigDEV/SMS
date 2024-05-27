@@ -30,6 +30,9 @@ import EditTeacher from '../screens/admin/teacher/EditTeacher.jsx';
 import StudentAgeRecord from '../screens/admin/student/StudentAgeRecod.jsx';
 import FeeStatusForm from '../screens/admin/feeStatus/FeeStatusForm.jsx';
 import FeeStatus from '../screens/admin/feeStatus/index.jsx';
+import teacherLogin from '../screens/auth/teacherLogin.jsx';
+import teacherDashboard from '../screens/teacher/teacherDashboard.jsx';
+
 
 const Stack = createStackNavigator();
 
@@ -197,10 +200,48 @@ const AdminNavigator = () => {
   );
 };
 
+const TeacherNavigator = () => {
+  return (
+    <Stack.Navigator initialRouteName="teacherDashboard">
+      <Stack.Screen
+        name="teacherDashboard"
+        component={teacherDashboard}
+        options={{headerShown: false}}
+      />
+   {/*    <Stack.Screen
+        name="teacherDashboard"
+        component={teacherDashboard}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Marks"
+        component={Marks}
+        options={{ title: 'Marks' }}
+      />
+      <Stack.Screen
+        name="FeeStatus"
+        component={FeeStatus}
+        options={{ title: 'Fee Status' }}
+      />
+      <Stack.Screen
+        name="Timetable"
+        component={Timetable}
+        options={{ title: 'Timetable' }}
+      />
+      <Stack.Screen
+        name="Syllabus"
+        component={Syllabus}
+        options={{ title: 'Syllabus' }}
+      />  */}
+    </Stack.Navigator>
+  );
+};
+
+
 const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="AdminNavigator">
+      <Stack.Navigator initialRouteName="TeacherNavigator">
         <Stack.Screen
           name="StudentNavigator"
           component={StudentNavigator}
@@ -209,6 +250,11 @@ const Navigator = () => {
         <Stack.Screen
           name="AdminNavigator"
           component={AdminNavigator}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="TeacherNavigator"
+          component={TeacherNavigator}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
