@@ -1,10 +1,7 @@
 // import * as React from "react";
 import React, {useEffect, useState} from 'react';
-
-
 import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity } from "react-native";
 import { FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
-
 import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
 import {signInWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth';
 import {doc, getDoc} from 'firebase/firestore';
@@ -13,16 +10,10 @@ import 'firebase/firestore';
 
 
 
-
-
 const TeacherLogin = ({navigation}) => {
-
   const [user, setUser] = useState(null);
-
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
     useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, user => {
       console.log('USER IS STILL LOGGED IN: ', user);
@@ -31,46 +22,21 @@ const TeacherLogin = ({navigation}) => {
       }
     });
   }, [user]);
-
-
-
-
-
   const handleLogin = async () => {
-
-
-
       console.log(email)
       console.log(password)
-
-
-
-
     try {
-
-
       const userCredential = await signInWithEmailAndPassword(
         FIREBASE_AUTH,
         email,
         password,
       );
-
-
       setUser(userCredential.user);
-
       const uid = userCredential.user.uid;
-
       console.log('User signed in:', user);
-
-
       const userDoc = await getDoc(doc(FIREBASE_DB, 'users', uid));
-
       const userData = userDoc.data();
-
-
-
       if (userDoc.exists()) {
-
         console.log('userRole:', userData);
         if (userData.role === 'teacher') {
           // Admin-specific logic
@@ -82,68 +48,31 @@ const TeacherLogin = ({navigation}) => {
 
         }
       // navigation.navigate('TeacherDashboard');
-
       } 
       else 
       {
         alert('user not found');
       }
-      } 
-      
-      
-      
+      }   
       catch (error) {
       console.error('Login Error:', error);
       alert('Login failed. Please check your credentials.');
     }
   };
-
-
-
-
-
-
   return (
-
-
-
-
-
-
-
-
-
-
-
-
     <View style={styles.background}>
-
-
-
       <View style={styles.upperContainer}>
-
-
         <Image
           style={styles.graduationCapIcon}
           resizeMode="cover"
           source={require('../../assets/icons/graduation-cap.png')}
         />
-
-
       <Text style={[styles.aura, styles.auraTypo]}>Aura</Text>
 
       <Text style={[styles.signIn, styles.auraTypo]}>Sign In</Text>
         </View>
-
-
-
-
       <View style={[styles.bottomContainer]}>
-
-
-
       <Text style={[styles.phoneNumber, styles.textTypo]}>Email</Text>
-
       <View style={[styles.androidLarge1Item, styles.androidLayout]} />
        <TextInput
         style={[styles.text, styles.textInput]}
@@ -154,14 +83,7 @@ const TeacherLogin = ({navigation}) => {
         autoCapitalize="none"
         placeholderTextColor={Color.placeholderTextColor} // Set placeholder text color
       />
-      
-  
-
-
-
       <Text style={[styles.password, styles.textTypo]}>Password</Text>
-
-
      <View style={[styles.androidLarge1Inner, styles.androidLayout]} />
        <TextInput
         style={[styles.text2, styles.textInput]}
@@ -171,59 +93,19 @@ const TeacherLogin = ({navigation}) => {
         keyboardType="visible-password"
         autoCapitalize="none"
         placeholderTextColor={Color.placeholderTextColor} // Set placeholder text color
-      />
-      
-
-
-      
-      
-      
-      <TouchableOpacity
-
-
-      
+      /> 
+      <TouchableOpacity 
         style={styles.button}
         onPress={handleLogin}
         >
-        <View style={[styles.rectangleView2, styles.androidLayout]}>
-
-
-
-        
-        
-        <Text style={styles.signIn2Typo}>Sign In</Text>
-        
+        <View style={[styles.rectangleView2, styles.androidLayout]}> 
+        <Text style={styles.signIn2Typo}>Sign In</Text>  
         </View>
-
-
       </TouchableOpacity>
-
-
-
-
-
-
-      
-      
-      
-      {/*
-      <View style={[styles.rectangleView, styles.androidLayout]} />
-      <Text style={[styles.signIn1, styles.signIn1Typo]}>Sign In</Text>
-     
-  */}
-
-
-</View>
-    
-
-
+    </View>
     </View>
   );
 };
-
-
-
-
 
 
 const styles = StyleSheet.create({
@@ -245,11 +127,6 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
 
-
-
-
-
-
   signIn1Typo: {
     fontFamily: FontFamily.interRegular,
     fontSize: FontSize.size_sm,
@@ -257,12 +134,6 @@ const styles = StyleSheet.create({
     // position: "absolute",
 
   },
-
-  
-
-
-
-
 
   upperContainer: {
   top: 0,
@@ -303,9 +174,6 @@ const styles = StyleSheet.create({
     color: Color.colorWhite,
   },
 
-
-
-
   androidLarge1Item: {
     top: 480,
     backgroundColor: Color.colorWhitesmoke,
@@ -313,25 +181,12 @@ const styles = StyleSheet.create({
     left: 14,
   },
 
-
-
-
-
   androidLarge1Inner: {
     top: 572,
     backgroundColor: Color.colorWhitesmoke,
     width: 329,
     left: 14,
   },
-
-
-
-
-
-
-
-
-
 
   rectangleView: {
     top: 655,
@@ -353,27 +208,19 @@ const styles = StyleSheet.create({
 
   },
   
-  
-
-
-
-
     signIn2Typo: {
     fontFamily: FontFamily.interRegular,
     fontSize: FontSize.size_sm,
-    // textAlign: "left",
-    // position: "absolute",
+
 
   },
-
-
 
   text: {
     top: 480,
     left: 30,
     color: Color.colorBlack,
   },
-   text2: {
+  text2: {
     top: 524,
     left: 30,
     color: Color.colorBlack,
@@ -383,35 +230,32 @@ const styles = StyleSheet.create({
     left: 30,
     color: Color.colorBlack,
   },
-  phoneNumber: {
+    phoneNumber: {
     top: 456,
     left: 14,
     color: Color.colorBlack,
   },
-  password: {
+    password: {
     top: 548,
     left: 14,
     color: Color.colorBlack,
   },
-  signIn1: {
+    signIn1: {
     top: 670,
     left: 156,
     color: Color.colorWhite,
   },
-  forgetPassword: {
+    forgetPassword: {
     top: 719,
     left: 123,
     color: Color.colorCrimson,
   },
 
 
-  bottomContainer: {
+    bottomContainer: {
     marginLeft:16,
   },
-
-
-
-  background: {
+    background: {
     backgroundColor: Color.colorWhite,
     // backgroundColor: Color.colorCrimson,
     flex: 1,
@@ -422,41 +266,16 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     paddingLeft: 10, // Add padding to align placeholder text with existing text
-    // top:5,
-    // marginTop: 5,
   },
 
-
-
-
-  
     button: {
-    //   backgroundColor:Color.colorBlack,
-    // flex: 1,
-    //  height: 47,
-    // width: 329,
-
-
-      // top: 655,
-    // left: 15,
     borderRadius: 50,
     backgroundColor: Color.colorCrimson,
       justifyContent: 'center',
     alignItems: 'center',
-    // justifyContent: 'center',
-    // alignItems: 'center',
+
   },
-
-    // position: "absolute",
-    // justifyContent: 'center', 
-    // alignItems: 'center',
-    // flexDirection: 'column',
-   
   },
-
-
-
-
 });
 
 export default TeacherLogin;
