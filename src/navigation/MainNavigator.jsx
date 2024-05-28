@@ -30,8 +30,9 @@ import EditTeacher from '../screens/admin/teacher/EditTeacher.jsx';
 import StudentAgeRecord from '../screens/admin/student/StudentAgeRecod.jsx';
 import FeeStatusForm from '../screens/admin/feeStatus/FeeStatusForm.jsx';
 import FeeStatus from '../screens/admin/feeStatus/index.jsx';
-import teacherLogin from '../screens/auth/teacherLogin.jsx';
-import teacherDashboard from '../screens/teacher/teacherDashboard.jsx';
+import teacherLogin from '../screens/auth/TeacherLogin.jsx';
+import teacherDashboard from '../screens/teacher/TeacherDashboard.jsx';
+import TeacherLogin from '../screens/auth/TeacherLogin.jsx';
 
 
 const Stack = createStackNavigator();
@@ -202,18 +203,18 @@ const AdminNavigator = () => {
 
 const TeacherNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="teacherDashboard">
+    <Stack.Navigator initialRouteName="TeacherLogin">
       <Stack.Screen
-        name="teacherDashboard"
-        component={teacherDashboard}
+        name="TeacherLogin"
+        component={TeacherLogin}
         options={{headerShown: false}}
       />
-   {/*    <Stack.Screen
-        name="teacherDashboard"
-        component={teacherDashboard}
+     <Stack.Screen
+        name="TeacherDashboard"
+        component={TeacherDetail}
         options={{headerShown: false}}
       />
-      <Stack.Screen
+    {/*    <Stack.Screen
         name="Marks"
         component={Marks}
         options={{ title: 'Marks' }}

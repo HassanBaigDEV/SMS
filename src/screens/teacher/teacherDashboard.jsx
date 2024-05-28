@@ -6,7 +6,7 @@ const initialData = [
   { id: '2', name: 'Jane Smith', firstTerm: 78, midTerm: 82, finalTerm: 85 },
 ];
 
-const teacherScreen = () => {
+const TeacherScreen = () => {
   const [students, setStudents] = useState(initialData);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [name, setName] = useState('');
@@ -183,4 +183,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default teacherScreen;
+export default TeacherScreen;
