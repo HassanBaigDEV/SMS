@@ -1,64 +1,116 @@
 // import * as React from "react";
 import React, {useEffect, useState} from 'react';
-import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity , Alert} from "react-native";
 import { FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
 import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
 import {signInWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth';
-import {doc, getDoc} from 'firebase/firestore';
+import {doc, getDoc,getDocs, getFirestore, collection, query, where} from 'firebase/firestore';
 import 'firebase/firestore';
 
 
+const getTeacherIdByEmail = async (email) => {
+  try {
+    // Reference to the teachers collection
+    const teachersCollectionRef = collection(FIREBASE_DB, 'teachers');
+    
+    // Create a query against the collection where the email matches
+    const q = query(teachersCollectionRef, where('email', '==', email));
+    
+    // Execute the query
+    const querySnapshot = await getDocs(q);
+    
+    // Check if we got any results
+    if (!querySnapshot.empty) {
+      // Get the document (there should be only one match if emails are unique)
+      const doc = querySnapshot.docs[0];
+      const teacherId = doc.id;  // This is the ID of the document
+      const teacherData = doc.data(); // This is the data within the document
 
+      console.log('Teacher ID:', teacherId);
+      console.log('Teacher Data:', teacherData);
+      
+      return { teacherId, teacherData };
+    } else {
+      // No document found with the given email
+      console.log('No teacher found with the given email.');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching teacher ID by email:', error);
+    return null;
+  }
+};
 
-const TeacherLogin = ({navigation}) => {
-  const [user, setUser] = useState(null);
+// Usage example within a React component
+const TeacherLogin = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-    useEffect(() => {
-    onAuthStateChanged(FIREBASE_AUTH, user => {
-      console.log('USER IS STILL LOGGED IN: ', user);
-      if (user) {
-        setUser(user);
-      }
-    });
-  }, [user]);
-  const handleLogin = async () => {
-      console.log(email)
-      console.log(password)
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        FIREBASE_AUTH,
-        email,
-        password,
-      );
-      setUser(userCredential.user);
-      const uid = userCredential.user.uid;
-      console.log('User signed in:', user);
-      const userDoc = await getDoc(doc(FIREBASE_DB, 'users', uid));
-      const userData = userDoc.data();
-      if (userDoc.exists()) {
-        console.log('userRole:', userData);
-        if (userData.role === 'teacher') {
-          // Admin-specific logic
-          console.log('Welcome, techer!');
-          navigation.navigate('TeacherDashboard');
-        } else {
-          // Normal user logic
-          console.log('diffrent role');
+  const [teacherId, setTeacherId] = useState(null);
 
+  const handleLogin = async () => {
+    console.log('Attempting to sign in with:', email, password);
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
+      const uid = userCredential.user.uid;
+      // console.log('User signed in:', userCredential.user);
+
+      // Fetch teacher ID by email
+      const result = await getTeacherIdByEmail(email);
+      if (result) {
+        const { teacherId, teacherData } = result;
+        console.log('Teacher ID found:', teacherId);
+        setTeacherId(teacherId);
+        // You can now use the teacherId variable in another function or logic
+        // For example, navigating to the teacher dashboard:
+
+         const userDoc = await getDoc(doc(FIREBASE_DB, 'teachers', teacherId));
+        const teacherRole = await getDoc(doc(FIREBASE_DB, 'users', uid))
+
+
+      var userData = userDoc.data();
+
+     if (userDoc.exists()) {
+        // console.log('userData:', userData);
+        if (teacherRole.data().role === 'teacher') {
+          // setShowLogoutModal(true); 
+          console.log("login success")
+          navigation.navigate('TeacherDashboard', { user: userData });
+
+
+        } else {
+          Alert.alert('Access denied', 'You do not have student privileges.');
         }
-      // navigation.navigate('TeacherDashboard');
-      } 
-      else 
-      {
-        alert('user not found');
+      } else {
+        Alert.alert('Error', 'User not found.');
       }
-      }   
-      catch (error) {
+    } 
+    
+    
+    } catch (error) {
       console.error('Login Error:', error);
-      alert('Login failed. Please check your credentials.');
+      Alert.alert('Login failed', 'Please check your credentials.');
     }
   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   return (
     <View style={styles.background}>
       <View style={styles.upperContainer}>
@@ -76,7 +128,7 @@ const TeacherLogin = ({navigation}) => {
       <View style={[styles.androidLarge1Item, styles.androidLayout]} />
        <TextInput
         style={[styles.text, styles.textInput]}
-        placeholder="teacher123@gmail.com"
+        placeholder="teacher123@teacher.com"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"

@@ -6,6 +6,28 @@ const initialData = [
   { id: '2', name: 'Jane Smith', firstTerm: 78, midTerm: 82, finalTerm: 85 },
 ];
 
+
+  const teacher = {
+
+
+
+
+    // acadamicYear:,
+
+
+
+
+
+    email:"albert@teacher.com",
+    idNumber: 58564,
+    password: "123456",
+    teacherName: "Albert"
+  }
+
+
+
+
+
 const TeacherScreen = () => {
   const [students, setStudents] = useState(initialData);
   const [selectedStudent, setSelectedStudent] = useState(null);

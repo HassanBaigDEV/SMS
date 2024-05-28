@@ -37,7 +37,7 @@ import FeeStatus from '../screens/admin/feeStatus/index.jsx';
 
 
 
-import TeacherLogin from '../screens/auth/TeacherLogin.jsx';
+import TeacherLogin from '../screens/auth/teacherLogin.jsx';
 import TeacherScreen from '../screens/teacher/TeacherDashboard.jsx';
 
 const Stack = createStackNavigator();
@@ -256,15 +256,11 @@ const TeacherNavigator = () => {
         component={TeacherLogin}
         options={{headerShown: false}}
       />
-<<<<<<< HEAD
+
      <Stack.Screen
         name="TeacherDashboard"
         component={TeacherScreen}
-=======
-      {/*    <Stack.Screen
-        name="teacherDashboard"
-        component={teacherDashboard}
->>>>>>> d164a3dda20c34e0babc6307b9ff5faa0ffe7551
+
         options={{headerShown: false}}
       />
     {/*    <Stack.Screen
@@ -294,7 +290,7 @@ const TeacherNavigator = () => {
 const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="AdminNavigator">
+      <Stack.Navigator initialRouteName="TeacherNavigator">
         <Stack.Screen
           name="StudentNavigator"
           component={StudentNavigator}
