@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 
 const initialData = [
@@ -7,28 +7,14 @@ const initialData = [
 ];
 
 
-  const teacher = {
+
+
+  const TeacherScreen = ({route, navigation}) => {
+  const { teacher } = route.params;
 
 
 
 
-    // acadamicYear:,
-
-
-
-
-
-    email:"albert@teacher.com",
-    idNumber: 58564,
-    password: "123456",
-    teacherName: "Albert"
-  }
-
-
-
-
-
-const TeacherScreen = () => {
   const [students, setStudents] = useState(initialData);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [name, setName] = useState('');
@@ -37,6 +23,31 @@ const TeacherScreen = () => {
   const [finalTerm, setFinalTerm] = useState('');
   const [search, setSearch] = useState('');
   const [isFormVisible, setIsFormVisible] = useState(false);
+
+
+ useEffect(() => {
+    if (teacher) {
+      console.log('Teacher Data:', teacher);
+    }
+  }, [teacher]);
+
+
+
+
+const handleLogout = async () => {
+    try {
+      setShowLogoutModal(true);
+      await signOut(FIREBASE_AUTH);
+      console.log('Logout Successful!');
+    } catch (error) {
+      console.error('Logout Error:', error.message);
+    } finally {
+      setTimeout(() => {
+        setShowLogoutModal(false);
+        navigation.navigate('TeacherLogin');
+      }, 3000);
+    }
+  };
 
   const handleSave = () => {
     const newStudent = {
@@ -84,7 +95,11 @@ const TeacherScreen = () => {
     student.name.toLowerCase().includes(search.toLowerCase())
   );
 
+
+
   if (isFormVisible) {
+
+
     return (
       <View style={styles.container}>
         <Text style={styles.title}>{selectedStudent ? 'Edit Student' : 'Add Student'}</Text>
@@ -117,45 +132,95 @@ const TeacherScreen = () => {
         />
         <Button title="Save" onPress={handleSave} />
         <Button title="Cancel" onPress={() => setIsFormVisible(false)} />
+
+
       </View>
     );
   }
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Manage Student Marks</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Search by name"
-        value={search}
-        onChangeText={setSearch}
-      />
-      <FlatList
-        data={filteredStudents}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.studentItem}>
-            <View style={styles.studentInfo}>
-              <Text style={styles.studentName}>{item.name}</Text>
-              <Text>First Term: {item.firstTerm}</Text>
-              <Text>Mid Term: {item.midTerm}</Text>
-              <Text>Final Term: {item.finalTerm}</Text>
-            </View>
-            <View style={styles.buttonsContainer}>
-              <Button title="Edit" onPress={() => handleEdit(item)} />
-              <Button title="Delete" onPress={() => handleDelete(item.id)} color="red" />
-            </View>
-          </View>
-        )}
-      />
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => setIsFormVisible(true)}
-      >
-        <Text style={styles.addButtonText}>Add Student</Text>
-      </TouchableOpacity>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  return(
+    <View>
+     <Text>Welcome, {teacher.teacherName}</Text>
+
+      {/* Display other teacher data as needed */}
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // return (
+
+
+
+  //   <View style={styles.container}>
+  //     <Text style={styles.title}>Manage Student Marks</Text>
+  //     <TextInput
+  //       style={styles.input}
+  //       placeholder="Search by name"
+  //       value={search}
+  //       onChangeText={setSearch}
+  //     />
+  //     <FlatList
+  //       data={filteredStudents}
+  //       keyExtractor={item => item.id}
+  //       renderItem={({ item }) => (
+  //         <View style={styles.studentItem}>
+  //           <View style={styles.studentInfo}>
+  //             <Text style={styles.studentName}>{item.name}</Text>
+  //             <Text>First Term: {item.firstTerm}</Text>
+  //             <Text>Mid Term: {item.midTerm}</Text>
+  //             <Text>Final Term: {item.finalTerm}</Text>
+  //           </View>
+  //           <View style={styles.buttonsContainer}>
+  //             <Button title="Edit" onPress={() => handleEdit(item)} />
+  //             <Button title="Delete" onPress={() => handleDelete(item.id)} color="red" />
+  //           </View>
+  //         </View>
+  //       )}
+  //     />
+  //     <TouchableOpacity
+  //       style={styles.addButton}
+  //       onPress={() => setIsFormVisible(true)}
+  //     >
+  //       <Text style={styles.addButtonText}>Add Student</Text>
+  //     </TouchableOpacity>
+  //   </View>
+  // );
+
+
+
 };
 
 const styles = StyleSheet.create({

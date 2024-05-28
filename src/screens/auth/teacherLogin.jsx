@@ -68,14 +68,21 @@ const TeacherLogin = ({ navigation }) => {
         const teacherRole = await getDoc(doc(FIREBASE_DB, 'users', uid))
 
 
-      var userData = userDoc.data();
+      var teacher_Data = userDoc.data();
 
      if (userDoc.exists()) {
         // console.log('userData:', userData);
         if (teacherRole.data().role === 'teacher') {
           // setShowLogoutModal(true); 
           console.log("login success")
-          navigation.navigate('TeacherDashboard', { user: userData });
+
+          console.log(teacher_Data)
+          // navigation.navigate('TeacherDashboard', { user: teacher_Data });
+
+            setTimeout(() => {
+            // setShowLogoutModal(false);
+              navigation.navigate('TeacherDashboard', { teacher: teacher_Data });
+                }, 2000); 
 
 
         } else {
