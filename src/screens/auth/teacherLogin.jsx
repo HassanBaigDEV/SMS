@@ -117,14 +117,14 @@ const styles = StyleSheet.create({
   androidLayout: {
     height: 47,
     width: 329,
-    position: "absolute",
+    position: 'absolute',
   },
   textTypo: {
     color: Color.colorBlack,
     fontFamily: FontFamily.interRegular,
     fontSize: FontSize.size_sm,
-    textAlign: "left",
-    position: "absolute",
+    textAlign: 'left',
+    position: 'absolute',
   },
 
   signIn1Typo: {
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     top: 1,
     // left: 132,
     letterSpacing: 9.9,
-    fontWeight: "200",
+    fontWeight: '200',
     fontFamily: FontFamily.interExtraLight,
     color: Color.colorCrimson,
   },
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorWhite,
     // backgroundColor: Color.colorCrimson,
     flex: 1,
-    width: "100%",
+    width: '100%',
     height: 800,
     overflow: "hidden",
 

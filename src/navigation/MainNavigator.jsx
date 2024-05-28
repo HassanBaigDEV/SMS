@@ -1,5 +1,6 @@
 // AppNavigator.js
 import React from 'react';
+import { TouchableOpacity } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import Login from '../screens/auth/Login.jsx';
@@ -11,8 +12,11 @@ import AdminDashboard from '../screens/admin/AdminDashboard.jsx';
 // import UploadTimetable from './screens/UploadTimetable'; // To be created
 // import UploadSyllabus from './screens/UploadSyllabus'; // To be created
 
-import StudentLogin from '../screens/auth/studentLogin.jsx';
 import StudentDashboard from '../screens/student/studentDashboard.jsx';
+import AcademicProfile from '../screens/student/academicProfile.jsx';
+import ViewFeeStatus from '../screens/student/viewFeeStatus.jsx';
+
+import StudentLogin from '../screens/auth/studentLogin.jsx';
 import StudentList from '../screens/admin/student/StudentList.jsx';
 import StudentDetail from '../screens/admin/student/StudentDetails.jsx';
 import EditStudent from '../screens/admin/student/EditStudent.jsx';
@@ -36,8 +40,49 @@ import FeeStatus from '../screens/admin/feeStatus/index.jsx';
 import TeacherLogin from '../screens/auth/TeacherLogin.jsx';
 import TeacherScreen from '../screens/teacher/TeacherDashboard.jsx';
 
-
 const Stack = createStackNavigator();
+
+const AcademicProfileScreenOptions = ({ route }) => {
+  const { user, selectedYear } = route.params;
+  const classEnrolled = user.classEnrolled;
+  const parts = classEnrolled.split('/'); // Split the string by "/"
+  const className = parts[1]; // Get the second part, which is the class name
+  console.log(className); // Output: Class 5
+
+  return {
+    title: `Academic Profile Report (${selectedYear})`,
+    headerStyle: {
+      backgroundColor: '#000', // Background color of the header
+    },
+    headerTitleStyle: {
+      fontSize: 18,
+      color: '#fff', // Text color of the header title
+      fontFamily: 'Arial',
+      letterSpacing: 1,
+    },
+    headerBackTitleVisible: false, // To hide the back button title
+    headerTintColor: '#fff', // Color of the back button
+  };
+};
+
+const FeeStatusScreenOptions = ({ route }) => {
+  const { user, feeYear } = route.params;
+
+  return {
+    title: `Fee Status (${feeYear})`,
+    headerStyle: {
+      backgroundColor: '#000', // Background color of the header
+    },
+    headerTitleStyle: {
+      fontSize: 18,
+      color: '#fff', // Text color of the header title
+      fontFamily: 'Arial',
+      letterSpacing: 1,
+    },
+    headerBackTitleVisible: false, // To hide the back button title
+    headerTintColor: '#fff', // Color of the back button
+  };
+};
 
 const StudentNavigator = () => {
   return (
@@ -50,19 +95,19 @@ const StudentNavigator = () => {
       <Stack.Screen
         name="StudentDashboard"
         component={StudentDashboard}
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
+      /> 
+      <Stack.Screen
+        name="AcademicProfile"
+        component={AcademicProfile}
+        options={AcademicProfileScreenOptions}
+      />
+      <Stack.Screen
+        name="ViewFeeStatus"
+        component={ViewFeeStatus}
+        options={FeeStatusScreenOptions}
       />
       {/* <Stack.Screen
-        name="Marks"
-        component={Marks}
-        options={{ title: 'Marks' }}
-      />
-      <Stack.Screen
-        name="FeeStatus"
-        component={FeeStatus}
-        options={{ title: 'Fee Status' }}
-      />
-      <Stack.Screen
         name="Timetable"
         component={Timetable}
         options={{ title: 'Timetable' }}
@@ -71,7 +116,7 @@ const StudentNavigator = () => {
         name="Syllabus"
         component={Syllabus}
         options={{ title: 'Syllabus' }}
-      />  */}
+      />   */}
     </Stack.Navigator>
   );
 };
@@ -211,9 +256,15 @@ const TeacherNavigator = () => {
         component={TeacherLogin}
         options={{headerShown: false}}
       />
+<<<<<<< HEAD
      <Stack.Screen
         name="TeacherDashboard"
         component={TeacherScreen}
+=======
+      {/*    <Stack.Screen
+        name="teacherDashboard"
+        component={teacherDashboard}
+>>>>>>> d164a3dda20c34e0babc6307b9ff5faa0ffe7551
         options={{headerShown: false}}
       />
     {/*    <Stack.Screen
@@ -240,11 +291,10 @@ const TeacherNavigator = () => {
   );
 };
 
-
 const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="TeacherNavigator">
+      <Stack.Navigator initialRouteName="AdminNavigator">
         <Stack.Screen
           name="StudentNavigator"
           component={StudentNavigator}
