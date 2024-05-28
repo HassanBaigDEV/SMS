@@ -37,7 +37,6 @@ import FeeStatus from '../screens/admin/feeStatus/index.jsx';
 import teacherLogin from '../screens/auth/teacherLogin.jsx';
 import teacherDashboard from '../screens/teacher/teacherDashboard.jsx';
 
-
 const Stack = createStackNavigator();
 
 const AcademicProfileScreenOptions = ({ route }) => {
@@ -254,7 +253,7 @@ const TeacherNavigator = () => {
         component={teacherDashboard}
         options={{headerShown: false}}
       />
-   {/*    <Stack.Screen
+      {/*    <Stack.Screen
         name="teacherDashboard"
         component={teacherDashboard}
         options={{headerShown: false}}
@@ -283,11 +282,10 @@ const TeacherNavigator = () => {
   );
 };
 
-
 const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="TeacherNavigator">
+      <Stack.Navigator initialRouteName="AdminNavigator">
         <Stack.Screen
           name="StudentNavigator"
           component={StudentNavigator}

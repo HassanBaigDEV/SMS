@@ -1,6 +1,6 @@
-import * as React from "react";
-import { StyleSheet, View, Image, Text } from "react-native";
-import { FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
+import * as React from 'react';
+import {StyleSheet, View, Image, Text} from 'react-native';
+import {FontSize, Color, FontFamily, Border} from '../../../GlobalStyles';
 
 const teacherLogin = () => {
   return (
@@ -9,9 +9,8 @@ const teacherLogin = () => {
       <Image
         style={styles.graduationCapIcon}
         resizeMode="cover"
-        // source={require("../assests/icons/graduation-cap.png")}
-        source={require('../../assests/icons/graduation-cap.png')}
-
+        // source={require("../assets/icons/graduation-cap.png")}
+        source={require('../../assets/icons/graduation-cap.png')}
       />
       <Text style={[styles.aura, styles.auraTypo]}>Aura</Text>
       <Text style={[styles.signIn, styles.auraTypo]}>Sign In</Text>
@@ -32,57 +31,57 @@ const teacherLogin = () => {
 
 const styles = StyleSheet.create({
   auraTypo: {
-    textAlign: "left",
+    textAlign: 'left',
     fontSize: FontSize.size_11xl_8,
-    position: "absolute",
+    position: 'absolute',
   },
   androidLayout: {
     height: 47,
     width: 329,
-    position: "absolute",
+    position: 'absolute',
   },
   textTypo: {
     color: Color.colorBlack,
     fontFamily: FontFamily.interRegular,
     fontSize: FontSize.size_sm,
-    textAlign: "left",
-    position: "absolute",
+    textAlign: 'left',
+    position: 'absolute',
   },
   signIn1Typo: {
     fontFamily: FontFamily.interRegular,
     fontSize: FontSize.size_sm,
-    textAlign: "left",
-    position: "absolute",
+    textAlign: 'left',
+    position: 'absolute',
   },
   androidLarge1Child: {
     top: 0,
     left: 0,
     borderBottomRightRadius: Border.br_14xl,
     borderBottomLeftRadius: Border.br_14xl,
-    backgroundColor: "#473f97",
+    backgroundColor: '#473f97',
     width: 360,
     height: 396,
-    position: "absolute",
+    position: 'absolute',
   },
   graduationCapIcon: {
     top: 87,
     left: 114,
     width: 132,
     height: 132,
-    position: "absolute",
+    position: 'absolute',
   },
   aura: {
     top: 219,
     left: 132,
     letterSpacing: 9.9,
-    fontWeight: "200",
+    fontWeight: '200',
     fontFamily: FontFamily.interExtraLight,
     color: Color.colorCrimson,
   },
   signIn: {
     top: 300,
     left: 129,
-    fontWeight: "600",
+    fontWeight: '600',
     fontFamily: FontFamily.interSemiBold,
     color: Color.colorWhite,
   },
@@ -137,9 +136,9 @@ const styles = StyleSheet.create({
   androidLarge1: {
     backgroundColor: Color.colorWhite,
     flex: 1,
-    width: "100%",
+    width: '100%',
     height: 800,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
 });
 
