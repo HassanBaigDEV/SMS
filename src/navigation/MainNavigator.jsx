@@ -31,6 +31,12 @@ import AddTeacherForm from '../screens/admin/teacher/AddTeacherForm.jsx';
 import TeacherList from '../screens/admin/teacher/TeacherList.jsx';
 import TeacherDetail from '../screens/admin/teacher/TeacherDetails.jsx';
 import EditTeacher from '../screens/admin/teacher/EditTeacher.jsx';
+import StudentAgeRecord from '../screens/admin/student/StudentAgeRecod.jsx';
+import FeeStatusForm from '../screens/admin/feeStatus/FeeStatusForm.jsx';
+import FeeStatus from '../screens/admin/feeStatus/index.jsx';
+import teacherLogin from '../screens/auth/teacherLogin.jsx';
+import teacherDashboard from '../screens/teacher/teacherDashboard.jsx';
+
 
 const Stack = createStackNavigator();
 
@@ -134,67 +140,82 @@ const AdminNavigator = () => {
       <Stack.Screen
         name="ClassList"
         component={ClassList}
-        options={{title: 'Classes'}}
+        options={{title: 'Classes', headerShown: false}}
       />
       <Stack.Screen
         name="ClassDetails"
         component={ClassDetails}
-        options={{title: 'Class Details'}}
+        options={{title: 'Class Details', headerShown: false}}
       />
       <Stack.Screen
         name="SubjectsList"
         component={SubjectsList}
-        options={{title: 'Subjects'}}
+        options={{title: 'Subjects', headerShown: false}}
       />
       <Stack.Screen
         name="SectionsList"
         component={SectionsList}
-        options={{title: 'Sections'}}
+        options={{title: 'Sections', headerShown: false}}
       />
       <Stack.Screen
         name="SectionDetails"
         component={SectionDetails}
-        options={{title: 'Section Details'}}
+        options={{title: 'Section Details', headerShown: false}}
       />
       <Stack.Screen
         name="addStudent"
         component={CreateStudentForm}
-        options={{title: 'Add Student'}}
+        options={{title: 'Add Student', headerShown: false}}
       />
       <Stack.Screen
         name="AddTeacher"
         component={AddTeacherForm}
-        options={{title: 'Add Teacher'}}
+        options={{title: 'Add Teacher', headerShown: false}}
       />
       <Stack.Screen
         name="Students"
         component={StudentList}
-        options={{title: 'Students'}}
+        options={{title: 'Students', headerShown: false}}
       />
       <Stack.Screen
         name="StudentDetails"
         component={StudentDetail}
-        options={{title: 'Student Details'}}
+        options={{title: 'Student Details', headerShown: false}}
       />
       <Stack.Screen
         name="EditStudent"
         component={EditStudent}
-        options={{title: 'Edit Student'}}
+        options={{title: 'Edit Student', headerShown: false}}
       />
       <Stack.Screen
         name="TeacherList"
         component={TeacherList}
-        options={{title: 'Teachers'}}
+        options={{title: 'Teachers', headerShown: false}}
       />
       <Stack.Screen
         name="TeacherDetails"
         component={TeacherDetail}
-        options={{title: 'Teacher Details'}}
+        options={{title: 'Teacher Details', headerShown: false}}
       />
       <Stack.Screen
         name="EditTeacher"
         component={EditTeacher}
-        options={{title: 'Edit Teacher'}}
+        options={{title: 'Edit Teacher', headerShown: false}}
+      />
+      <Stack.Screen
+        name="StudentAgeRecord"
+        component={StudentAgeRecord}
+        options={{title: 'Student Age Record', headerShown: false}}
+      />
+      <Stack.Screen
+        name="FeeStatusForm"
+        component={FeeStatusForm}
+        options={{title: 'Fee Status', headerShown: false}}
+      />
+      <Stack.Screen
+        name="FeeStatus"
+        component={FeeStatus}
+        options={{title: 'Fee Status', headerShown: false}}
       />
       {/* <Stack.Screen
           name="ManageStudents"
@@ -225,12 +246,48 @@ const AdminNavigator = () => {
   );
 };
 
+const TeacherNavigator = () => {
+  return (
+    <Stack.Navigator initialRouteName="teacherDashboard">
+      <Stack.Screen
+        name="teacherDashboard"
+        component={teacherDashboard}
+        options={{headerShown: false}}
+      />
+   {/*    <Stack.Screen
+        name="teacherDashboard"
+        component={teacherDashboard}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Marks"
+        component={Marks}
+        options={{ title: 'Marks' }}
+      />
+      <Stack.Screen
+        name="FeeStatus"
+        component={FeeStatus}
+        options={{ title: 'Fee Status' }}
+      />
+      <Stack.Screen
+        name="Timetable"
+        component={Timetable}
+        options={{ title: 'Timetable' }}
+      />
+      <Stack.Screen
+        name="Syllabus"
+        component={Syllabus}
+        options={{ title: 'Syllabus' }}
+      />  */}
+    </Stack.Navigator>
+  );
+};
 
 
 const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="StudentNavigator">
+      <Stack.Navigator initialRouteName="TeacherNavigator">
         <Stack.Screen
           name="StudentNavigator"
           component={StudentNavigator}
@@ -239,6 +296,11 @@ const Navigator = () => {
         <Stack.Screen
           name="AdminNavigator"
           component={AdminNavigator}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="TeacherNavigator"
+          component={TeacherNavigator}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

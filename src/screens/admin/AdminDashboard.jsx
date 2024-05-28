@@ -39,15 +39,15 @@ const AdminDashboard = ({navigation}) => {
         <TouchableOpacity onPress={() => navigation.navigate('Students')}>
           <Text>Manage Students</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('AddClass')}>
+        {/* <TouchableOpacity onPress={() => navigation.navigate('AddClass')}>
           <Text>Add Class</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity onPress={() => navigation.navigate('TeacherList')}>
           <Text>Manage Teachers</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('ManageFees')}>
+        {/* <TouchableOpacity onPress={() => navigation.navigate('ManageFees')}>
           <Text>Manage Fees</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => navigation.navigate('UploadTimetable')}>
           <Text>Upload Timetable</Text>
@@ -67,8 +67,20 @@ const AdminDashboard = ({navigation}) => {
         {/* <TouchableOpacity onPress={() => navigation.navigate('addStudent')}>
           <Text>Add Student</Text>
         </TouchableOpacity> */}
-        <TouchableOpacity onPress={() => navigation.navigate('addTeacher')}>
+        {/* <TouchableOpacity onPress={() => navigation.navigate('addTeacher')}>
           <Text>Add Teacher</Text>
+        </TouchableOpacity> */}
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('StudentAgeRecord');
+          }}>
+          <Text>Student Age Record</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('FeeStatus');
+          }}>
+          <Text>Fee Status</Text>
         </TouchableOpacity>
       </View>
     </>

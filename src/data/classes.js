@@ -106,6 +106,86 @@ export const classes = [
   },
 ];
 
+export const subjectByClass = {
+  // eslint-disable-next-line prettier/prettier
+  'Nursery': ['English', 'Urdu', 'Math', 'Nazra-e-Quran'],
+  // eslint-disable-next-line prettier/prettier
+  'Prep': ['English', 'Urdu', 'Math', 'Nazra-e-Quran', 'General Knowledge'],
+  'Class 1': ['English', 'Urdu', 'Math', 'General Knowledge', 'Islamyat'],
+  'Class 2': [
+    'English',
+    'Urdu',
+    'Math',
+    'General Knowledge',
+    'Islamyat',
+    'Computer (Part 1)',
+    'Computer (Part 2)',
+  ],
+  'Class 3': [
+    'English',
+    'Urdu',
+    'Math',
+    'General Knowledge',
+    'Social Study',
+    'Islamyat',
+    'Computer (Part 1)',
+    'Computer (Part 2)',
+  ],
+  'Class 4': [
+    'English',
+    'Urdu',
+    'Math',
+    'General Knowledge',
+    'Social Study',
+    'Islamyat',
+    'Computer (Part 1)',
+    'Computer (Part 2)',
+  ],
+  'Class 5': [
+    'English',
+    'Urdu',
+    'Math',
+    'General Knowledge',
+    'Social Study',
+    'Islamyat',
+    'Computer (Part 1)',
+    'Computer (Part 2)',
+  ],
+  'Class 6': [
+    'English',
+    'Urdu',
+    'Math',
+    'General Knowledge',
+    'Social Study',
+    'Islamyat',
+    'Computer (Part 1)',
+    'Computer (Part 2)',
+    'Quran',
+  ],
+  'Class 7': [
+    'English',
+    'Urdu',
+    'Math',
+    'General Knowledge',
+    'Social Study',
+    'Islamyat',
+    'Computer (Part 1)',
+    'Computer (Part 2)',
+    'Quran',
+  ],
+  'Class 8': [
+    'English',
+    'Urdu',
+    'Math',
+    'General Knowledge',
+    'Social Study',
+    'Islamyat',
+    'Computer (Part 1)',
+    'Computer (Part 2)',
+    'Quran',
+  ],
+};
+
 const marksDistribution = {
   subjects: {
     English: {firstMidterm: 50, finalTerm: 100},
