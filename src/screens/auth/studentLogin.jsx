@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, SafeAreaView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, SafeAreaView, Image, Modal, ActivityIndicator } from 'react-native';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebase/firebaseConfig';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -11,6 +11,8 @@ const StudentLogin = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [registrationNumberFocused, setRegistrationNumberFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
 
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, user => {
@@ -36,16 +38,12 @@ const StudentLogin = ({ navigation }) => {
       // console.log(studentRole.data().role);
       // console.log(userDoc.data());
       // console.log(studentRole.data());
+      var userData = userDoc.data();
       
       if (userDoc.exists()) {
-        const userData = userDoc.data();
         console.log('userData:', userData);
-        // Update user object with additional properties
-        // user.userData = userData;
-        // user.studentName = userData.studentName;
-        // user.registrationNumber = userData.registrationNumber;
         if (studentRole.data().role === 'student') {
-          navigation.navigate('StudentDashboard', { user: userData });
+          setShowLogoutModal(true); 
         } else {
           Alert.alert('Access denied', 'You do not have student privileges.');
         }
@@ -55,6 +53,11 @@ const StudentLogin = ({ navigation }) => {
     } catch (error) {
       console.log('Error signing in:', error.message);
       Alert.alert('Login failed', 'Please check your credentials.');
+    } finally {
+      setTimeout(() => {
+        setShowLogoutModal(false);
+        navigation.navigate('StudentDashboard', { user: userData });
+      }, 2000); 
     }
   };
 
@@ -65,7 +68,8 @@ const StudentLogin = ({ navigation }) => {
           source={schoolIcon1}
           style={styles.icon}
         />
-        <Text style={styles.appTitle}>SCHOOL MANAGEMENT APP</Text>
+        <Text style={styles.appTitle}>STELLAR TACTFUL EDU</Text>
+        <Text style={styles.tagline}>Navigating Brilliance, Building Futures</Text>
       </View>
       <View style={styles.bottomContainer}>
         <Text style={styles.title}>STUDENT LOGIN</Text>
@@ -94,6 +98,16 @@ const StudentLogin = ({ navigation }) => {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
+
+
+      {/* Loading Modal */}
+      <Modal visible={showLogoutModal} transparent={false} animationType="fade">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4CAF50" />
+          <Text style={styles.loadingText}>LOGGING IN...</Text>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 };
@@ -106,39 +120,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   topContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    flex: 0.5,
     alignItems: 'center',
+    fontFamily: 'Arial',
   },
+  tagline: {
+    fontSize: 16,
+    color: '#ddd', // Light gray
+    textAlign: 'center',
+    fontFamily: 'serif',
+    fontStyle: 'italic', // Apply italic style
+  },  
   appTitle: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333333', 
-    marginTop: 20,
+    color: '#fff', // White
     textAlign: 'center',
     textShadowColor: '#aaa',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
-    marginBottom: '20%',
+    marginBottom: 10,
   },  
   bottomContainer: {
-    flex: 1,
+    flex: 0.8,
     justifyContent: 'center',
     alignItems: 'center',
     width: '80%',
     padding: 20,
-    marginBottom: 50,
+    marginTop: '25%',
+    marginBottom: '10%',
     borderRadius: 10,
     backgroundColor: 'rgba(211, 211, 211, 0.9)',
   },
-  iconContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 50, 
-  },
   icon: {
-    width: 150,
+    width: 250,
     height: 150,
     resizeMode: 'contain',
   },
@@ -188,6 +203,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
   },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: '100%',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },  
 });
 
 export default StudentLogin;
