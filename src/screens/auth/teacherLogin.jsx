@@ -18,6 +18,8 @@ import 'firebase/firestore';
 const TeacherLogin = ({navigation}) => {
 
   const [user, setUser] = useState(null);
+
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -36,36 +38,61 @@ const TeacherLogin = ({navigation}) => {
 
   const handleLogin = async () => {
 
+
+
+      console.log(email)
+      console.log(password)
+
+
+
+
     try {
+
+
       const userCredential = await signInWithEmailAndPassword(
         FIREBASE_AUTH,
         email,
         password,
       );
+
+
       setUser(userCredential.user);
+
       const uid = userCredential.user.uid;
+
       console.log('User signed in:', user);
+
+
       const userDoc = await getDoc(doc(FIREBASE_DB, 'users', uid));
 
       const userData = userDoc.data();
+
+
+
       if (userDoc.exists()) {
-        // navigation.navigate('AdminDashboard');
 
-        // console.log('userRole:', userData);
-        // if (userData.role === 'teacher') {
-        //   // Admin-specific logic
-        //   console.log('Welcome, techer!');
-        //   navigation.navigate('AdminDashboard');
-        // } else {
-        //   // Normal user logic
-        //   console.log('Welcome, User!');
-        // }
-      navigation.navigate('TeacherDashboard');
+        console.log('userRole:', userData);
+        if (userData.role === 'teacher') {
+          // Admin-specific logic
+          console.log('Welcome, techer!');
+          navigation.navigate('TeacherDashboard');
+        } else {
+          // Normal user logic
+          console.log('diffrent role');
 
-      } else {
+        }
+      // navigation.navigate('TeacherDashboard');
+
+      } 
+      else 
+      {
         alert('user not found');
       }
-      } catch (error) {
+      } 
+      
+      
+      
+      catch (error) {
       console.error('Login Error:', error);
       alert('Login failed. Please check your credentials.');
     }
@@ -121,6 +148,10 @@ const TeacherLogin = ({navigation}) => {
        <TextInput
         style={[styles.text, styles.textInput]}
         placeholder="teacher123@gmail.com"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
         placeholderTextColor={Color.placeholderTextColor} // Set placeholder text color
       />
       
@@ -135,6 +166,10 @@ const TeacherLogin = ({navigation}) => {
        <TextInput
         style={[styles.text2, styles.textInput]}
         placeholder="****"
+        value={password}
+        onChangeText={setPassword}
+        keyboardType="visible-password"
+        autoCapitalize="none"
         placeholderTextColor={Color.placeholderTextColor} // Set placeholder text color
       />
       
@@ -148,9 +183,7 @@ const TeacherLogin = ({navigation}) => {
 
       
         style={styles.button}
-        onPress={() => {
-          // Handle button press event
-        }}
+        onPress={handleLogin}
         >
         <View style={[styles.rectangleView2, styles.androidLayout]}>
 

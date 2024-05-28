@@ -31,8 +31,14 @@ const StudentLogin = ({ navigation }) => {
       setUser(userCredential.user);
       const user = userCredential.user;
       const uid = userCredential.user.uid;
+
+      
       const userDoc = await getDoc(doc(FIREBASE_DB, 'students', registrationNumber));
-      const studentRole = await getDoc(doc(FIREBASE_DB, 'users', uid));
+      const studentRole = await getDoc(doc(FIREBASE_DB, 'users', uid))
+      
+      
+      
+      ;
       // console.log(studentRole.data().role);
       // console.log(userDoc.data());
       // console.log(studentRole.data());
@@ -52,7 +58,11 @@ const StudentLogin = ({ navigation }) => {
       } else {
         Alert.alert('Error', 'User not found.');
       }
-    } catch (error) {
+    } 
+    
+    
+    
+    catch (error) {
       console.log('Error signing in:', error.message);
       Alert.alert('Login failed', 'Please check your credentials.');
     }

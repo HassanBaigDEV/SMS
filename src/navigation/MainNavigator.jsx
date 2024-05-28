@@ -30,9 +30,11 @@ import EditTeacher from '../screens/admin/teacher/EditTeacher.jsx';
 import StudentAgeRecord from '../screens/admin/student/StudentAgeRecod.jsx';
 import FeeStatusForm from '../screens/admin/feeStatus/FeeStatusForm.jsx';
 import FeeStatus from '../screens/admin/feeStatus/index.jsx';
-import teacherLogin from '../screens/auth/TeacherLogin.jsx';
-import teacherDashboard from '../screens/teacher/TeacherDashboard.jsx';
+
+
+
 import TeacherLogin from '../screens/auth/TeacherLogin.jsx';
+import TeacherScreen from '../screens/teacher/TeacherDashboard.jsx';
 
 
 const Stack = createStackNavigator();
@@ -211,7 +213,7 @@ const TeacherNavigator = () => {
       />
      <Stack.Screen
         name="TeacherDashboard"
-        component={TeacherDetail}
+        component={TeacherScreen}
         options={{headerShown: false}}
       />
     {/*    <Stack.Screen
