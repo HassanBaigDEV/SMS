@@ -1,6 +1,6 @@
 // import * as React from "react";
 import React, {useEffect, useState} from 'react';
-import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity , Alert} from "react-native";
+import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity , Alert, Modal, ActivityIndicator} from "react-native";
 import { FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
 import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
 import {signInWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth';
@@ -43,58 +43,99 @@ const getTeacherIdByEmail = async (email) => {
 
 // Usage example within a React component
 const TeacherLogin = ({ navigation }) => {
+    const [user, setUser] = useState(null);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [teacherId, setTeacherId] = useState(null);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  useEffect(() => {
+    onAuthStateChanged(FIREBASE_AUTH, user => {
+      if (user) {
+        setUser(user);
+      }
+    });
+  }, [user]);
+
+
+
 
   const handleLogin = async () => {
     console.log('Attempting to sign in with:', email, password);
 
     try {
       const userCredential = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
+
+
+      setUser(userCredential.user);
+
+
+
+      //we got uid from the users collection
       const uid = userCredential.user.uid;
-      // console.log('User signed in:', userCredential.user);
 
       // Fetch teacher ID by email
       const result = await getTeacherIdByEmail(email);
+
+      //main if start
       if (result) {
+
         const { teacherId, teacherData } = result;
         console.log('Teacher ID found:', teacherId);
-        setTeacherId(teacherId);
-        // You can now use the teacherId variable in another function or logic
-        // For example, navigating to the teacher dashboard:
 
-         const userDoc = await getDoc(doc(FIREBASE_DB, 'teachers', teacherId));
+        //we got the teacherId from the teachers collection
+        setTeacherId(teacherId);
+
+
+        //getting the full teacher doc by teacherId
+        const userDoc = await getDoc(doc(FIREBASE_DB, 'teachers', teacherId));
+        //getiing the full user doc by uid
         const teacherRole = await getDoc(doc(FIREBASE_DB, 'users', uid))
 
+        //just putting the teacher data in a variable
+        var teacher_Data = userDoc.data();
 
-      var teacher_Data = userDoc.data();
+        //nested if start
+        if (userDoc.exists()) {
 
-     if (userDoc.exists()) {
-        // console.log('userData:', userData);
-        if (teacherRole.data().role === 'teacher') {
-          // setShowLogoutModal(true); 
-          console.log("login success")
+            //second nested if start
+            if (teacherRole.data().role === 'teacher') {
+              setShowLogoutModal(true); 
+              console.log("login success")
 
-          console.log(teacher_Data)
-          // navigation.navigate('TeacherDashboard', { user: teacher_Data });
+              console.log(teacher_Data)
 
-            setTimeout(() => {
-            // setShowLogoutModal(false);
-              navigation.navigate('TeacherDashboard', { teacher: teacher_Data });
-                }, 2000); 
+                setTimeout(() => {
+                setShowLogoutModal(false);
+                  navigation.navigate('TeacherDashboard', { teacher: teacher_Data });
+                    }, 2000); 
 
 
-        } else {
-          Alert.alert('Access denied', 'You do not have student privileges.');
-        }
-      } else {
-        Alert.alert('Error', 'User not found.');
-      }
+            } 
+            else 
+            {
+              Alert.alert('Access denied', 'You do not have student privileges.');
+            }
+
+
+
+          } //nested if end
+
+          else 
+          {
+            Alert.alert('Error', 'User not found.');
+          }
+
+
+
+
+      //main if end
     } 
     
     
-    } catch (error) {
+    } 
+    catch (error) {
       console.error('Login Error:', error);
       Alert.alert('Login failed', 'Please check your credentials.');
     }
@@ -118,7 +159,55 @@ const TeacherLogin = ({ navigation }) => {
 
 
 
-  return (
+  // return (
+  //   <View style={styles.background}>
+  //     <View style={styles.upperContainer}>
+  //       <Image
+  //         style={styles.graduationCapIcon}
+  //         resizeMode="cover"
+  //         source={require('../../assets/icons/graduation-cap.png')}
+  //       />
+  //     <Text style={[styles.aura, styles.auraTypo]}>Aura</Text>
+
+  //     <Text style={[styles.signIn, styles.auraTypo]}>Sign In</Text>
+  //       </View>
+  //     <View style={[styles.bottomContainer]}>
+  //     <Text style={[styles.phoneNumber, styles.textTypo]}>Email</Text>
+  //     <View style={[styles.androidLarge1Item, styles.androidLayout]} />
+  //      <TextInput
+  //       style={[styles.text, styles.textInput]}
+  //       placeholder="teacher123@teacher.com"
+  //       value={email}
+  //       onChangeText={setEmail}
+  //       keyboardType="email-address"
+  //       autoCapitalize="none"
+  //       placeholderTextColor={Color.placeholderTextColor} // Set placeholder text color
+  //     />
+  //     <Text style={[styles.password, styles.textTypo]}>Password</Text>
+  //    <View style={[styles.androidLarge1Inner, styles.androidLayout]} />
+  //      <TextInput
+  //       style={[styles.text2, styles.textInput]}
+  //       placeholder="****"
+  //       value={password}
+  //       onChangeText={setPassword}
+  //       keyboardType="visible-password"
+  //       autoCapitalize="none"
+  //       placeholderTextColor={Color.placeholderTextColor} // Set placeholder text color
+  //     /> 
+  //     <TouchableOpacity 
+  //       style={styles.button}
+  //       onPress={handleLogin}
+  //       >
+  //       <View style={[styles.rectangleView2, styles.androidLayout]}> 
+  //       <Text style={styles.signIn2Typo}>Sign In</Text>  
+  //       </View>
+  //     </TouchableOpacity>
+  //   </View>
+  //   </View>
+  // );
+
+
+    return (
     <View style={styles.background}>
       <View style={styles.upperContainer}>
         <Image
@@ -126,44 +215,53 @@ const TeacherLogin = ({ navigation }) => {
           resizeMode="cover"
           source={require('../../assets/icons/graduation-cap.png')}
         />
-      <Text style={[styles.aura, styles.auraTypo]}>Aura</Text>
-
-      <Text style={[styles.signIn, styles.auraTypo]}>Sign In</Text>
-        </View>
-      <View style={[styles.bottomContainer]}>
-      <Text style={[styles.phoneNumber, styles.textTypo]}>Email</Text>
-      <View style={[styles.androidLarge1Item, styles.androidLayout]} />
-       <TextInput
-        style={[styles.text, styles.textInput]}
-        placeholder="teacher123@teacher.com"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        placeholderTextColor={Color.placeholderTextColor} // Set placeholder text color
-      />
-      <Text style={[styles.password, styles.textTypo]}>Password</Text>
-     <View style={[styles.androidLarge1Inner, styles.androidLayout]} />
-       <TextInput
-        style={[styles.text2, styles.textInput]}
-        placeholder="****"
-        value={password}
-        onChangeText={setPassword}
-        keyboardType="visible-password"
-        autoCapitalize="none"
-        placeholderTextColor={Color.placeholderTextColor} // Set placeholder text color
-      /> 
-      <TouchableOpacity 
-        style={styles.button}
-        onPress={handleLogin}
+        <Text style={[styles.aura, styles.auraTypo]}>Aura</Text>
+        <Text style={[styles.signIn, styles.auraTypo]}>Sign In</Text>
+      </View>
+      <View style={styles.bottomContainer}>
+        <Text style={[styles.phoneNumber, styles.textTypo]}>Email</Text>
+        <View style={[styles.androidLarge1Item, styles.androidLayout]} />
+        <TextInput
+          style={[styles.text, styles.textInput]}
+          placeholder="teacher123@teacher.com"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholderTextColor={Color.placeholderTextColor} // Set placeholder text color
+        />
+        <Text style={[styles.password, styles.textTypo]}>Password</Text>
+        <View style={[styles.androidLarge1Inner, styles.androidLayout]} />
+        <TextInput
+          style={[styles.text2, styles.textInput]}
+          placeholder="****"
+          value={password}
+          onChangeText={setPassword}
+          keyboardType="visible-password"
+          autoCapitalize="none"
+          placeholderTextColor={Color.placeholderTextColor} // Set placeholder text color
+        />
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={handleLogin}
         >
-        <View style={[styles.rectangleView2, styles.androidLayout]}> 
-        <Text style={styles.signIn2Typo}>Sign In</Text>  
+          <View style={[styles.rectangleView2, styles.androidLayout]}> 
+            <Text style={styles.signIn2Typo}>Sign In</Text>  
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <Modal visible={showLogoutModal} transparent={false} animationType="fade">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4CAF50" />
+          <Text style={styles.loadingText}>LOGGING IN...</Text>
         </View>
-      </TouchableOpacity>
-    </View>
+      </Modal>
+
+
     </View>
   );
+
 };
 
 
@@ -334,7 +432,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
 
   },
+
   },
+      loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: '100%',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: Color.colorCrimson,
+    fontSize: 20,
+    fontWeight: 'bold',
+  }, 
 });
 
 export default TeacherLogin;

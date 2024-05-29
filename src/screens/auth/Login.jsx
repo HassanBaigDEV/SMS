@@ -89,6 +89,9 @@ const Login = ({navigation}) => {
     }
   };
 
+
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -111,10 +114,6 @@ const Login = ({navigation}) => {
     </View>
   );
 };
-
-
-
-
 
 const styles = StyleSheet.create({
   container: {

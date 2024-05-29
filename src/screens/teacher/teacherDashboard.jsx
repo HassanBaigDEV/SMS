@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { FIREBASE_AUTH ,FIREBASE_DB} from '../../firebase/firebaseConfig';
+import { signOut } from 'firebase/auth';
+import {doc, getDoc,getDocs, getFirestore, collection, query, where} from 'firebase/firestore';
+import 'firebase/firestore';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
+import RNPickerSelect from 'react-native-picker-select';
+
+
+
+
+
 const initialData = [
   { id: '1', name: 'John Doe', firstTerm: 85, midTerm: 88, finalTerm: 90 },
   { id: '2', name: 'Jane Smith', firstTerm: 78, midTerm: 82, finalTerm: 85 },
@@ -9,12 +21,13 @@ const initialData = [
 
 
 
+
+
   const TeacherScreen = ({route, navigation}) => {
   const { teacher } = route.params;
 
 
-
-
+  const [academicYearDetailss, setacademicYearDetails] = useState();
   const [students, setStudents] = useState(initialData);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [name, setName] = useState('');
@@ -25,127 +38,49 @@ const initialData = [
   const [isFormVisible, setIsFormVisible] = useState(false);
 
 
-  const [selectedYear, setSelectedYear] = useState(null);
 
 
 
- useEffect(() => {
-    if (teacher) {
-      console.log('Teacher Data:', teacher);
-    }
-  }, [teacher]);
-
-
-  useEffect(() => {
-    if (selectedYear && teacher.academicYear[selectedYear]) {
-      setStudents(teacher.academicYear[selectedYear]);
-    }
-  }, [selectedYear, teacher]);
-
-
-const handleLogout = async () => {
-    try {
-      // setShowLogoutModal(true);
-      await signOut(FIREBASE_AUTH);
-      console.log('Logout Successful!');
-    } catch (error) {
-      console.error('Logout Error:', error.message);
-    } finally {
-      setTimeout(() => {
-        setShowLogoutModal(false);
-        navigation.navigate('TeacherLogin');
-      }, 3000);
-    }
-  };
-
-  const handleSave = () => {
-    const newStudent = {
-      id: selectedStudent ? selectedStudent.id : Date.now().toString(),
-      name,
-      firstTerm: parseInt(firstTerm),
-      midTerm: parseInt(midTerm),
-      finalTerm: parseInt(finalTerm),
+if(teacher){
+const getAcademicYearDetails = (teacher) => {
+  const academicYears = teacher.academicYear;
+  const years = Object.keys(academicYears); // Get all years
+  const details = years.map(year => {
+    return {
+      year: year,
+      classAssigned: academicYears[year].classAssigned,
+      subject: academicYears[year].subject
     };
+  });
+  return details;
+};
 
-    if (selectedStudent) {
-      setStudents(students.map(student =>
-        student.id === selectedStudent.id ? newStudent : student
-      ));
-    } else {
-      setStudents([...students, newStudent]);
-    }
+// Usage
+const academicYears = getAcademicYearDetails(teacher);
+console.log("academicYears");
+console.log(academicYears);
 
-    clearForm();
-    setIsFormVisible(false);
-  };
-
-  const handleEdit = (student) => {
-    setSelectedStudent(student);
-    setName(student.name);
-    setFirstTerm(student.firstTerm.toString());
-    setMidTerm(student.midTerm.toString());
-    setFinalTerm(student.finalTerm.toString());
-    setIsFormVisible(true);
-  };
-
-  const handleDelete = (id) => {
-    setStudents(students.filter(student => student.id !== id));
-  };
-
-  const clearForm = () => {
-    setSelectedStudent(null);
-    setName('');
-    setFirstTerm('');
-    setMidTerm('');
-    setFinalTerm('');
-  };
-
-  const filteredStudents = students.filter(student =>
-    student.name.toLowerCase().includes(search.toLowerCase())
-  );
+}
 
 
 
-  if (isFormVisible) {
+  const academicYearDetails = Object.keys(teacher.academicYear).map(year => ({
+    label: year,
+    value: year
+  }));
+
+  
 
 
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>{selectedStudent ? 'Edit Student' : 'Add Student'}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Name"
-          value={name}
-          onChangeText={setName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="First Term Marks"
-          value={firstTerm}
-          onChangeText={setFirstTerm}
-          keyboardType="numeric"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Mid Term Marks"
-          value={midTerm}
-          onChangeText={setMidTerm}
-          keyboardType="numeric"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Final Term Marks"
-          value={finalTerm}
-          onChangeText={setFinalTerm}
-          keyboardType="numeric"
-        />
-        <Button title="Save" onPress={handleSave} />
-        <Button title="Cancel" onPress={() => setIsFormVisible(false)} />
 
 
-      </View>
-    );
-  }
+const getClassForYear = (year) => {
+  const a =teacher.academicYear[year]?.classAssigned || '';
+console.log("*******************************")
+console.log(a)
+return a;
+
+};
 
 
 
@@ -156,129 +91,151 @@ const handleLogout = async () => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // const [year, setYear] = useState([]);
+
+
+
+
+
+
+
+  const [selectedYear, setSelectedYear] = useState(Object.keys(teacher.academicYear)[0]);
+
+
+
+//  useEffect(() => {
+//     if (teacher) {
+
+
+//       console.log('Teacher Data:', teacher);
+
+//       const years = Object.keys(teacher.academicYear);
+
+      
+
+//     }
+//   }, [teacher]);
+
+
+//   useEffect(() => {
+//     if (selectedYear && teacher.academicYear[selectedYear]) {
+//       setStudents(teacher.academicYear[selectedYear]);
+//     }
+//   }, [selectedYear, teacher]);
+
+
+// const handleLogout = async () => {
+//     try {
+//       // setShowLogoutModal(true);
+//       await signOut(FIREBASE_AUTH);
+//       console.log('Logout Successful!');
+//     } catch (error) {
+//       console.error('Logout Error:', error.message);
+//     } finally {
+//       setTimeout(() => {
+//         setShowLogoutModal(false);
+//         navigation.navigate('TeacherLogin');
+//       }, 3000);
+//     }
+//   };
 
 
 
 
   return(
+  
+    
+    
   <View style={styles.container}>
-      <Text style={styles.title}>Welcome, {teacher.teacherName}</Text>
-      <Picker
-        selectedValue={selectedYear}
-        style={styles.picker}
-        onValueChange={(itemValue) => setSelectedYear(itemValue)}
-      >
-        {Object.keys(teacher.academicYear).map(year => (
-          <Picker.Item label={year} value={year} key={year} />
-        ))}
-      </Picker>
-      <TextInput
-        style={styles.input}
-        placeholder="Search by name"
-        value={search}
-        onChangeText={setSearch}
-      />
-      <FlatList
-        data={filteredStudents}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.studentItem}>
-            <View style={styles.studentInfo}>
-              <Text style={styles.studentName}>{item.name}</Text>
-              <Text>First Term: {item.firstTerm}</Text>
-              <Text>Mid Term: {item.midTerm}</Text>
-              <Text>Final Term: {item.finalTerm}</Text>
-            </View>
-            <View style={styles.buttonsContainer}>
-              <Button title="Edit" onPress={() => handleEdit(item)} />
-              <Button title="Delete" onPress={() => handleDelete(item.id)} color="red" />
-            </View>
-          </View>
-        )}
-      />
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => setIsFormVisible(true)}
-      >
-        <Text style={styles.addButtonText}>Add Student</Text>
-      </TouchableOpacity>
-      <Button title="Logout" onPress={handleLogout} />
+
+
+   <View style={styles.header}>
+        <Text style={styles.headerText}>Teacher Dashboard</Text>
+      </View>
+
+
+
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Welcome, {teacher.teacherName}</Text>
+
+          
+        <RNPickerSelect
+          onValueChange={(value) => setSelectedYear(value)}
+          items={academicYearDetails}
+          style={pickerSelectStyles}
+          value={selectedYear}
+          placeholder={{}}
+
+  />
+
+      </View>
+       <Text style={styles.classText}>Class for {selectedYear}: {getClassForYear(selectedYear)}</Text> 
+    
+
+
+
+ 
     </View>
+   
+
   );
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // return (
-
-
-
-  //   <View style={styles.container}>
-  //     <Text style={styles.title}>Manage Student Marks</Text>
-  //     <TextInput
-  //       style={styles.input}
-  //       placeholder="Search by name"
-  //       value={search}
-  //       onChangeText={setSearch}
-  //     />
-  //     <FlatList
-  //       data={filteredStudents}
-  //       keyExtractor={item => item.id}
-  //       renderItem={({ item }) => (
-  //         <View style={styles.studentItem}>
-  //           <View style={styles.studentInfo}>
-  //             <Text style={styles.studentName}>{item.name}</Text>
-  //             <Text>First Term: {item.firstTerm}</Text>
-  //             <Text>Mid Term: {item.midTerm}</Text>
-  //             <Text>Final Term: {item.finalTerm}</Text>
-  //           </View>
-  //           <View style={styles.buttonsContainer}>
-  //             <Button title="Edit" onPress={() => handleEdit(item)} />
-  //             <Button title="Delete" onPress={() => handleDelete(item.id)} color="red" />
-  //           </View>
-  //         </View>
-  //       )}
-  //     />
-  //     <TouchableOpacity
-  //       style={styles.addButton}
-  //       onPress={() => setIsFormVisible(true)}
-  //     >
-  //       <Text style={styles.addButtonText}>Add Student</Text>
-  //     </TouchableOpacity>
-  //   </View>
-  // );
 
 
 
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
+    container: {
+    // flex: 1,
+    // padding: 16,
+  },
+  header: {
+    backgroundColor: "#473f97",
+    width: "100%",
+    height: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  headerText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
-    marginBottom: 16,
-    textAlign: 'center',
   },
+  classText: {
+    fontSize: 18,
+    marginLeft: 20,
+  },
+
+
+
   input: {
     height: 40,
     borderColor: 'gray',
@@ -315,5 +272,31 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+
+
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+});
+
 
 export default TeacherScreen;

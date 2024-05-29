@@ -22,6 +22,9 @@ const StudentLogin = ({ navigation }) => {
     });
   }, [user]);
 
+
+  
+
   const handleLogin = async () => {
     try {
       console.log('Attempting to sign in with:', registrationNumber + '@school.com', password);
