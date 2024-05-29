@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator,ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { FIREBASE_AUTH ,FIREBASE_DB} from '../../firebase/firebaseConfig';
 import { signOut } from 'firebase/auth';
@@ -8,94 +8,68 @@ import 'firebase/firestore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
 import RNPickerSelect from 'react-native-picker-select';
+import TeacherHeader from '../../components/teacherheader';
 
 
 
 
 
-
-const initialData = [
-  { id: '1', name: 'John Doe', firstTerm: 85, midTerm: 88, finalTerm: 90 },
-  { id: '2', name: 'Jane Smith', firstTerm: 78, midTerm: 82, finalTerm: 85 },
-];
 
 
 
 
   const TeacherScreen = ({route, navigation}) => {
+  const { teacher } = route.params;
+  const [students, setStudents] = useState([]);
 
 
-  const [teacher, setTeacher] = useState(null);
-  const [loading, setLoading] = useState(true);
-  // const [academicYearDetailss, setacademicYearDetails] = useState();
-  const teacherId ="58564";
+  const [academicYearDetailss, setacademicYearDetails] = useState();
+
+  const [classId, setClassid] = useState('');
+  
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [name, setName] = useState('');
+  const [firstTerm, setFirstTerm] = useState('');
+  const [midTerm, setMidTerm] = useState('');
+  const [finalTerm, setFinalTerm] = useState('');
+  const [search, setSearch] = useState('');
+  const [isFormVisible, setIsFormVisible] = useState(false);
 
 
-  useEffect(() => {
-    const fetchTeacherData = async () => {
-      try {
-        // const teacherDoc = doc(FIREBASE_DB, 'teachers', teacherId); // Adjust 'teachers' to your collection name
-        // const teacherDoc = await getDoc(teacherDocRef);
-        const teacherDoc = await getDoc(doc(FIREBASE_DB, 'teachers', teacherId));
 
-        if (teacherDoc.exists()) {
-          console.log("hsi")
-          setTeacher(teacherDoc.data());
 
-        } else {
-          console.log('No such document!');
-        }
-      } catch (error) {
-        // console.error('Error fetching teacher data:', error);
-        console.log("error")
-      } finally {
-        setLoading(false);
-      }
+
+
+
+
+
+
+
+
+
+
+  
+
+if(teacher){
+const getAcademicYearDetails = (teacher) => {
+  const academicYears = teacher.academicYear;
+  const years = Object.keys(academicYears); // Get all years
+  const details = years.map(year => {
+    return {
+      year: year,
+      classAssigned: academicYears[year].classAssigned,
+      subject: academicYears[year].subject
     };
+  });
+  return details;
+};
 
-    fetchTeacherData();
-  }, [teacherId]);
+// Usage
+const academicYears = getAcademicYearDetails(teacher);
+console.log("academicYears");
+console.log(academicYears);
 
-
-
-
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#473f97" />
-      </View>
-    );
-  }
-
-  if (!teacher) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Failed to load teacher data.</Text>
-      </View>
-    );
-  }
-
-// if(teacher){
-// const getAcademicYearDetails = (teacher) => {
-//   const academicYears = teacher.academicYear;
-//   const years = Object.keys(academicYears); // Get all years
-//   const details = years.map(year => {
-//     return {
-//       year: year,
-//       classAssigned: academicYears[year].classAssigned,
-//       subject: academicYears[year].subject
-//     };
-//   });
-//   return details;
-// };
-
-// // Usage
-// const academicYears = getAcademicYearDetails(teacher);
-// console.log("academicYears");
-// console.log(academicYears);
-
-// }
+}
 
 
 
@@ -107,91 +81,48 @@ const initialData = [
   
 
 
-  // const academicYearDetails = Object.keys(teacher.academicYear).map(year => ({
-  //   label: year,
-  //   value: year
-  // }))
 
 
 const getClassForYear = (year) => {
   const a =teacher.academicYear[year]?.classAssigned || '';
 console.log("*******************************")
 console.log(a)
+setClassid(a);
 return a;
 
 };
 
-
-// const getClassForYear = (year) => {
-//   const a =teacher.academicYear[year]?.classAssigned || '';
-// console.log("*******************************")
-// console.log(a)
-// return a;
+const [selectedYear, setSelectedYear] = useState(academicYearDetails.length > 5 ? academicYearDetails[5].value : null);
 
 
 
 
+const toclass = getClassForYear(selectedYear);
+
+const fetchStudents = async (year) => {
+  try {
+    // setLoading(true);
+    const studentsCollectionRef = collection(
+      FIREBASE_DB,
+      `classes/${classId}/${year}`
+    );
+    const studentsSnapshot = await getDocs(studentsCollectionRef);
+    const studentsList = studentsSnapshot.docs.map(doc => doc.data());
+    setStudents(studentsList);
+    // setLoading(false);
+  } catch (error) {
+    console.error('Error fetching students:', error);
+    setLoading(false); // Make sure to stop loading even if an error occurs
+  }
+};
+
+useEffect(() => {
+  if (classId && selectedYear) {
+    fetchStudents(selectedYear);
+  }
+}, [getClassForYear(selectedYear), selectedYear]);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // const { teacher } = route.params;
-
-
-
-
-
-
-  // const [year, setYear] = useState([]);
-
-  const [students, setStudents] = useState(initialData);
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [name, setName] = useState('');
-  const [firstTerm, setFirstTerm] = useState('');
-  const [midTerm, setMidTerm] = useState('');
-  const [finalTerm, setFinalTerm] = useState('');
-  const [search, setSearch] = useState('');
-  const [isFormVisible, setIsFormVisible] = useState(false);
-
-
-  // const [selectedYear, setSelectedYear] = useState(null);
-
-
-
-
-
-
-
-//  useEffect(() => {
-//     if (teacher) {
-
-
-//       console.log('Teacher Data:', teacher);
-
-//       const years = Object.keys(teacher.academicYear);
-
-      
-
-//     }
-//   }, [teacher]);
-
-
-//   useEffect(() => {
-//     if (selectedYear && teacher.academicYear[selectedYear]) {
-//       setStudents(teacher.academicYear[selectedYear]);
-//     }
-//   }, [selectedYear, teacher]);
 
 
 // const handleLogout = async () => {
@@ -211,214 +142,35 @@ return a;
 
 
 
-
-
-
-
-
-  // if (!teacher) {
-  //   return (
-  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-  //       <ActivityIndicator size="large" color="#0000ff" />
-  //     </View>
-  //   );
-  // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // const [selectedYear, setSelectedYear] = useState(Object.keys(teacher.academicYear)[0]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  return(
-  
-    
-    
-  <View style={styles.container}>
-
-
-   <View style={styles.header}>
-        <Text style={styles.headerText}>Teacher Dashboard</Text>
-      </View>
-
-
-
+return (
+  <ScrollView style={styles.container}>
+    <View style={styles.header}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Welcome, {teacher.teacherName}</Text>
-
-           
-        <RNPickerSelect
-          onValueChange={(value) => setSelectedYear(value)}
-          items={academicYearDetails}
-          style={pickerSelectStyles}
-          value={selectedYear}
-          placeholder={{}}
-  />
       </View>
-      <Text style={styles.classText}>Class for {selectedYear}: {getClassForYear(selectedYear)}</Text>
-
-
-
-  {/*  
-  
-      <Text style={styles.title}>Welcome, {year}</Text>
-
-
-
-      <Picker
-        selectedValue={selectedYear}
-        style={styles.picker}
-        onValueChange={(itemValue) => setSelectedYear(itemValue)}
-      >
-        {Object.keys(teacher.academicYear).map(year => (
-          <Picker.Item label={year} value={year} key={year} />
-        ))}
-      </Picker>
-      <TextInput
-        style={styles.input}
-        placeholder="Search by name"
-        value={search}
-        onChangeText={setSearch}
-      /> 
-
-
-
-      <FlatList
-        data={filteredStudents}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.studentItem}>
-            <View style={styles.studentInfo}>
-              <Text style={styles.studentName}>{item.name}</Text>
-              <Text>First Term: {item.firstTerm}</Text>
-              <Text>Mid Term: {item.midTerm}</Text>
-              <Text>Final Term: {item.finalTerm}</Text>
-            </View>
-            <View style={styles.buttonsContainer}>
-              <Button title="Edit" onPress={() => handleEdit(item)} />
-              <Button title="Delete" onPress={() => handleDelete(item.id)} color="red" />
-            </View>
-          </View>
-        )}
-      />
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => setIsFormVisible(true)}
-      >
-        <Text style={styles.addButtonText}>Add Student</Text>
-      </TouchableOpacity>
-      <Button title="Logout" onPress={handleLogout} />
-
-
-      */}
     </View>
-   
+    <Text style={styles.classText}>Class for {selectedYear}: {getClassForYear(selectedYear)}</Text>
+    <Picker
+      selectedValue={selectedYear}
+      onValueChange={(itemValue, itemIndex) => setSelectedYear(itemValue)}
+      style={styles.picker}
+    >
+      {academicYearDetails.map((yearDetail, index) => (
+        <Picker.Item key={index} label={yearDetail.label} value={yearDetail.value} />
+      ))}
+    </Picker>
 
-  );
-
-
-
-
-    // return (
-    //   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    //     <Text>Error: Teacher data not loading</Text>
-    //   </View>
-    // );
-
-
-
-
-
+    <View>
+      <Text>Hi</Text>
+    
+    </View>
 
 
-
-
+  </ScrollView>
+);
 
 
 
-
-
-
-
-
-
-
-
-  // return (
-
-
-
-  //   <View style={styles.container}>
-  //     <Text style={styles.title}>Manage Student Marks</Text>
-  //     <TextInput
-  //       style={styles.input}
-  //       placeholder="Search by name"
-  //       value={search}
-  //       onChangeText={setSearch}
-  //     />
-  //     <FlatList
-  //       data={filteredStudents}
-  //       keyExtractor={item => item.id}
-  //       renderItem={({ item }) => (
-  //         <View style={styles.studentItem}>
-  //           <View style={styles.studentInfo}>
-  //             <Text style={styles.studentName}>{item.name}</Text>
-  //             <Text>First Term: {item.firstTerm}</Text>
-  //             <Text>Mid Term: {item.midTerm}</Text>
-  //             <Text>Final Term: {item.finalTerm}</Text>
-  //           </View>
-  //           <View style={styles.buttonsContainer}>
-  //             <Button title="Edit" onPress={() => handleEdit(item)} />
-  //             <Button title="Delete" onPress={() => handleDelete(item.id)} color="red" />
-  //           </View>
-  //         </View>
-  //       )}
-  //     />
-  //     <TouchableOpacity
-  //       style={styles.addButton}
-  //       onPress={() => setIsFormVisible(true)}
-  //     >
-  //       <Text style={styles.addButtonText}>Add Student</Text>
-  //     </TouchableOpacity>
-  //   </View>
-  // );
 
 
 
@@ -426,8 +178,8 @@ return a;
 
 const styles = StyleSheet.create({
     container: {
-    flex: 1,
-    padding: 16,
+    // flex: 1,
+    // padding: 16,
   },
   header: {
     backgroundColor: "#473f97",
@@ -436,6 +188,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
+    
   },
   headerText: {
     color: '#FFFFFF',
@@ -455,36 +208,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 20,
   },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -523,6 +246,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
   },
+   picker: {
+    width: '30%',
+    height: 50,
+    borderWidth: 1,
+    borderColor: 'gray',
+  },
 });
 
 
@@ -539,8 +268,8 @@ const pickerSelectStyles = StyleSheet.create({
     paddingRight: 30, // to ensure the text is never behind the icon
   },
   inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
+    fontSize: 10,
+    paddingHorizontal: 2,
     paddingVertical: 8,
     borderWidth: 0.5,
     borderColor: 'purple',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator,ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { FIREBASE_AUTH ,FIREBASE_DB} from '../../firebase/firebaseConfig';
 import { signOut } from 'firebase/auth';
@@ -8,15 +8,10 @@ import 'firebase/firestore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
 import RNPickerSelect from 'react-native-picker-select';
+import TeacherHeader from '../../components/teacherheader';
 
 
 
-
-
-const initialData = [
-  { id: '1', name: 'John Doe', firstTerm: 85, midTerm: 88, finalTerm: 90 },
-  { id: '2', name: 'Jane Smith', firstTerm: 78, midTerm: 82, finalTerm: 85 },
-];
 
 
 
@@ -25,10 +20,13 @@ const initialData = [
 
   const TeacherScreen = ({route, navigation}) => {
   const { teacher } = route.params;
+  const [students, setStudents] = useState([]);
 
 
   const [academicYearDetailss, setacademicYearDetails] = useState();
-  const [students, setStudents] = useState(initialData);
+
+  // const [classId, setClassid] = useState('');
+  
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [name, setName] = useState('');
   const [firstTerm, setFirstTerm] = useState('');
@@ -40,6 +38,17 @@ const initialData = [
 
 
 
+
+
+
+
+
+
+
+
+
+
+  
 
 if(teacher){
 const getAcademicYearDetails = (teacher) => {
@@ -78,66 +87,44 @@ const getClassForYear = (year) => {
   const a =teacher.academicYear[year]?.classAssigned || '';
 console.log("*******************************")
 console.log(a)
+// setClassid(a);
 return a;
 
 };
 
+const [selectedYear, setSelectedYear] = useState(academicYearDetails.length > 5 ? academicYearDetails[5].value : null);
 
 
 
 
+const classId = getClassForYear(selectedYear);
+
+const fetchStudents = async (year) => {
+  try {
+    // setLoading(true);
+    const studentsCollectionRef = collection(
+      FIREBASE_DB,
+      `classes/${classId}/${year}`
+    );
+    const studentsSnapshot = await getDocs(studentsCollectionRef);
+    const studentsList = studentsSnapshot.docs.map(doc => doc.data());
+    setStudents(studentsList);
+    // setLoading(false);
+    console.log("students");
+    console.log(students);
+  } catch (error) {
+    console.error('Error fetching students:', error);
+    setLoading(false); // Make sure to stop loading even if an error occurs.j.
+  }
+};
+
+useEffect(() => {
+  if (classId && selectedYear) {
+    fetchStudents(selectedYear);
+  }
+}, [classId, selectedYear]);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // const [year, setYear] = useState([]);
-
-
-
-
-
-
-
-  const [selectedYear, setSelectedYear] = useState(Object.keys(teacher.academicYear)[0]);
-
-
-
-//  useEffect(() => {
-//     if (teacher) {
-
-
-//       console.log('Teacher Data:', teacher);
-
-//       const years = Object.keys(teacher.academicYear);
-
-      
-
-//     }
-//   }, [teacher]);
-
-
-//   useEffect(() => {
-//     if (selectedYear && teacher.academicYear[selectedYear]) {
-//       setStudents(teacher.academicYear[selectedYear]);
-//     }
-//   }, [selectedYear, teacher]);
 
 
 // const handleLogout = async () => {
@@ -157,44 +144,33 @@ return a;
 
 
 
-
-  return(
-  
-    
-    
-  <View style={styles.container}>
-
-
-   <View style={styles.header}>
-        <Text style={styles.headerText}>Teacher Dashboard</Text>
-      </View>
-
-
-
+return (
+  <ScrollView style={styles.container}>
+    <View style={styles.header}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Welcome, {teacher.teacherName}</Text>
-
-          
-        <RNPickerSelect
-          onValueChange={(value) => setSelectedYear(value)}
-          items={academicYearDetails}
-          style={pickerSelectStyles}
-          value={selectedYear}
-          placeholder={{}}
-
-  />
-
       </View>
-       <Text style={styles.classText}>Class for {selectedYear}: {getClassForYear(selectedYear)}</Text> 
-    
-
-
-
- 
     </View>
-   
+    <Text style={styles.classText}>Class for {selectedYear}: {getClassForYear(selectedYear)}</Text>
+    <Picker
+      selectedValue={selectedYear}
+      onValueChange={(itemValue, itemIndex) => setSelectedYear(itemValue)}
+      style={styles.picker}
+    >
+      {academicYearDetails.map((yearDetail, index) => (
+        <Picker.Item key={index} label={yearDetail.label} value={yearDetail.value} />
+      ))}
+    </Picker>
 
-  );
+    <ScrollView>
+      <Text>Hi</Text>
+    
+    </ScrollView>
+
+
+  </ScrollView>
+);
+
 
 
 
@@ -214,6 +190,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
+    
   },
   headerText: {
     color: '#FFFFFF',
@@ -271,6 +248,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
   },
+   picker: {
+    width: '30%',
+    height: 50,
+    borderWidth: 1,
+    borderColor: 'gray',
+  },
 });
 
 
@@ -287,8 +270,8 @@ const pickerSelectStyles = StyleSheet.create({
     paddingRight: 30, // to ensure the text is never behind the icon
   },
   inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
+    fontSize: 10,
+    paddingHorizontal: 2,
     paddingVertical: 8,
     borderWidth: 0.5,
     borderColor: 'purple',
