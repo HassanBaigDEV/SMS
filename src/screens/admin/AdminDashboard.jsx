@@ -1,32 +1,22 @@
-// screens/AdminDashboard.js
-import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import React from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ToastAndroid,
+} from 'react-native';
 import {signOut} from 'firebase/auth';
-// import RoleBasedComponent from '../components/RoleBasedComponent';
-import {getDocs, doc, collection} from 'firebase/firestore';
-import {FIREBASE_DB, FIREBASE_AUTH} from '../../firebase/firebaseConfig';
+import {FIREBASE_AUTH} from '../../firebase/firebaseConfig';
+import Header from '../../components/header';
 
 const AdminDashboard = ({navigation}) => {
-  const [userRole, setUserRole] = useState('');
-
-  // useEffect(() => {
-  //   const fetchUserRole = async () => {
-  //     const user = FIREBASE_AUTH.currentUser;
-  //     if (user) {
-  //       const userDoc = await getDoc(doc(FIREBASE_DB, 'users', user.uid));
-  //       if (userDoc.exists()) {
-  //         setUserRole(userDoc.data().role);
-  //       }
-  //     }
-  //   };
-
-  //   fetchUserRole();
-  // }, []);
-
   const handleLogout = async () => {
+    ToastAndroid.show('Logging out...', ToastAndroid.SHORT);
     try {
       await signOut(FIREBASE_AUTH);
-      navigation.navigate('AdminLogin');
+      navigation.navigate('Login');
     } catch (error) {
       console.error('Logout Error:', error);
     }
@@ -34,54 +24,75 @@ const AdminDashboard = ({navigation}) => {
 
   return (
     <>
+      <Header title="Dashboard" nav={false} />
       <View style={styles.container}>
-        <Text style={styles.title}>Admin Dashboard</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Students')}>
-          <Text>Manage Students</Text>
-        </TouchableOpacity>
-        {/* <TouchableOpacity onPress={() => navigation.navigate('AddClass')}>
-          <Text>Add Class</Text>
-        </TouchableOpacity> */}
-        <TouchableOpacity onPress={() => navigation.navigate('TeacherList')}>
-          <Text>Manage Teachers</Text>
-        </TouchableOpacity>
-        {/* <TouchableOpacity onPress={() => navigation.navigate('ManageFees')}>
-          <Text>Manage Fees</Text>
-        </TouchableOpacity> */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate('UploadTimetable')}>
-          <Text>Upload Timetable</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('UploadSyllabus')}>
-          <Text>Upload Syllabus</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text>Logout</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('ClassList');
-          }}>
-          <Text>Classes</Text>
-        </TouchableOpacity>
-        {/* <TouchableOpacity onPress={() => navigation.navigate('addStudent')}>
-          <Text>Add Student</Text>
-        </TouchableOpacity> */}
-        {/* <TouchableOpacity onPress={() => navigation.navigate('addTeacher')}>
-          <Text>Add Teacher</Text>
-        </TouchableOpacity> */}
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('StudentAgeRecord');
-          }}>
-          <Text>Student Age Record</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('FeeStatus');
-          }}>
-          <Text>Fee Status</Text>
-        </TouchableOpacity>
+        <View style={styles.logoutButtonContainer}>
+          <TouchableOpacity onPress={handleLogout}>
+            <Image
+              style={styles.logoutButton}
+              source={require('../../assets/icons/logout_icon.png')}
+            />
+            {/* <Text style={styles.logoutButton}>Logout</Text> */}
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.title}>Dashboard</Text>
+        <View style={styles.cardsContainer}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('Students')}>
+            <Image
+              source={require('../../assets/icons/student_icon.png')}
+              style={styles.cardImage}
+            />
+            <Text style={styles.cardText}>Students</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('TeacherList')}>
+            <Image
+              source={require('../../assets/icons/teacher_icon.png')}
+              style={styles.cardImage}
+            />
+            <Text style={styles.cardText}>Teachers</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('TimeTable')}>
+            <Image
+              source={require('../../assets/icons/timetable_icon.png')}
+              style={styles.cardImage}
+            />
+            <Text style={styles.cardText}>Timetable</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('ClassList')}>
+            <Image
+              source={require('../../assets/icons/class_icon.png')}
+              style={styles.cardImage}
+            />
+            <Text style={styles.cardText}>Classes</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('FeeStatus')}>
+            <Image
+              source={require('../../assets/icons/fee_status_icon.png')}
+              style={styles.cardImage}
+            />
+            <Text style={styles.cardText}>Fee Status</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('StudentRecord')}>
+            <Image
+              source={require('../../assets/icons/student_record_icon.png')}
+              style={styles.cardImage}
+            />
+            <Text style={styles.cardText}>Reports</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </>
   );
@@ -90,13 +101,53 @@ const AdminDashboard = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
     padding: 16,
   },
   title: {
     fontSize: 24,
     marginBottom: 16,
     textAlign: 'center',
+  },
+  logoutButtonContainer: {
+    alignItems: 'flex-end',
+    marginBottom: 16,
+  },
+  logoutButton: {
+    fontSize: 18,
+    color: '#007BFF',
+    height: 35,
+    width: 35,
+  },
+  cardsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  card: {
+    width: '48%',
+    backgroundColor: '#fff',
+    marginBottom: 16,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  cardImage: {
+    width: 80,
+    height: 80,
+    marginBottom: 10,
+  },
+  cardText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

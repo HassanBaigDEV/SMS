@@ -22,7 +22,7 @@ const BackButton = styled.Image`
   font-size: 18px;
 `;
 
-const Header = ({title}) => {
+const Header = ({title, nav = true}) => {
   const navigation = useNavigation();
 
   return (
@@ -36,9 +36,11 @@ const Header = ({title}) => {
         colors={['rgb(64, 172, 194)', 'rgb(131, 15, 147)']}
         start={{x: 0, y: 0}}
         end={{x: 1, y: 0}}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <BackButton source={require('../assets/icons/chevron-left.png')} />
-        </TouchableOpacity>
+        {nav && (
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <BackButton source={require('../assets/icons/chevron-left.png')} />
+          </TouchableOpacity>
+        )}
         <Text
           style={{
             color: 'white',

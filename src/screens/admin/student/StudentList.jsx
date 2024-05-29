@@ -4,17 +4,21 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  Button,
   StyleSheet,
   Alert,
   Image,
+  TextInput,
 } from 'react-native';
 import {collection, getDocs, doc, deleteDoc} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
 import Header from '../../../components/header';
+import {ActivityIndicator} from 'react-native-paper';
 
 const StudentList = ({navigation}) => {
   const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredStudents, setFilteredStudents] = useState([]);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -25,15 +29,38 @@ const StudentList = ({navigation}) => {
         ...doc.data(),
       }));
       setStudents(studentList);
+      setFilteredStudents(studentList);
+      setLoading(false);
     };
 
     fetchStudents();
   }, []);
 
+  useEffect(() => {
+    if (searchQuery === '') {
+      setFilteredStudents(students);
+    } else {
+      const filtered = students.filter(
+        student =>
+          student?.registrationNumber
+            ?.toString()
+            .includes(searchQuery.toLowerCase()) ||
+          student?.studentName
+            ?.toLowerCase()
+
+            .includes(searchQuery.toLowerCase()),
+      );
+      setFilteredStudents(filtered);
+    }
+  }, [searchQuery]);
+
   const handleDeleteStudent = async studentId => {
     try {
       await deleteDoc(doc(FIREBASE_DB, 'students', studentId));
       setStudents(students.filter(student => student.id !== studentId));
+      setFilteredStudents(
+        filteredStudents.filter(student => student.id !== studentId),
+      );
       Alert.alert('Success', 'Student deleted successfully');
     } catch (error) {
       console.error('Error deleting student:', error);
@@ -73,12 +100,25 @@ const StudentList = ({navigation}) => {
     <>
       <Header title="Students" />
       <View style={styles.container}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by Registration Number or Name"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {loading && (
+          <ActivityIndicator animating={true} color="#007bff" size="large" />
+        )}
+        {!loading && students.length === 0 && (
+          <Text>No students found. Add a student to get started.</Text>
+        )}
         <FlatList
           data={students}
           renderItem={renderItem}
           keyExtractor={item => item.id}
-          contentContainerStyle={styles.flatListContent}
+          // contentContainerStyle={styles.flatListContent}
         />
+
         <TouchableOpacity
           style={styles.buttonContainer}
           onPress={() => navigation.navigate('addStudent')}>
@@ -131,7 +171,8 @@ const styles = StyleSheet.create({
   buttonContainer: {
     backgroundColor: '#007BFF',
     paddingVertical: 15,
-    marginVertical: 20,
+    // marginVertical: 20,
+    marginTop: 10,
     marginHorizontal: 20,
     borderRadius: 50,
     alignItems: 'center',
@@ -143,8 +184,16 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  searchInput: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingLeft: 10,
+    marginBottom: 20,
+    backgroundColor: '#fff',
   },
 });
 
