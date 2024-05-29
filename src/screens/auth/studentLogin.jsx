@@ -1,18 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, SafeAreaView, Image, Modal, ActivityIndicator } from 'react-native';
-import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebase/firebaseConfig';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  SafeAreaView,
+  Image,
+  Modal,
+  ActivityIndicator,
+} from 'react-native';
+import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+} from 'firebase/auth';
+import {doc, getDoc, setDoc} from 'firebase/firestore';
 import schoolIcon1 from '../../images/image2-nobg.png';
 
-const StudentLogin = ({ navigation }) => {
+const StudentLogin = ({navigation}) => {
   const [user, setUser] = useState(null);
   const [registrationNumber, setRegistrationNumber] = useState('');
   const [password, setPassword] = useState('');
-  const [registrationNumberFocused, setRegistrationNumberFocused] = useState(false);
+  const [registrationNumberFocused, setRegistrationNumberFocused] =
+    useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-
 
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, user => {
@@ -27,32 +42,32 @@ const StudentLogin = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      console.log('Attempting to sign in with:', registrationNumber + '@school.com', password);
+      console.log(
+        'Attempting to sign in with:',
+        registrationNumber + '@school.com',
+        password,
+      );
       const userCredential = await signInWithEmailAndPassword(
         FIREBASE_AUTH,
         registrationNumber + '@student.com',
-        password
+        password,
       );
       setUser(userCredential.user);
       const user = userCredential.user;
       const uid = userCredential.user.uid;
-
-      
-      const userDoc = await getDoc(doc(FIREBASE_DB, 'students', registrationNumber));
-      const studentRole = await getDoc(doc(FIREBASE_DB, 'users', uid))
-      
-      
-      
-      ;
+      const userDoc = await getDoc(
+        doc(FIREBASE_DB, 'students', registrationNumber),
+      );
+      const studentRole = await getDoc(doc(FIREBASE_DB, 'users', uid));
       // console.log(studentRole.data().role);
       // console.log(userDoc.data());
       // console.log(studentRole.data());
       var userData = userDoc.data();
-      
+
       if (userDoc.exists()) {
         console.log('userData:', userData);
         if (studentRole.data().role === 'student') {
-          setShowLogoutModal(true); 
+          setShowLogoutModal(true);
         } else {
           Alert.alert('Access denied', 'You do not have student privileges.');
         }
@@ -69,25 +84,27 @@ const StudentLogin = ({ navigation }) => {
     } finally {
       setTimeout(() => {
         setShowLogoutModal(false);
-        navigation.navigate('StudentDashboard', { user: userData });
-      }, 2000); 
+        navigation.navigate('StudentDashboard', {user: userData});
+      }, 2000);
     }
   };
 
   return (
     <SafeAreaView style={styles.background}>
       <View style={styles.topContainer}>
-        <Image
-          source={schoolIcon1}
-          style={styles.icon}
-        />
+        <Image source={schoolIcon1} style={styles.icon} />
         <Text style={styles.appTitle}>STELLAR TACTFUL EDU</Text>
-        <Text style={styles.tagline}>Navigating Brilliance, Building Futures</Text>
+        <Text style={styles.tagline}>
+          Navigating Brilliance, Building Futures
+        </Text>
       </View>
       <View style={styles.bottomContainer}>
         <Text style={styles.title}>STUDENT LOGIN</Text>
         <TextInput
-          style={[styles.input, registrationNumberFocused && styles.inputFocused]}
+          style={[
+            styles.input,
+            registrationNumberFocused && styles.inputFocused,
+          ]}
           placeholder="Registration Number"
           value={registrationNumber}
           onChangeText={setRegistrationNumber}
@@ -112,7 +129,6 @@ const StudentLogin = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-
       {/* Loading Modal */}
       <Modal visible={showLogoutModal} transparent={false} animationType="fade">
         <View style={styles.loadingContainer}>
@@ -120,7 +136,6 @@ const StudentLogin = ({ navigation }) => {
           <Text style={styles.loadingText}>LOGGING IN...</Text>
         </View>
       </Modal>
-
     </SafeAreaView>
   );
 };
@@ -128,7 +143,7 @@ const StudentLogin = ({ navigation }) => {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    backgroundColor: '#000000', 
+    backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -143,17 +158,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'serif',
     fontStyle: 'italic', // Apply italic style
-  },  
+  },
   appTitle: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#fff', // White
     textAlign: 'center',
     textShadowColor: '#aaa',
-    textShadowOffset: { width: 2, height: 2 },
+    textShadowOffset: {width: 2, height: 2},
     textShadowRadius: 4,
     marginBottom: 10,
-  },  
+  },
   bottomContainer: {
     flex: 0.8,
     justifyContent: 'center',
@@ -176,16 +191,16 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
-    marginBottom: 50, 
+    marginBottom: 50,
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333333', 
+    color: '#333333',
     marginTop: 20,
     textAlign: 'center',
     textShadowColor: '#aaa',
-    textShadowOffset: { width: 2, height: 2 },
+    textShadowOffset: {width: 2, height: 2},
     textShadowRadius: 4,
     marginBottom: 10,
   },
@@ -226,7 +241,7 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 20,
     fontWeight: 'bold',
-  },  
+  },
 });
 
 export default StudentLogin;

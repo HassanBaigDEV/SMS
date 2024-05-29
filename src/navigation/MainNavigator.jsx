@@ -1,6 +1,6 @@
 // AppNavigator.js
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import {TouchableOpacity} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import Login from '../screens/auth/Login.jsx';
@@ -26,24 +26,24 @@ import ClassDetails from '../screens/admin/class/classDetails.jsx';
 import SubjectsList from '../screens/admin/class/subjectsList.jsx';
 import SectionsList from '../screens/admin/class/sectionsList.jsx';
 import SectionDetails from '../screens/admin/class/sectionsDetails.jsx';
-import CreateStudentForm from '../screens/admin/CreateStudentForm.jsx';
+import CreateStudentForm from '../screens/admin/student/CreateStudentForm.jsx';
 import AddTeacherForm from '../screens/admin/teacher/AddTeacherForm.jsx';
 import TeacherList from '../screens/admin/teacher/TeacherList.jsx';
 import TeacherDetail from '../screens/admin/teacher/TeacherDetails.jsx';
 import EditTeacher from '../screens/admin/teacher/EditTeacher.jsx';
-import StudentAgeRecord from '../screens/admin/student/StudentAgeRecod.jsx';
+import StudentAgeRecord from '../screens/admin/StudentAgeRecod.jsx';
 import FeeStatusForm from '../screens/admin/feeStatus/FeeStatusForm.jsx';
 import FeeStatus from '../screens/admin/feeStatus/index.jsx';
 
-
-
 import TeacherLogin from '../screens/auth/teacherLogin.jsx';
-import TeacherScreen from '../screens/teacher/TeacherDashboard.jsx';
+import TeacherScreen from '../screens/teacher/teacherDashboard.jsx';
+import StudentReport from '../screens/admin/reportTwo.jsx';
+import TimeTable from '../screens/admin/TimeTable.jsx';
 
 const Stack = createStackNavigator();
 
-const AcademicProfileScreenOptions = ({ route }) => {
-  const { user, selectedYear } = route.params;
+const AcademicProfileScreenOptions = ({route}) => {
+  const {user, selectedYear} = route.params;
   const classEnrolled = user.classEnrolled;
   const parts = classEnrolled.split('/'); // Split the string by "/"
   const className = parts[1]; // Get the second part, which is the class name
@@ -65,8 +65,8 @@ const AcademicProfileScreenOptions = ({ route }) => {
   };
 };
 
-const FeeStatusScreenOptions = ({ route }) => {
-  const { user, feeYear } = route.params;
+const FeeStatusScreenOptions = ({route}) => {
+  const {user, feeYear} = route.params;
 
   return {
     title: `Fee Status (${feeYear})`,
@@ -95,8 +95,8 @@ const StudentNavigator = () => {
       <Stack.Screen
         name="StudentDashboard"
         component={StudentDashboard}
-        options={{ headerShown: false }}
-      /> 
+        options={{headerShown: false}}
+      />
       <Stack.Screen
         name="AcademicProfile"
         component={AcademicProfile}
@@ -132,12 +132,12 @@ const AdminNavigator = () => {
       <Stack.Screen
         name="AdminDashboard"
         component={AdminDashboard}
-        options={{title: 'Dashboard'}}
+        options={{title: 'Dashboard', headerShown: false}}
       />
       <Stack.Screen
         name="AddClass"
         component={AddClassForm}
-        options={{title: 'Add Class'}}
+        options={{title: 'Add Class', headerShown: false}}
       />
       <Stack.Screen
         name="ClassList"
@@ -219,6 +219,16 @@ const AdminNavigator = () => {
         component={FeeStatus}
         options={{title: 'Fee Status', headerShown: false}}
       />
+      <Stack.Screen
+        name="StudentRecord"
+        component={StudentReport}
+        options={{title: 'Student Record', headerShown: false}}
+      />
+      <Stack.Screen
+        name="TimeTable"
+        component={TimeTable}
+        options={{title: 'Time Table', headerShown: false}}
+      />
       {/* <Stack.Screen
           name="ManageStudents"
           component={ManageStudents}
@@ -257,13 +267,12 @@ const TeacherNavigator = () => {
         options={{headerShown: false}}
       />
 
-     <Stack.Screen
+      <Stack.Screen
         name="TeacherDashboard"
         component={TeacherScreen}
-
         options={{headerShown: false}}
       />
-    {/*    <Stack.Screen
+      {/*    <Stack.Screen
         name="Marks"
         component={Marks}
         options={{ title: 'Marks' }}

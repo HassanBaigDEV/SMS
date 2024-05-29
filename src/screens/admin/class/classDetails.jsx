@@ -15,6 +15,7 @@ import {
   Button,
   Image,
   ToastAndroid,
+  Platform,
 } from 'react-native';
 
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
@@ -28,6 +29,7 @@ import {
   arrayUnion,
   updateDoc,
   arrayRemove,
+  getDoc,
 } from 'firebase/firestore';
 import {getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
 import Header from '../../../components/header';
@@ -56,8 +58,23 @@ const ClassDetails = ({route, navigation}) => {
   const [imageUrl, setImageUrl] = useState('');
   const [newTeacher, setNewTeacher] = useState('');
   const [allTeachers, setAllTeachers] = useState([]);
+  const [syllabus, setSyllabus] = useState(null);
 
   const _storage = getStorage();
+
+  useEffect(() => {
+    const fetchSyllabus = async () => {
+      // console.log('sseees');
+      const syllabusRef = doc(FIREBASE_DB, 'syllabus', `${classId}`);
+      // console.log('syllabusRef', syllabusRef);
+      const syllabusSnapshot = await getDoc(syllabusRef);
+      console.log('syllabusSnapshot', syllabusSnapshot);
+      const syllabusData = syllabusSnapshot.data();
+      console.log('syllabusData', syllabusData.syllabus);
+      setSyllabus(syllabusData.syllabus);
+    };
+    fetchSyllabus();
+  }, []);
 
   useEffect(() => {
     fetchAllTeachers();
@@ -134,67 +151,112 @@ const ClassDetails = ({route, navigation}) => {
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
       } else {
+        // const source = {uri: response.assets[0].uri};
+
+        // console.log('-----------------------', response);
+        // const _response = await fetch(response.assets[0].uri);
+        // const blob = await _response.blob();
+        // console.log('blob', blob);
+        // await uploadImage(source.uri);
         const source = {uri: response.assets[0].uri};
         console.log(source);
         await uploadImage(source.uri);
       }
     });
+    // launchImageLibrary({noData: true}, response => {
+    //   if (response) {
+    //     console.log(response);
+    //     // setPhoto(response);
+    //   }
+    // });
   };
+  // const uploadImage = async uri => {
+  //   const filename = uri.substring(uri.lastIndexOf('/') + 1);
+  //   console.log('filename', filename);
+  //   console.log('uploadUri', uri);
+  //   const storageRef = ref(_storage, `images/${filename}`);
+  //   console.log('storageRef', storageRef);
+  //   const metadata = {
+  //     contentType: 'image/jpeg',
+  //   };
+  //   uploadBytes(storageRef, uri).then(snapshot => {
+  //     console.log('Uploaded a blob or file!', snapshot);
+  //     getDownloadURL(storageRef).then(url => {
+  //       console.log('url', url);
+  //       saveImageURLToFirestore(url);
+  //       setImageUrl(url);
+  //       setImage(filename);
+  //       // show a loading toast
+  //       ToastAndroid.show('Uploading', ToastAndroid.SHORT);
+  //     });
+  //   });
+  //   // uploadTask.on(
+  //   //   'state_changed',
+  //   //   snapshot => {
+  //   //     const progress =
+  //   //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+  //   //     console.log('Upload is ' + progress + '% done');
+  //   //     ToastAndroid.show(`Uploading ${progress}`, ToastAndroid.SHORT);
+  //   //     switch (snapshot.state) {
+  //   //       case 'paused':
+  //   //         console.log('Upload is paused');
+  //   //         break;
+  //   //       case 'running':
+  //   //         ToastAndroid.show('Uploading', ToastAndroid.SHORT);
+  //   //         console.log('Upload is running');
+  //   //         break;
+  //   //     }
+  //   //   },
+  //   //   error => {
+  //   //     console.log(error);
+  //   //     ToastAndroid.show('Error uploading image', ToastAndroid.SHORT);
+  //   //   },
+  //   // );
+  // };
+
   const uploadImage = async uri => {
     const filename = uri.substring(uri.lastIndexOf('/') + 1);
     console.log('filename', filename);
     console.log('uploadUri', uri);
-    const storageRef = ref(_storage, `images/${filename}`);
-    console.log('storageRef', storageRef);
-    // const metadata = {
-    //   contentType: 'image/jpeg',
-    // };
-    uploadBytes(storageRef, uri).then(snapshot => {
+
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      const storageRef = ref(_storage, `images/${filename}`);
+      console.log('storageRef', storageRef);
+
+      const snapshot = await uploadBytes(storageRef, blob);
       console.log('Uploaded a blob or file!', snapshot);
-      getDownloadURL(storageRef).then(url => {
-        console.log('url', url);
-        saveImageURLToFirestore(url);
-        setImageUrl(url);
-        setImage(filename);
-        // show a loading toast
-        ToastAndroid.show('Uploading', ToastAndroid.SHORT);
-      });
-    });
-    // uploadTask.on(
-    //   'state_changed',
-    //   snapshot => {
-    //     const progress =
-    //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    //     console.log('Upload is ' + progress + '% done');
-    //     ToastAndroid.show(`Uploading ${progress}`, ToastAndroid.SHORT);
-    //     switch (snapshot.state) {
-    //       case 'paused':
-    //         console.log('Upload is paused');
-    //         break;
-    //       case 'running':
-    //         ToastAndroid.show('Uploading', ToastAndroid.SHORT);
-    //         console.log('Upload is running');
-    //         break;
-    //     }
-    //   },
-    //   error => {
-    //     console.log(error);
-    //     ToastAndroid.show('Error uploading image', ToastAndroid.SHORT);
-    //   },
-    // );
+
+      const url = await getDownloadURL(storageRef);
+      console.log('url', url);
+
+      saveImageURLToFirestore(url);
+      setImageUrl(url);
+      setImage(filename);
+
+      ToastAndroid.show('Uploading', ToastAndroid.LONG);
+    } catch (error) {
+      console.error('Error uploading image: ', error);
+      ToastAndroid.show('Error uploading image', ToastAndroid.SHORT);
+    }
   };
 
   const saveImageURLToFirestore = async url => {
     try {
-      await setDoc(doc(FIREBASE_DB, 'syllabus', `${classId}`), {
-        [selectedYear]: {
+      await setDoc(
+        doc(FIREBASE_DB, 'syllabus', `${classId}`),
+        {
           syllabus: url,
         },
-      });
+        {merge: true},
+      );
       console.log('Image URL saved to Firestore!');
       // Alert.alert('Success', 'Syllabus uploaded successfully');
       // show a toast message
       ToastAndroid.show('Syllabus uploaded successfully', ToastAndroid.SHORT);
+      setSyllabus(url);
     } catch (e) {
       console.error('Error saving image URL to Firestore: ', e);
     }
@@ -549,6 +611,24 @@ const ClassDetails = ({route, navigation}) => {
       setNewTeacher(foundTeacher.teacherName);
     }
   };
+  const handleSyllabusDlt = async () => {
+    try {
+      ToastAndroid.show('Deleting Syllabus', ToastAndroid.SHORT);
+      await setDoc(
+        doc(FIREBASE_DB, 'syllabus', `${classId}`),
+        {
+          syllabus: '',
+        },
+        {merge: true},
+      );
+      // Alert.alert('Success', 'Syllabus deleted successfully');
+      // show a toast message
+      ToastAndroid.show('Syllabus deleted successfully', ToastAndroid.SHORT);
+      setSyllabus(null);
+    } catch (e) {
+      console.error('Error deleting syllabus:', e);
+    }
+  };
 
   return (
     <>
@@ -605,9 +685,25 @@ const ClassDetails = ({route, navigation}) => {
         )}
       </ScrollView>
       {!showStudents && (
-        <TouchableOpacity style={styles.addButton} onPress={chooseImage}>
-          <Text style={styles.addButtonText}>Upload Syllabus</Text>
-        </TouchableOpacity>
+        <>
+          {syllabus && (
+            <View style={styles.syllabusImageContainer}>
+              {/* <View style={styles.syllabusImageSubContainer}> */}
+              {/* <Text style={styles.syllabusText}>Syllabus:</Text> */}
+              <Image source={{uri: syllabus}} style={styles.syllabusImage} />
+              {/* </View> */}
+              <TouchableOpacity onPress={handleSyllabusDlt}>
+                <Image
+                  source={require('../../../assets/icons/bin.png')}
+                  style={styles.syllabusImageDlt}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
+          <TouchableOpacity style={styles.addButton} onPress={chooseImage}>
+            <Text style={styles.addButtonText}>Upload Syllabus</Text>
+          </TouchableOpacity>
+        </>
       )}
       {showStudents && (
         <TouchableOpacity
@@ -691,17 +787,6 @@ const ClassDetails = ({route, navigation}) => {
               onChangeText={text => setSelectedSubject(text)}
               editable={false}
             />
-            {/* <Text>Syllabus:</Text>
-            <Text>
-              {image ? (
-                <Image
-                  source={{uri: image}}
-                  style={{width: 200, height: 200, marginVertical: 10}}
-                />
-              ) : (
-                'No image selected'
-              )}
-            </Text> */}
 
             <View style={styles.modalButtons}>
               <Button title="Assign" onPress={assignTeacher} color="#007BFF" />
@@ -875,6 +960,47 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 18,
     color: '#666',
+  },
+  syllabusImageContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 0,
+    paddingHorizontal: 30,
+    marginTop: 10,
+    marginHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: '#f9f9f9',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+
+    // marginVertical: 20,
+  },
+  syllabusImageSubContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  syllabusText: {
+    fontSize: 16,
+    fontWeight: '500',
+    paddingTop: 20,
+    color: '#666',
+  },
+  syllabusImage: {
+    width: 150,
+    height: 150,
+    resizeMode: 'contain',
+    paddingVertical: 0,
+  },
+  syllabusImageDlt: {
+    width: 20,
+    height: 20,
+    tintColor: '#FF0000',
+    marginLeft: 10,
   },
 });
 
