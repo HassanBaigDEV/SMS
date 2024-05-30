@@ -10,7 +10,7 @@ const teacherLogin = () => {
         style={styles.graduationCapIcon}
         resizeMode="cover"
         // source={require("../assests/icons/graduation-cap.png")}
-        source={require('../../assests/icons/graduation-cap.png')}
+        source={require('../../assets/icons/graduation-cap.png')}
 
       />
       <Text style={[styles.aura, styles.auraTypo]}>Aura</Text>

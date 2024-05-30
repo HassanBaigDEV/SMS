@@ -24,7 +24,7 @@ const StudentLogin = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      console.log('Attempting to sign in with:', registrationNumber + '@school.com', password);
+      console.log('Attempting to sign in with:', registrationNumber + '@student.com', password);
       const userCredential = await signInWithEmailAndPassword(
         FIREBASE_AUTH,
         registrationNumber + '@student.com',

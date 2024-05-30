@@ -78,7 +78,7 @@ const StudentDashboard = ({ navigation, route }) => {
         <View style={styles.separator}></View>
         <Text style={[styles.boldText, styles.registrationNumberText]}>REGISTRATION NUMBER: <Text style={styles.userInfoText}>{user.registrationNumber ? user.registrationNumber : 'N/A'}</Text></Text>
         <View style={styles.separator}></View>
-        <TouchableOpacity style={[styles.optionButton, { backgroundColor: '#8A2BE2' }]} onPress={() => setModalVisible(true)}>
+        <TouchableOpacity style={[styles.optionButton, { backgroundColor: '#8A2BE2' }]} onPress={() => navigation.navigate('ClassSyllabus', { user })}>
           <Text style={styles.optionButtonText}>VIEW CLASS SYLLABUS</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.optionButton, { backgroundColor: '#8A2BE2' }]} onPress={() => setModalVisible(true)}>
@@ -86,6 +86,9 @@ const StudentDashboard = ({ navigation, route }) => {
         </TouchableOpacity>
         <TouchableOpacity style={[styles.optionButton, { backgroundColor: '#8A2BE2' }]} onPress={() => setFeeModalVisible(true)}>
           <Text style={styles.optionButtonText}>VIEW FEE STATUS</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.optionButton, { backgroundColor: '#8A2BE2' }]} onPress={() => navigation.navigate('TimeTable', { user })}>
+          <Text style={styles.optionButtonText}>VIEW TIMETABLE</Text>
         </TouchableOpacity>
         <TouchableOpacity 
             style={[styles.optionButton, { backgroundColor: '#8A2BE2' }]} 
