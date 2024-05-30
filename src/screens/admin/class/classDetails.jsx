@@ -670,15 +670,17 @@ const ClassDetails = ({route, navigation}) => {
             {subjects.map(subject => (
               <View key={subject} style={styles.subjectItem}>
                 <Text style={styles.subjectText}>{subject}</Text>
-                <Text style={styles.teacherText}>
-                  {getTeacherForSubject(subject)}
-                </Text>
-                <TouchableOpacity onPress={() => handleEditSubject(subject)}>
-                  <Image
-                    source={require('../../../assets/icons/pencil.png')}
-                    style={styles.editIcon}
-                  />
-                </TouchableOpacity>
+                <View style={styles.subjectSubContainer}>
+                  <Text style={styles.teacherText}>
+                    {getTeacherForSubject(subject)}
+                  </Text>
+                  <TouchableOpacity onPress={() => handleEditSubject(subject)}>
+                    <Image
+                      source={require('../../../assets/icons/pencil.png')}
+                      style={styles.editIcon}
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
             ))}
           </Animated.View>
@@ -834,6 +836,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 15,
   },
+  subjectSubContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   toggleButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -895,6 +901,9 @@ const styles = StyleSheet.create({
   teacherText: {
     fontSize: 16,
     color: '#666',
+    // alignItems: 'flex-end',
+    textAlign: 'left',
+    marginRight: 20,
   },
   editIcon: {
     width: 20,
