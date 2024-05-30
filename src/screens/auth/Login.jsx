@@ -1,6 +1,13 @@
-// screens/AdminLogin.js
 import React, {useEffect, useState} from 'react';
-import {View, Text, TextInput, Button, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ToastAndroid,
+} from 'react-native';
 import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
 import {signInWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth';
 import {doc, getDoc} from 'firebase/firestore';
@@ -20,27 +27,8 @@ const Login = ({navigation}) => {
     });
   }, [user]);
 
-  // useEffect(() => {
-  //   const adminData = {
-  //     name: 'Admin Name',
-  //     email: 'admin@example.com',
-  //     role: 'admin',
-  //   };
-
-  //   firebase
-  //     .firestore()
-  //     .collection('admins')
-  //     .doc('admin1')
-  //     .set(adminData)
-  //     .then(() => {
-  //       console.log('Admin data added successfully.');
-  //     })
-  //     .catch(error => {
-  //       console.error('Error adding admin data: ', error);
-  //     });
-  // }, []);
-
   const handleLogin = async () => {
+    ToastAndroid.show('Logging in...', ToastAndroid.SHORT);
     try {
       const userCredential = await signInWithEmailAndPassword(
         FIREBASE_AUTH,
@@ -54,60 +42,55 @@ const Login = ({navigation}) => {
 
       const userData = userDoc.data();
       if (userDoc.exists()) {
-        // navigation.navigate('AdminDashboard');
-
         console.log('userRole:', userData);
         if (userData.role === 'admin') {
-          // Admin-specific logic
           console.log('Welcome, Admin!');
+          ToastAndroid.show('Welcome!', ToastAndroid.SHORT);
           navigation.navigate('AdminDashboard');
         } else {
-          // Normal user logic
           console.log('Welcome, User!');
         }
       } else {
-        alert('user not found');
+        // Alert.alert('Error', 'User not found');
+        // console.error('User not found');
+        ToastAndroid.show('User not found', ToastAndroid.SHORT);
       }
-      // const user = userCredential.user;
-
-      // // Check user role in Firestore
-      // const userDoc = await getDoc(doc(FIREBASE_DB, 'users', user.uid));
-      // console.log(userDoc);
-      // if (userDoc.exists()) {
-      //   const userData = userDoc.data();
-      //   // if (userData.role === 'admin') {
-      //   navigation.navigate('AdminDashboard');
-      //   // } else {
-      //   //   alert('Access denied: You do not have admin privileges.');
-      //   // }
-      // } else {
-      //   alert('User does not exist.');
-      // }
     } catch (error) {
       console.error('Login Error:', error);
-      alert('Login failed. Please check your credentials.');
+      // Alert.alert('Error', 'Login failed. Please check your credentials.');
+      ToastAndroid.show(
+        'Login failed. Please check your credentials.',
+        ToastAndroid.SHORT,
+      );
     }
   };
 
+
+
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <Button title="Login" onPress={handleLogin} />
+      <View style={styles.loginBox}>
+        <Text style={styles.title}>Admin Login</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -117,18 +100,43 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 16,
+    backgroundColor: '#f7f7f7',
+  },
+  loginBox: {
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
   },
   title: {
     fontSize: 24,
-    marginBottom: 16,
+    marginBottom: 20,
     textAlign: 'center',
+    color: '#333333',
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
+    height: 50,
+    borderColor: '#cccccc',
     borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
+    marginBottom: 16,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: '#f9f9f9',
+  },
+  button: {
+    backgroundColor: '#007bff',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

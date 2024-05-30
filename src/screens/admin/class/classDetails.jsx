@@ -14,6 +14,8 @@ import {
   TextInput,
   Button,
   Image,
+  ToastAndroid,
+  Platform,
 } from 'react-native';
 
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
@@ -24,14 +26,17 @@ import {
   where,
   setDoc,
   doc,
-  Platform,
+  arrayUnion,
+  updateDoc,
+  arrayRemove,
+  getDoc,
 } from 'firebase/firestore';
 import {getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
 import Header from '../../../components/header';
 import {years} from '../../../data/academicYear';
 import {subjectByClass} from '../../../data/classes';
 import {launchImageLibrary} from 'react-native-image-picker';
-import {set} from 'firebase/database';
+import {get, set} from 'firebase/database';
 
 const ClassDetails = ({route, navigation}) => {
   const {classId} = route.params;
@@ -51,50 +56,29 @@ const ClassDetails = ({route, navigation}) => {
   const [subjectModalVisible, setSubjectModalVisible] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [newTeacher, setNewTeacher] = useState('');
+  const [allTeachers, setAllTeachers] = useState([]);
+  const [syllabus, setSyllabus] = useState(null);
 
   const _storage = getStorage();
 
-  const chooseImage = async () => {
-    launchImageLibrary({mediaType: 'photo'}, async response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        const source = {uri: response.assets[0].uri};
-        console.log(source);
-        await uploadImage(source.uri);
-      }
-    });
-  };
-  const uploadImage = async uri => {
-    const filename = uri.substring(uri.lastIndexOf('/') + 1);
-    console.log('filename', filename);
-    console.log('uploadUri', uri);
-    const storageRef = ref(_storage, `images/${filename}`);
-    console.log('storageRef', storageRef);
-    uploadBytes(storageRef, uri).then(snapshot => {
-      console.log('Uploaded a blob or file!', snapshot);
-      getDownloadURL(storageRef).then(url => {
-        console.log('url', url);
-        saveImageURLToFirestore(url);
-        setImageUrl(url);
-        setImage(filename);
-      });
-    });
-  };
-  const saveImageURLToFirestore = async url => {
-    try {
-      await setDoc(doc(FIREBASE_DB, 'syllabus', `${classId}`), {
-        [selectedYear]: {
-          syllabus: url,
-        },
-      });
-      console.log('Image URL saved to Firestore!');
-    } catch (e) {
-      console.error('Error saving image URL to Firestore: ', e);
-    }
-  };
+  useEffect(() => {
+    const fetchSyllabus = async () => {
+      // console.log('sseees');
+      const syllabusRef = doc(FIREBASE_DB, 'syllabus', `${classId}`);
+      // console.log('syllabusRef', syllabusRef);
+      const syllabusSnapshot = await getDoc(syllabusRef);
+      console.log('syllabusSnapshot', syllabusSnapshot);
+      const syllabusData = syllabusSnapshot.data();
+      console.log('syllabusData', syllabusData.syllabus);
+      setSyllabus(syllabusData.syllabus);
+    };
+    fetchSyllabus();
+  }, []);
+
+  useEffect(() => {
+    fetchAllTeachers();
+  }, [navigation]);
 
   useEffect(() => {
     if (selectedYear) {
@@ -121,9 +105,167 @@ const ClassDetails = ({route, navigation}) => {
     fetchAllStudents();
   }, [newStudentRollNo, modalVisible]);
 
+  useEffect(() => {
+    const fetchMatchingTeachers = async () => {
+      setLoading(true);
+      try {
+        const teachersCollectionRef = collection(FIREBASE_DB, 'teachers');
+        const teachersSnapshot = await getDocs(teachersCollectionRef);
+        const teachersList = teachersSnapshot.docs
+          .map(doc => ({
+            ...doc.data(),
+            id: doc.id,
+          }))
+          .filter(teacher => teacher.idNumber.toString().includes(newTeacher));
+        setAllTeachers(teachersList);
+      } catch (error) {
+        console.error('Error fetching teachers:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMatchingTeachers();
+  }, [newTeacher, subjectModalVisible]);
+
+  const fetchAllTeachers = async () => {
+    setLoading(true);
+    try {
+      const teachersCollectionRef = collection(FIREBASE_DB, 'teachers');
+      const teachersSnapshot = await getDocs(teachersCollectionRef);
+      const teachersList = teachersSnapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setAllTeachers(teachersList);
+    } catch (error) {
+      console.error('Error fetching teachers:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const chooseImage = async () => {
+    launchImageLibrary({mediaType: 'photo'}, async response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        // const source = {uri: response.assets[0].uri};
+
+        // console.log('-----------------------', response);
+        // const _response = await fetch(response.assets[0].uri);
+        // const blob = await _response.blob();
+        // console.log('blob', blob);
+        // await uploadImage(source.uri);
+        const source = {uri: response.assets[0].uri};
+        console.log(source);
+        await uploadImage(source.uri);
+      }
+    });
+    // launchImageLibrary({noData: true}, response => {
+    //   if (response) {
+    //     console.log(response);
+    //     // setPhoto(response);
+    //   }
+    // });
+  };
+  // const uploadImage = async uri => {
+  //   const filename = uri.substring(uri.lastIndexOf('/') + 1);
+  //   console.log('filename', filename);
+  //   console.log('uploadUri', uri);
+  //   const storageRef = ref(_storage, `images/${filename}`);
+  //   console.log('storageRef', storageRef);
+  //   const metadata = {
+  //     contentType: 'image/jpeg',
+  //   };
+  //   uploadBytes(storageRef, uri).then(snapshot => {
+  //     console.log('Uploaded a blob or file!', snapshot);
+  //     getDownloadURL(storageRef).then(url => {
+  //       console.log('url', url);
+  //       saveImageURLToFirestore(url);
+  //       setImageUrl(url);
+  //       setImage(filename);
+  //       // show a loading toast
+  //       ToastAndroid.show('Uploading', ToastAndroid.SHORT);
+  //     });
+  //   });
+  //   // uploadTask.on(
+  //   //   'state_changed',
+  //   //   snapshot => {
+  //   //     const progress =
+  //   //       (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+  //   //     console.log('Upload is ' + progress + '% done');
+  //   //     ToastAndroid.show(`Uploading ${progress}`, ToastAndroid.SHORT);
+  //   //     switch (snapshot.state) {
+  //   //       case 'paused':
+  //   //         console.log('Upload is paused');
+  //   //         break;
+  //   //       case 'running':
+  //   //         ToastAndroid.show('Uploading', ToastAndroid.SHORT);
+  //   //         console.log('Upload is running');
+  //   //         break;
+  //   //     }
+  //   //   },
+  //   //   error => {
+  //   //     console.log(error);
+  //   //     ToastAndroid.show('Error uploading image', ToastAndroid.SHORT);
+  //   //   },
+  //   // );
+  // };
+
+  const uploadImage = async uri => {
+    const filename = uri.substring(uri.lastIndexOf('/') + 1);
+    console.log('filename', filename);
+    console.log('uploadUri', uri);
+
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      const storageRef = ref(_storage, `images/${filename}`);
+      console.log('storageRef', storageRef);
+
+      const snapshot = await uploadBytes(storageRef, blob);
+      console.log('Uploaded a blob or file!', snapshot);
+
+      const url = await getDownloadURL(storageRef);
+      console.log('url', url);
+
+      saveImageURLToFirestore(url);
+      setImageUrl(url);
+      setImage(filename);
+
+      ToastAndroid.show('Uploading', ToastAndroid.LONG);
+    } catch (error) {
+      console.error('Error uploading image: ', error);
+      ToastAndroid.show('Error uploading image', ToastAndroid.SHORT);
+    }
+  };
+
+  const saveImageURLToFirestore = async url => {
+    try {
+      await setDoc(
+        doc(FIREBASE_DB, 'syllabus', `${classId}`),
+        {
+          syllabus: url,
+        },
+        {merge: true},
+      );
+      console.log('Image URL saved to Firestore!');
+      // Alert.alert('Success', 'Syllabus uploaded successfully');
+      // show a toast message
+      ToastAndroid.show('Syllabus uploaded successfully', ToastAndroid.SHORT);
+      setSyllabus(url);
+    } catch (e) {
+      console.error('Error saving image URL to Firestore: ', e);
+    }
+  };
+
   const handleAddStudent = async () => {
     if (newStudentRollNo.trim() === '' || newStudentName.trim() === '') {
-      Alert.alert('Error', 'Please fill all fields.');
+      // Alert.alert('Error', 'Please fill all fields.');
+      ToastAndroid.show('Please fill all fields', ToastAndroid.SHORT);
       return;
     }
 
@@ -159,12 +301,14 @@ const ClassDetails = ({route, navigation}) => {
       };
 
       await setDoc(studentRef, studentData, {merge: true});
-      Alert.alert('Success', 'Student added successfully');
+      // Alert.alert('Success', 'Student added successfully');
+      ToastAndroid.show('Student added successfully', ToastAndroid.SHORT);
       setNewStudentRollNo('');
       setNewStudentName('');
       setModalVisible(false);
     } catch (error) {
-      Alert.alert('Error', error.message);
+      // Alert.alert('Error', error.message);
+      ToastAndroid.show(error.message, ToastAndroid.SHORT);
     }
   };
 
@@ -186,26 +330,70 @@ const ClassDetails = ({route, navigation}) => {
     }).start();
   };
 
+  // const fetchTeachers = async year => {
+  //   setLoading(true);
+
+  //   try {
+  //     const teachersCollectionRef = collection(FIREBASE_DB, 'teachers');
+  //     const teachersSnapshot = await getDocs(teachersCollectionRef);
+  //     const teachersList = teachersSnapshot.docs
+  //       .map(doc => ({...doc.data(), id: doc.id}))
+  //       .filter(teacher => {
+  //         const classAssigned = teacher.academicYear?.[year]?.classAssigned;
+  //         console.log('classass', classAssigned);
+  //         // return classesAssigned.some(
+  //         //   classInfo => classInfo.classId === classId,
+  //         // );
+  //         // let _teachers = classesAssigned.map(elm => {
+  //         //   if (elm.classId == classId) {
+  //         //     return elm;
+  //         //   }
+  //         // });
+  //         // console.log('_teachers', _teachers);
+  //         // console.log('classesAssigned', classesAssigned);
+  //       });
+  //     console.log('teachersList', teachersList);
+  //     setTeachers(teachersList);
+  //   } catch (error) {
+  //     console.error('Error fetching teachers:', error);
+  //   } finally {
+  //     setLoading(false);
+  //     Animated.timing(fadeAnim, {
+  //       toValue: 1,
+  //       duration: 500,
+  //       useNativeDriver: true,
+  //     }).start();
+  //   }
+  // };
+
   const fetchTeachers = async year => {
     setLoading(true);
-    const teachersCollectionRef = collection(FIREBASE_DB, 'teachers');
-    const q = query(
-      teachersCollectionRef,
-      where(`academicYear.${year}.classAssigned`, '==', classId),
-    );
-    const teachersSnapshot = await getDocs(q);
-    const teachersList = teachersSnapshot.docs.map(doc => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
-    setTeachers(teachersList);
-    setLoading(false);
 
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
+    try {
+      const teachersCollectionRef = collection(FIREBASE_DB, 'teachers');
+      const teachersSnapshot = await getDocs(teachersCollectionRef);
+      const teachersList = teachersSnapshot.docs
+        .map(doc => ({...doc.data(), id: doc.id}))
+        .filter(teacher => {
+          const classesAssigned =
+            teacher.academicYear?.[year]?.classAssigned || [];
+          return (
+            Array.isArray(classesAssigned) &&
+            classesAssigned.some(classInfo => classInfo.classId === classId)
+          );
+        });
+
+      setTeachers(teachersList);
+    } catch (error) {
+      console.error('Error fetching teachers:', error);
+    } finally {
+      setLoading(false);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }
   };
 
   const renderTab = year => (
@@ -228,6 +416,8 @@ const ClassDetails = ({route, navigation}) => {
 
   const handleEditSubject = subject => {
     setSelectedSubject(subject);
+    setNewTeacher(getTeacherIdForSubject(subject));
+    console.log('teacherID', newTeacher);
     setSubjectModalVisible(true);
     // navigation.navigate('EditTeacherAssignment', {
     //   classId,
@@ -236,10 +426,26 @@ const ClassDetails = ({route, navigation}) => {
     // });
   };
 
+  const getTeacherIdForSubject = subject => {
+    const teacher = teachers.find(t => {
+      const classesAssigned = t.academicYear[selectedYear]?.classAssigned || [];
+      return classesAssigned.some(classInfo => classInfo.subject === subject);
+    });
+
+    return teacher ? teacher.idNumber.toString() : 'N/A';
+  };
+
   const getTeacherForSubject = subject => {
-    const teacher = teachers.find(
-      t => t.academicYear[selectedYear]?.subject === subject,
-    );
+    // console.log('subject', subject);
+    const teacher = teachers.find(t => {
+      const classesAssigned = t.academicYear[selectedYear]?.classAssigned || [];
+
+      return classesAssigned.some(
+        classInfo =>
+          classInfo.classId == classId && classInfo.subject === subject,
+      );
+    });
+
     return teacher ? teacher.teacherName : 'N/A';
   };
 
@@ -257,6 +463,170 @@ const ClassDetails = ({route, navigation}) => {
     );
     if (foundStudent) {
       setNewStudentName(foundStudent.studentName);
+    }
+  };
+
+  // const assignTeacher = async () => {
+  //   if (newTeacher.trim() === '') {
+  //     Alert.alert('Error', 'Please enter teacher name');
+  //     return;
+  //   }
+
+  //   try {
+  //     //check if new teacher exists in teachers collection in firebase
+  //     const teachersCollectionRef = collection(FIREBASE_DB, 'teachers');
+  //     const teachersSnapshot = await getDocs(teachersCollectionRef);
+  //     const _teachers = teachersSnapshot.docs.map(doc => doc.data());
+  //     console.log('teachers', _teachers);
+  //     let teacher;
+  //     _teachers.map(t => {
+  //       if (t.idNumber == newTeacher) {
+  //         teacher = t;
+  //         console.log('xsss', t);
+  //       }
+  //     });
+
+  //     // const teacher = teachers.find(t => t.teacherName === newTeacher);
+  //     if (teacher) {
+  //       const teacherRef = doc(FIREBASE_DB, 'teachers', newTeacher);
+
+  //       // const teacherData = {
+  //       //   teacherName: teacher.teacherName,
+  //       //   academicYear: {
+  //       //     [selectedYear]: {
+  //       //       ...teacher?.academicYear[selectedYear],
+  //       //       classAssigned: arrayUnion({classId, subject: selectedSubject}),
+  //       //     },
+  //       //   },
+  //       // };
+
+  //       await updateDoc(teacherRef, {
+  //         [`academicYear.${selectedYear}.classAssigned`]: arrayUnion({
+  //           classId,
+  //           subject: selectedSubject,
+  //         }),
+  //       });
+  //       console.log('Teacher data updated successfully.');
+  //       Alert.alert('Success', 'Teacher assigned successfully');
+  //       setNewTeacher('');
+  //     } else {
+  //       Alert.alert('Error', 'Teacher does not exist');
+  //     }
+  //     setSubjectModalVisible(false);
+  //   } catch (error) {
+  //     Alert.alert('Error', error.message);
+  //   }
+  // };
+
+  const assignTeacher = async () => {
+    if (newTeacher.trim() === '') {
+      // Alert.alert('Error', 'Please enter teacher ID number');
+      ToastAndroid.show('Please enter teacher ID number', ToastAndroid.SHORT);
+      return;
+    }
+
+    try {
+      // Fetch all teachers from the collection
+      const teachersCollectionRef = collection(FIREBASE_DB, 'teachers');
+      const teachersSnapshot = await getDocs(teachersCollectionRef);
+      const _teachers = teachersSnapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      // Check if the new teacher exists
+      let teacher;
+      _teachers.map(t => {
+        if (t.idNumber == newTeacher) {
+          teacher = t;
+        }
+      });
+
+      if (teacher) {
+        const teacherRef = doc(FIREBASE_DB, 'teachers', teacher.id);
+
+        // Remove the class assignment from any other teacher who has this class assigned in the same academic year
+        const otherTeacherWithClassAssigned = _teachers.find(t => {
+          const classesAssigned =
+            t.academicYear?.[selectedYear]?.classAssigned || [];
+          return (
+            Array.isArray(classesAssigned) &&
+            classesAssigned.some(
+              classInfo =>
+                classInfo.classId == classId &&
+                classInfo.subject === selectedSubject,
+            )
+          );
+        });
+
+        if (otherTeacherWithClassAssigned) {
+          // console.log(
+          //   'Other teacher with class assigned:',
+          //   otherTeacherWithClassAssigned,
+          // );
+          const otherTeacherRef = doc(
+            FIREBASE_DB,
+            'teachers',
+            otherTeacherWithClassAssigned.id,
+          );
+          const updatedClassesAssigned =
+            otherTeacherWithClassAssigned.academicYear[
+              selectedYear
+            ].classAssigned.filter(classInfo => classInfo.classId !== classId);
+          await updateDoc(otherTeacherRef, {
+            [`academicYear.${selectedYear}.classAssigned`]:
+              updatedClassesAssigned,
+          });
+        }
+
+        // Assign the class to the new teacher
+        await updateDoc(teacherRef, {
+          [`academicYear.${selectedYear}.classAssigned`]: arrayUnion({
+            classId,
+            subject: selectedSubject,
+          }),
+        });
+
+        // Alert.alert('Success', 'Teacher assigned successfully');
+        ToastAndroid.show('Teacher assigned successfully', ToastAndroid.SHORT);
+        setNewTeacher('');
+      } else {
+        // Alert.alert('Error', 'Teacher does not exist');
+        ToastAndroid.show('Teacher does not exist', ToastAndroid.SHORT);
+      }
+
+      setSubjectModalVisible(false);
+    } catch (error) {
+      // Alert.alert('Error', error.message);
+      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+    }
+  };
+
+  const handleSelectTeacher = idNumber => {
+    setNewTeacher(idNumber);
+    const foundTeacher = allTeachers.find(
+      teacher => teacher.idNumber === idNumber,
+    );
+    if (foundTeacher) {
+      setNewTeacher(foundTeacher.teacherName);
+    }
+  };
+  const handleSyllabusDlt = async () => {
+    try {
+      ToastAndroid.show('Deleting Syllabus', ToastAndroid.SHORT);
+      await setDoc(
+        doc(FIREBASE_DB, 'syllabus', `${classId}`),
+        {
+          syllabus: '',
+        },
+        {merge: true},
+      );
+      // Alert.alert('Success', 'Syllabus deleted successfully');
+      // show a toast message
+      ToastAndroid.show('Syllabus deleted successfully', ToastAndroid.SHORT);
+      setSyllabus(null);
+    } catch (e) {
+      console.error('Error deleting syllabus:', e);
     }
   };
 
@@ -314,14 +684,34 @@ const ClassDetails = ({route, navigation}) => {
           </Animated.View>
         )}
       </ScrollView>
-      <View>
-        <Button title="Choose Image" onPress={chooseImage} />
-      </View>
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => setModalVisible(true)}>
-        <Text style={styles.addButtonText}>Add New Student</Text>
-      </TouchableOpacity>
+      {!showStudents && (
+        <>
+          {syllabus && (
+            <View style={styles.syllabusImageContainer}>
+              {/* <View style={styles.syllabusImageSubContainer}> */}
+              {/* <Text style={styles.syllabusText}>Syllabus:</Text> */}
+              <Image source={{uri: syllabus}} style={styles.syllabusImage} />
+              {/* </View> */}
+              <TouchableOpacity onPress={handleSyllabusDlt}>
+                <Image
+                  source={require('../../../assets/icons/bin.png')}
+                  style={styles.syllabusImageDlt}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
+          <TouchableOpacity style={styles.addButton} onPress={chooseImage}>
+            <Text style={styles.addButtonText}>Upload Syllabus</Text>
+          </TouchableOpacity>
+        </>
+      )}
+      {showStudents && (
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setModalVisible(true)}>
+          <Text style={styles.addButtonText}>Add New Student</Text>
+        </TouchableOpacity>
+      )}
       <Modal visible={modalVisible} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -375,36 +765,31 @@ const ClassDetails = ({route, navigation}) => {
             <Text style={styles.modalTitle}>Assign Teacher</Text>
             <TextInput
               style={styles.input}
-              placeholder="Teacher"
-              value={getTeacherForSubject(selectedSubject)}
-              editable={false}
+              placeholder="TeacherID"
+              value={newTeacher}
+              onChangeText={text => setNewTeacher(text)}
+              editable={true}
             />
+            {/* <View style={styles.input}>
+              <Dropdown
+                label="Select Teacher"
+                data={allTeachers.map(teacher => ({
+                  label: teacher.teacherName,
+                  value: teacher.idNumber.toString(),
+                }))}
+                onSelect={handleSelectTeacher}
+              />
+            </View> */}
             <TextInput
               style={styles.input}
               placeholder="Subject"
               value={selectedSubject}
               onChangeText={text => setSelectedSubject(text)}
+              editable={false}
             />
-            {/* <Text>Syllabus:</Text>
-            <Text>
-              {image ? (
-                <Image
-                  source={{uri: image}}
-                  style={{width: 200, height: 200, marginVertical: 10}}
-                />
-              ) : (
-                'No image selected'
-              )}
-            </Text> */}
-            <View>
-              <Button title="Choose Image" onPress={chooseImage} />
-            </View>
+
             <View style={styles.modalButtons}>
-              <Button
-                title="Assign"
-                onPress={() => setSubjectModalVisible(false)}
-                color="#007BFF"
-              />
+              <Button title="Assign" onPress={assignTeacher} color="#007BFF" />
               <Button
                 title="Cancel"
                 onPress={() => setSubjectModalVisible(false)}
@@ -575,6 +960,47 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 18,
     color: '#666',
+  },
+  syllabusImageContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 0,
+    paddingHorizontal: 30,
+    marginTop: 10,
+    marginHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: '#f9f9f9',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+
+    // marginVertical: 20,
+  },
+  syllabusImageSubContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  syllabusText: {
+    fontSize: 16,
+    fontWeight: '500',
+    paddingTop: 20,
+    color: '#666',
+  },
+  syllabusImage: {
+    width: 150,
+    height: 150,
+    resizeMode: 'contain',
+    paddingVertical: 0,
+  },
+  syllabusImageDlt: {
+    width: 20,
+    height: 20,
+    tintColor: '#FF0000',
+    marginLeft: 10,
   },
 });
 

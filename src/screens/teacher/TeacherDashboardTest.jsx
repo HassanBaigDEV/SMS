@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator,Image, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 import { collection, getDocs } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../firebase/firebaseConfig';
-import { list } from 'firebase/storage';
 
 const TeacherScreen = ({ route, navigation }) => {
   const { teacher } = route.params;
@@ -47,20 +46,8 @@ const [selectedYear, setSelectedYear] = useState(academicYearDetails.length > 5 
   }, [selectedYear]);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-          style={styles.listItem}
-          >
-          <View style={styles.listItemTextContainer}>
-            <Text style={styles.listItemText}>
-              {item.registrationNumber} - {item.studentName}
-            </Text>
-          </View>
-          <Image
-          source={require('../../assets/icons/eye.png')}
-          style={styles.editIcon}
-          />
-        </TouchableOpacity>
-    );
+    <Text style={styles.studentName}>{item.studentName}</Text>
+  );
 
   return (
     <View style={styles.container}>
@@ -69,8 +56,7 @@ const [selectedYear, setSelectedYear] = useState(academicYearDetails.length > 5 
           <Text style={styles.title}>Welcome, {teacher.teacherName}</Text>
         </View>
       </View>
-
-      <Text style={styles.classText}>Academic Year {selectedYear}: {getClassForYear(selectedYear)}</Text>
+      <Text style={styles.classText}>Class for {selectedYear}: {getClassForYear(selectedYear)}</Text>
       <Picker
         selectedValue={selectedYear}
         onValueChange={(itemValue, itemIndex) => setSelectedYear(itemValue)}
@@ -80,7 +66,6 @@ const [selectedYear, setSelectedYear] = useState(academicYearDetails.length > 5 
           <Picker.Item key={index} label={yearDetail.label} value={yearDetail.value} />
         ))}
       </Picker>
-      <View style={styles.list}>
       {loading ? (
         <ActivityIndicator size="large" color="blue" />
       ) : (
@@ -90,9 +75,7 @@ const [selectedYear, setSelectedYear] = useState(academicYearDetails.length > 5 
           keyExtractor={(item, index) => index.toString()}
           style={styles.flatList}
         />
-
       )}
-      </View>
     </View>
   );
 };
@@ -137,36 +120,6 @@ const styles = StyleSheet.create({
   },
   flatList: {
     flex: 1,
-  },
-    listItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 15,
-    marginBottom: 10,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  listItemTextContainer: {
-    flex: 1,
-  },
-  listItemText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  editIcon: {
-    width: 23,
-    height: 23,
-    tintColor: 'rgb(0, 123, 255)',
-  },
-  list: {
-    flex: 1,
-    padding: 20,
   },
 });
 

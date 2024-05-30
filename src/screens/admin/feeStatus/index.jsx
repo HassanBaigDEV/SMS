@@ -3,17 +3,14 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   FlatList,
   TouchableOpacity,
   StyleSheet,
   Modal,
-  Alert,
   ScrollView,
 } from 'react-native';
 import {getDocs, collection} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
-import FeeStatusForm from './FeeStatusForm'; // Import the FeeStatusForm component
 import Header from '../../../components/header';
 
 const FeeStatus = ({navigation}) => {
@@ -21,6 +18,7 @@ const FeeStatus = ({navigation}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [years, setYears] = useState([]);
+  const [months, setMonths] = useState([]);
   const [student, setStudent] = useState({});
 
   useEffect(() => {
@@ -54,9 +52,21 @@ const FeeStatus = ({navigation}) => {
     if (student.feeStatus) {
       const feeYears = Object.keys(student.feeStatus);
       setYears(feeYears);
+      setMonths([]);
       setModalVisible(true);
     } else {
+      setYears([]);
+      setMonths([]);
       setModalVisible(true);
+    }
+  };
+
+  const handleShowMonths = year => {
+    if (student.feeStatus && student.feeStatus[year]) {
+      const feeMonths = Object.keys(student.feeStatus[year]);
+      setMonths(feeMonths);
+    } else {
+      setMonths([]);
     }
   };
 
@@ -72,10 +82,17 @@ const FeeStatus = ({navigation}) => {
     </TouchableOpacity>
   );
 
-  const openStatusForm = () => {
-    const currentYear = new Date().getFullYear().toString();
+  const openStatusForm = (year, month = null) => {
+    // get current month if month is not provided
+    if (!month) {
+      const currentMonth = new Date().toLocaleString('default', {
+        month: 'long',
+      });
+      month = currentMonth;
+    }
     navigation.navigate('FeeStatusForm', {
-      year: currentYear,
+      year,
+      month,
       student: student,
     });
   };
@@ -106,26 +123,44 @@ const FeeStatus = ({navigation}) => {
           onRequestClose={handleCloseModal}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Fee Status Years</Text>
-              <FlatList
-                data={years}
-                keyExtractor={item => item}
-                renderItem={({item}) => (
-                  <TouchableOpacity
-                    style={styles.yearItem}
-                    onPress={() =>
-                      navigation.navigate('FeeStatusForm', {
-                        student,
-                        year: item,
-                      })
-                    }>
-                    <Text style={styles.yearText}>{item}</Text>
-                  </TouchableOpacity>
-                )}
-              />
+              <Text style={styles.modalTitle}>Fee Status</Text>
+              {years.length > 0 ? (
+                <>
+                  <FlatList
+                    data={years}
+                    keyExtractor={item => item}
+                    renderItem={({item}) => (
+                      <TouchableOpacity
+                        style={styles.yearItem}
+                        onPress={() => handleShowMonths(item)}>
+                        <Text style={styles.yearText}>{item}</Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                  {months.length > 0 && (
+                    <FlatList
+                      data={months}
+                      keyExtractor={item => item}
+                      renderItem={({item}) => (
+                        <TouchableOpacity
+                          style={styles.monthItem}
+                          onPress={() =>
+                            openStatusForm(student.feeStatus, item)
+                          }>
+                          <Text style={styles.monthText}>{item}</Text>
+                        </TouchableOpacity>
+                      )}
+                    />
+                  )}
+                </>
+              ) : (
+                <Text>No fee status available for the selected student</Text>
+              )}
               <TouchableOpacity
                 style={styles.addButton}
-                onPress={openStatusForm}>
+                onPress={() =>
+                  openStatusForm(new Date().getFullYear().toString())
+                }>
                 <Text style={styles.addButtonText}>Add Fee Status</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -201,6 +236,14 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
   },
   yearText: {
+    fontSize: 16,
+  },
+  monthItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  monthText: {
     fontSize: 16,
   },
   addButton: {

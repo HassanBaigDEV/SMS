@@ -14,7 +14,7 @@ import {addFeeStatus} from '../../../utils/feeStatus';
 import Header from '../../../components/header';
 
 const FeeStatusForm = ({route, navigation}) => {
-  const {student, year, newStudent} = route.params;
+  const {student, year, month} = route.params;
 
   const [feeDetails, setFeeDetails] = useState({
     registrationNumber: '',
@@ -28,19 +28,18 @@ const FeeStatusForm = ({route, navigation}) => {
 
   useEffect(() => {
     console.log('student:', student);
-    console.log('newStudent:', newStudent);
 
     if (student) {
-      const feeStatusForYear = student.feeStatus?.[year];
-      if (feeStatusForYear) {
+      const feeStatusForMonth = student.feeStatus?.[year]?.[month];
+      if (feeStatusForMonth) {
         setFeeDetails({
           registrationNumber: student.registrationNumber,
           studentName: student.studentName,
-          amountDue: feeStatusForYear.amountDue?.toString() || '',
-          amountPaid: feeStatusForYear.amountPaid?.toString() || '',
-          payableAmount: feeStatusForYear.payableAmount?.toString() || '',
-          paymentDate: feeStatusForYear.paymentDate?.toString() || '',
-          remarks: feeStatusForYear.remarks?.toString() || '',
+          amountDue: feeStatusForMonth.amountDue?.toString() || '',
+          amountPaid: feeStatusForMonth.amountPaid?.toString() || '',
+          payableAmount: feeStatusForMonth.payableAmount?.toString() || '',
+          paymentDate: feeStatusForMonth.paymentDate?.toString() || '',
+          remarks: feeStatusForMonth.remarks?.toString() || '',
         });
       } else {
         setFeeDetails({
@@ -55,12 +54,17 @@ const FeeStatusForm = ({route, navigation}) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [student, year]);
+  }, [student, year, month]);
 
   const handleAddFeeStatus = async () => {
     try {
       console.log('feeDetails:', feeDetails);
-      await addFeeStatus(feeDetails, feeDetails.registrationNumber);
+      await addFeeStatus(
+        feeDetails,
+        feeDetails.registrationNumber,
+        year,
+        month,
+      );
       Alert.alert('Success', 'Fee status added successfully.');
       setFeeDetails({
         registrationNumber: '',
@@ -71,6 +75,7 @@ const FeeStatusForm = ({route, navigation}) => {
         paymentDate: '',
         remarks: '',
       });
+      navigation.goBack();
     } catch (error) {
       Alert.alert('Error', error.message);
     }

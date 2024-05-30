@@ -1,18 +1,16 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import LinearGradient from 'react-native-linear-gradient';
-import {TouchableOpacity, StatusBar, Platform} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {Text} from 'react-native-paper';
+import { TouchableOpacity, StatusBar, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Text } from 'react-native-paper';
 
-const HeaderContainer = styled(LinearGradient)`
+const HeaderContainer = styled.View`
   height: ${Platform.OS === 'ios' ? '110px' : '90px'};
   padding-top: ${Platform.OS === 'ios' ? '40px' : '30px'};
   justify-content: left;
   padding-left: 15px;
   padding-bottom: 10px;
-  /* border-bottom-left-radius: 30px; */
-  border-bottom-right-radius: 0px;
+  background-color: #473f97;
   flex-direction: row;
   align-items: center;
 `;
@@ -22,7 +20,7 @@ const BackButton = styled.Image`
   font-size: 18px;
 `;
 
-const Header = ({title, nav = true}) => {
+const TeacherHeader = ({ title }) => {
   const navigation = useNavigation();
 
   return (
@@ -32,15 +30,10 @@ const Header = ({title, nav = true}) => {
         backgroundColor="transparent"
         barStyle="light-content"
       />
-      <HeaderContainer
-        colors={['rgb(64, 172, 194)', 'rgb(131, 15, 147)']}
-        start={{x: 0, y: 0}}
-        end={{x: 1, y: 0}}>
-        {nav && (
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <BackButton source={require('../assets/icons/chevron-left.png')} />
-          </TouchableOpacity>
-        )}
+      <HeaderContainer>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <BackButton source={require('../assets/icons/chevron-left.png')} />
+        </TouchableOpacity>
         <Text
           style={{
             color: 'white',
@@ -54,4 +47,4 @@ const Header = ({title, nav = true}) => {
   );
 };
 
-export default Header;
+export default TeacherHeader;
