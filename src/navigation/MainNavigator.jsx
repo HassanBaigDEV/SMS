@@ -16,7 +16,8 @@ import StudentDashboard from '../screens/student/studentDashboard.jsx';
 import AcademicProfile from '../screens/student/academicProfile.jsx';
 import ViewFeeStatus from '../screens/student/viewFeeStatus.jsx';
 import ClassSyllabus from '../screens/student/classSyllabus.jsx';
-import TimeTable from '../screens/student/timeTable.jsx';
+import StudentTimeTable from '../screens/student/timeTable.jsx';
+import RoleSelectionScreen from '../screens/auth/roleSelectionScreen.jsx';
 
 
 import StudentLogin from '../screens/auth/studentLogin.jsx';
@@ -157,12 +158,12 @@ const StudentNavigator = () => {
       <Stack.Screen
         name="ClassSyllabus"
         component={ClassSyllabus}
-        options={SyllabusScreenOptions}
+        options={{headerShown: false}}
       />  
       <Stack.Screen
-        name="TimeTable"
-        component={TimeTable}
-        options={TimeTableScreenOptions}
+        name="StudentTimeTable"
+        component={StudentTimeTable}
+        options={{headerShown: false}}
       />  
     </Stack.Navigator>
   );
@@ -346,7 +347,12 @@ const TeacherNavigator = () => {
 const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="StudentNavigator">
+      <Stack.Navigator initialRouteName="RoleSelectionScreen">
+        <Stack.Screen
+          name="RoleSelectionScreen"
+          component={RoleSelectionScreen}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name="StudentNavigator"
           component={StudentNavigator}

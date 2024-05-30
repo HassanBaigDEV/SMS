@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import Header from '../../components/header';
 
 const ClassSyllabus = ({ route, navigation }) => {
   const { user } = route.params;
@@ -41,6 +42,8 @@ const ClassSyllabus = ({ route, navigation }) => {
   }
 
   return (
+    <>
+    <Header title={`Academic Syllabus (${className})`}/>
     <ScrollView contentContainerStyle={styles.container}>
       {syllabusUrl ? (
         <View style={styles.imageContainer}>
@@ -53,6 +56,7 @@ const ClassSyllabus = ({ route, navigation }) => {
         <Text style={styles.backButtonText}>Back to Dashboard</Text>
       </TouchableOpacity>
     </ScrollView>
+    </>
   );
 };
 

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import Header from '../../components/header';
 
-const ClassTimetable = ({ route, navigation }) => {
+const StudentTimetable = ({ route, navigation }) => {
   const { user } = route.params;
   const [timetableUrl, setTimetableUrl] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,6 +38,8 @@ const ClassTimetable = ({ route, navigation }) => {
   }
 
   return (
+    <>
+    <Header title='Time Table' />
     <ScrollView contentContainerStyle={styles.container}>
       {timetableUrl ? (
         <View style={styles.imageContainer}>
@@ -49,6 +52,7 @@ const ClassTimetable = ({ route, navigation }) => {
         <Text style={styles.backButtonText}>Back to Dashboard</Text>
       </TouchableOpacity>
     </ScrollView>
+    </>
   );
 };
 
@@ -114,4 +118,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ClassTimetable;
+export default StudentTimetable;
