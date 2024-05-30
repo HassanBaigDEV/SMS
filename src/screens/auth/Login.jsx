@@ -10,13 +10,19 @@ import {
   Image,
   Animated,
   Modal,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
 import {signInWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth';
-import {doc, getDoc, getDocs, collection, query, where} from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+} from 'firebase/firestore';
 import 'firebase/firestore';
-
 
 const Login = ({navigation}) => {
   const [user, setUser] = useState(null);
@@ -38,28 +44,27 @@ const Login = ({navigation}) => {
   //   });
   // }, [user]);
 
-
   const getTeacherIdByEmail = async email => {
     try {
       // Reference to the teachers collection
       const teachersCollectionRef = collection(FIREBASE_DB, 'teachers');
-  
+
       // Create a query against the collection where the email matches
       const q = query(teachersCollectionRef, where('email', '==', email));
-  
+
       // Execute the query
       const querySnapshot = await getDocs(q);
-  
+
       // Check if we got any results
       if (!querySnapshot.empty) {
         // Get the document (there should be only one match if emails are unique)
         const doc = querySnapshot.docs[0];
         const teacherId = doc.id; // This is the ID of the document
         const teacherData = doc.data(); // This is the data within the document
-  
+
         console.log('Teacher ID:', teacherId);
         console.log('Teacher Data:', teacherData);
-  
+
         return {teacherId, teacherData};
       } else {
         // No document found with the given email
@@ -71,77 +76,89 @@ const Login = ({navigation}) => {
       return null;
     }
   };
-  
 
   const handleLogin = async () => {
     ToastAndroid.show('Logging in...', ToastAndroid.SHORT);
-  
+
     try {
       setShowLoginModal(true);
       // Authenticate user with email and password
-      const userCredential = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        FIREBASE_AUTH,
+        email,
+        password,
+      );
       const user = userCredential.user;
       setUser(user);
-  
+
       // Log the signed-in user
       console.log('User signed in:', user);
-  
+
       // Get user document from Firestore
       const uid = user.uid;
       const userDoc = await getDoc(doc(FIREBASE_DB, 'users', uid));
       const userData = userDoc.data();
-  
+
       if (userDoc.exists()) {
         console.log('userRole:', userData);
-  
+
         // Handle admin role
         if (userData.role === 'admin') {
           console.log('Welcome, Admin!');
           ToastAndroid.show('Welcome!', ToastAndroid.SHORT);
           // navigation.navigate('AdminDashboard');
           setShowLoginModal(false);
-          navigation.navigate('AdminNavigator', { screen: 'AdminDashboard', params: { user: userData } });
-
-        } 
+          navigation.navigate('AdminNavigator', {
+            screen: 'AdminDashboard',
+            params: {user: userData},
+          });
+        }
         // Handle student role
         else if (userData.role === 'student') {
           const studentEmailPrefix = email.split('@')[0];
-          const studentDoc = await getDoc(doc(FIREBASE_DB, 'students', studentEmailPrefix));
-  
+          const studentDoc = await getDoc(
+            doc(FIREBASE_DB, 'students', studentEmailPrefix),
+          );
+
           if (studentDoc.exists()) {
             const studentData = studentDoc.data();
             console.log('Welcome, Student:', studentData);
-  
+
             setShowLoginModal(false);
             ToastAndroid.show('Welcome!', ToastAndroid.SHORT);
-            navigation.navigate('StudentNavigator', { screen: 'StudentDashboard', params: { user: studentData } });
-          } 
-          else {
+            navigation.navigate('StudentNavigator', {
+              screen: 'StudentDashboard',
+              params: {user: studentData},
+            });
+          } else {
             setShowLoginModal(false);
             console.error('Student document not found');
             ToastAndroid.show('Student record not found.', ToastAndroid.SHORT);
           }
-        } 
+        }
 
         // Handle teacher role
         else if (userData.role === 'teacher') {
           const result = await getTeacherIdByEmail(email);
           const {teacherId, teacherData} = result;
           console.log('Teacher ID found:', teacherId);
-          const teacherDoc = await getDoc(doc(FIREBASE_DB, 'teachers', teacherId));
+          // const teacherDoc = await getDoc(
+          //   doc(FIREBASE_DB, 'teachers', teacherData),
+          // );
 
-  
-          if (teacherDoc.exists()) {
-            const teacherData = teacherDoc.data();
+          if (teacherId !== null) {
+            // const teacherData = teacherDoc.data();
             console.log('Welcome, Teacher:', teacherData);
             setShowLoginModal(false);
             ToastAndroid.show('Welcome!', ToastAndroid.SHORT);
-            navigation.navigate('TeacherNavigator', { screen: 'TeacherDashboard', params: { user: teacherData } });
-          } 
-          else {
+            navigation.navigate('TeacherNavigator', {
+              screen: 'TeacherDashboard',
+              params: {teacher: teacherData},
+            });
+          } else {
             setShowLoginModal(false);
-            console.error('Student document not found');
-            ToastAndroid.show('Student record not found.', ToastAndroid.SHORT);
+            console.error('Teacher document not found');
+            ToastAndroid.show('Teacher record not found.', ToastAndroid.SHORT);
           }
         }
       } else {
@@ -151,10 +168,12 @@ const Login = ({navigation}) => {
     } catch (error) {
       setShowLoginModal(false);
       console.error('Login Error:', error);
-      ToastAndroid.show('Login failed. Please check your credentials.', ToastAndroid.SHORT);
+      ToastAndroid.show(
+        'Login failed. Please check your credentials.',
+        ToastAndroid.SHORT,
+      );
     }
   };
-  
 
   const handleFocus = (anim, placeholderAnim) => {
     Animated.parallel([
@@ -297,7 +316,6 @@ const Login = ({navigation}) => {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
-
 
       {/* Loading Modal */}
       <Modal visible={showLoginModal} transparent={false} animationType="fade">

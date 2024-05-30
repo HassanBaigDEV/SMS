@@ -20,7 +20,6 @@ import StudentTimeTable from '../screens/student/timeTable.jsx';
 import RoleSelectionScreen from '../screens/auth/roleSelectionScreen.jsx';
 import SplashScreen from '../screens/splashScreen.jsx';
 
-
 // import StudentLogin from '../screens/auth/studentLogin.jsx';
 import StudentList from '../screens/admin/student/StudentList.jsx';
 import StudentDetail from '../screens/admin/student/StudentDetails.jsx';
@@ -136,8 +135,8 @@ const FeeStatusScreenOptions = ({route}) => {
   };
 };
 
-const StudentNavigator = ({ route }) => {
-  const { user } = route.params;
+const StudentNavigator = ({route}) => {
+  const {user} = route.params;
 
   return (
     <Stack.Navigator initialRouteName="StudentDashboard">
@@ -146,31 +145,31 @@ const StudentNavigator = ({ route }) => {
         component={StudentDashboard}
         // initialParams={user}
         options={{headerShown: false}}
-        />
+      />
       <Stack.Screen
         name="AcademicProfile"
         component={AcademicProfile}
         initialParams={user}
         options={{headerShown: false}}
-        />
+      />
       <Stack.Screen
         name="ViewFeeStatus"
         component={ViewFeeStatus}
         initialParams={user}
         options={{headerShown: false}}
-        />
+      />
       <Stack.Screen
         name="ClassSyllabus"
         component={ClassSyllabus}
         initialParams={user}
         options={{headerShown: false}}
-        />  
+      />
       <Stack.Screen
         name="StudentTimeTable"
         component={StudentTimeTable}
         initialParams={user}
         options={{headerShown: false}}
-      />  
+      />
     </Stack.Navigator>
   );
 };
@@ -282,8 +281,8 @@ const AdminNavigator = () => {
   );
 };
 
-const TeacherNavigator = ({ route }) => {
-  const { teacherUser } = route.params;
+const TeacherNavigator = ({route}) => {
+  const {teacher} = route.params;
 
   return (
     <Stack.Navigator initialRouteName="TeacherDashboard">
@@ -292,17 +291,17 @@ const TeacherNavigator = ({ route }) => {
         component={TeacherScreen}
         options={{headerShown: false}}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="StudentMarks"
         component={StudentMarks}
         options={{headerShown: false}}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="EditMarks"
         component={EditMarks}
         options={{headerShown: false}}
       />
-      
+
       {/*    <Stack.Screen
         name="Marks"
         component={Marks}
@@ -334,7 +333,7 @@ const Navigator = () => {
         <Stack.Screen
           name="SplashScreen"
           component={SplashScreen}
-          options={{ headerShown: false }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="RoleSelectionScreen"

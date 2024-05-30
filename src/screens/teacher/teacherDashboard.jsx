@@ -1,11 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TextInput, ActivityIndicator, Image, FlatList, TouchableOpacity } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { collection, getDocs } from 'firebase/firestore';
-import { FIREBASE_DB } from '../../firebase/firebaseConfig';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  ActivityIndicator,
+  Image,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
+import {collection, getDocs} from 'firebase/firestore';
+import {FIREBASE_DB} from '../../firebase/firebaseConfig';
 
-const TeacherScreen = ({ route, navigation }) => {
-  const { teacher } = route.params;
+const TeacherScreen = ({route, navigation}) => {
+  const {teacher} = route.params;
+
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -13,20 +24,20 @@ const TeacherScreen = ({ route, navigation }) => {
 
   const academicYearDetails = Object.keys(teacher.academicYear).map(year => ({
     label: year,
-    value: year
+    value: year,
   }));
 
-  const getClassForYear = (year) => {
+  const getClassForYear = year => {
     return teacher.academicYear[year]?.classAssigned || '';
   };
 
-  const fetchStudents = async (year) => {
+  const fetchStudents = async year => {
     try {
       setLoading(true);
       const classId = getClassForYear(year);
       const studentsCollectionRef = collection(
         FIREBASE_DB,
-        `classes/${classId}/${year}`
+        `classes/${classId}/${year}`,
       );
       const studentsSnapshot = await getDocs(studentsCollectionRef);
       const studentsList = studentsSnapshot.docs.map(doc => doc.data());
@@ -38,7 +49,9 @@ const TeacherScreen = ({ route, navigation }) => {
       setLoading(false);
     }
   };
-const [selectedYear, setSelectedYear] = useState(academicYearDetails.length > 5 ? academicYearDetails[5].value : null);
+  const [selectedYear, setSelectedYear] = useState(
+    academicYearDetails.length > 5 ? academicYearDetails[5].value : null,
+  );
 
   useEffect(() => {
     if (selectedYear) {
@@ -52,29 +65,32 @@ const [selectedYear, setSelectedYear] = useState(academicYearDetails.length > 5 
     } else {
       const filtered = students.filter(
         student =>
-          student?.registrationNumber?.toString().includes(searchQuery.toLowerCase()) ||
-          student?.studentName?.toLowerCase().includes(searchQuery.toLowerCase())
+          student?.registrationNumber
+            ?.toString()
+            .includes(searchQuery.toLowerCase()) ||
+          student?.studentName
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()),
       );
       setFilteredStudents(filtered);
     }
   }, [searchQuery, students]);
 
-  const renderItem = ({ item }) => (
-    
+  const renderItem = ({item}) => (
     <TouchableOpacity
       style={styles.listItem}
       // console
-      onPress={() =>
-        navigation.navigate('StudentMarks', {
-          registrationNumber: item.registrationNumber,
-          student: item,
-          selectedYear:selectedYear
-        })
+      onPress={
+        () =>
+          navigation.navigate('StudentMarks', {
+            registrationNumber: item.registrationNumber,
+            student: item,
+            selectedYear: selectedYear,
+          })
         // {console.log("regnum")
         //   console.log(item.registrationNumber)
         // }
-      }
-    >
+      }>
       <View style={styles.listItemTextContainer}>
         <Text style={styles.listItemText}>
           {item.registrationNumber} - {item.studentName}
@@ -94,14 +110,19 @@ const [selectedYear, setSelectedYear] = useState(academicYearDetails.length > 5 
           <Text style={styles.title}>Welcome, {teacher.teacherName}</Text>
         </View>
       </View>
-      <Text style={styles.classText}>Academic Year {selectedYear}: {getClassForYear(selectedYear)}</Text>
+      <Text style={styles.classText}>
+        Academic Year {selectedYear}: {getClassForYear(selectedYear)}
+      </Text>
       <Picker
         selectedValue={selectedYear}
         onValueChange={(itemValue, itemIndex) => setSelectedYear(itemValue)}
-        style={styles.picker}
-      >
+        style={styles.picker}>
         {academicYearDetails.map((yearDetail, index) => (
-          <Picker.Item key={index} label={yearDetail.label} value={yearDetail.value} />
+          <Picker.Item
+            key={index}
+            label={yearDetail.label}
+            value={yearDetail.value}
+          />
         ))}
       </Picker>
       <View style={styles.list}>
@@ -134,8 +155,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    backgroundColor: "#473f97",
-    width: "100%",
+    backgroundColor: '#473f97',
+    width: '100%',
     height: 80,
     alignItems: 'center',
     justifyContent: 'center',
@@ -179,7 +200,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
