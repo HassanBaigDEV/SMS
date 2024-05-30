@@ -10,6 +10,7 @@ import {
 import {signOut} from 'firebase/auth';
 import {FIREBASE_AUTH} from '../../firebase/firebaseConfig';
 import Header from '../../components/header';
+import LinearGradient from 'react-native-linear-gradient';
 
 const AdminDashboard = ({navigation}) => {
   const handleLogout = async () => {
@@ -35,7 +36,14 @@ const AdminDashboard = ({navigation}) => {
             {/* <Text style={styles.logoutButton}>Logout</Text> */}
           </TouchableOpacity>
         </View>
-        <Text style={styles.title}>Dashboard</Text>
+        {/* <LinearGradient
+          colors={['rgb(64, 172, 194)', 'rgb(131, 15, 147)']}
+          style={styles.gradientContainer}> */}
+        <Image
+          style={styles.title}
+          source={require('../../images/image2-nobg.png')}
+        />
+        {/* </LinearGradient> */}
         <View style={styles.cardsContainer}>
           <TouchableOpacity
             style={styles.card}
@@ -105,10 +113,18 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    fontSize: 24,
-    marginBottom: 16,
-    textAlign: 'center',
+    height: 120,
+    width: 370,
+    marginBottom: 20,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    paddingVertical: 0,
+    marginVertical: 0,
+    tintColor: '#000',
   },
+  // gradientContainer: {
+  //   flex: 1,
+  // },
   logoutButtonContainer: {
     alignItems: 'flex-end',
     marginBottom: 16,

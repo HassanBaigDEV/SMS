@@ -16,8 +16,7 @@ import StudentDashboard from '../screens/student/studentDashboard.jsx';
 import AcademicProfile from '../screens/student/academicProfile.jsx';
 import ViewFeeStatus from '../screens/student/viewFeeStatus.jsx';
 import ClassSyllabus from '../screens/student/classSyllabus.jsx';
-import TimeTable from '../screens/student/timeTable.jsx';
-
+import StudentTimeTable from '../screens/student/timeTable.jsx';
 
 import StudentLogin from '../screens/auth/studentLogin.jsx';
 import StudentList from '../screens/admin/student/StudentList.jsx';
@@ -68,11 +67,11 @@ const AcademicProfileScreenOptions = ({route}) => {
   };
 };
 
-const SyllabusScreenOptions = ({ route }) => {
-  const { user, selectedYear } = route.params;
+const SyllabusScreenOptions = ({route}) => {
+  const {user, selectedYear} = route.params;
   const classEnrolled = user.classEnrolled;
-  const parts = classEnrolled.split('/'); 
-  const className = parts[1]; 
+  const parts = classEnrolled.split('/');
+  const className = parts[1];
 
   return {
     title: `Academic Syllabus (${className})`,
@@ -90,11 +89,11 @@ const SyllabusScreenOptions = ({ route }) => {
   };
 };
 
-const TimeTableScreenOptions = ({ route }) => {
-  const { user, selectedYear } = route.params;
+const TimeTableScreenOptions = ({route}) => {
+  const {user, selectedYear} = route.params;
   const classEnrolled = user.classEnrolled;
-  const parts = classEnrolled.split('/'); 
-  const className = parts[1]; 
+  const parts = classEnrolled.split('/');
+  const className = parts[1];
 
   return {
     title: `Time Table`,
@@ -158,12 +157,12 @@ const StudentNavigator = () => {
         name="ClassSyllabus"
         component={ClassSyllabus}
         options={SyllabusScreenOptions}
-      />  
+      />
       <Stack.Screen
         name="TimeTable"
         component={TimeTable}
         options={TimeTableScreenOptions}
-      />  
+      />
     </Stack.Navigator>
   );
 };
@@ -346,7 +345,7 @@ const TeacherNavigator = () => {
 const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="StudentNavigator">
+      <Stack.Navigator initialRouteName="AdminNavigator">
         <Stack.Screen
           name="StudentNavigator"
           component={StudentNavigator}

@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
-const ClassTimetable = ({ route, navigation }) => {
-  const { user } = route.params;
+const StudentTimetable = ({route, navigation}) => {
+  const {user} = route.params;
   const [timetableUrl, setTimetableUrl] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,12 +48,14 @@ const ClassTimetable = ({ route, navigation }) => {
     <ScrollView contentContainerStyle={styles.container}>
       {timetableUrl ? (
         <View style={styles.imageContainer}>
-          <Image source={{ uri: timetableUrl }} style={styles.timetableImage} />
+          <Image source={{uri: timetableUrl}} style={styles.timetableImage} />
         </View>
       ) : (
         <Text style={styles.errorText}>Timetable not available</Text>
       )}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}>
         <Text style={styles.backButtonText}>Back to Dashboard</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -114,4 +124,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ClassTimetable;
+export default StudentTimetable;

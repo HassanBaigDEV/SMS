@@ -47,8 +47,10 @@ const Login = ({navigation}) => {
           console.log('Welcome, Admin!');
           ToastAndroid.show('Welcome!', ToastAndroid.SHORT);
           navigation.navigate('AdminDashboard');
-        } else {
-          console.log('Welcome, User!');
+        } else if (userData.role === 'student') {
+          Alert.alert("You don't have permission to access this page");
+        } else if (userData.role === 'teacher') {
+          Alert.alert("You don't have permission to access this page");
         }
       } else {
         // Alert.alert('Error', 'User not found');
@@ -65,13 +67,10 @@ const Login = ({navigation}) => {
     }
   };
 
-
-
-
   return (
     <View style={styles.container}>
       <View style={styles.loginBox}>
-        <Text style={styles.title}>Admin Login</Text>
+        <Text style={styles.title}>Login</Text>
         <TextInput
           style={styles.input}
           placeholder="Email"
