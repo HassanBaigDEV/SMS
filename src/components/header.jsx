@@ -53,5 +53,4 @@ const Header = ({title, nav = true}) => {
     </>
   );
 };
-
 export default Header;

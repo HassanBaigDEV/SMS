@@ -27,9 +27,11 @@ const FeeStatusForm = ({route, navigation}) => {
   });
 
   useEffect(() => {
-    console.log('student:', student);
+    console.log('student:', student?.feeStatus?.[year]);
+    console.log(month);
 
     if (student) {
+      // console.log('student:', student);
       const feeStatusForMonth = student.feeStatus?.[year]?.[month];
       if (feeStatusForMonth) {
         setFeeDetails({
