@@ -7,7 +7,6 @@ import Header from '../../components/header';
 
 const StudentDashboard = ({ navigation, route }) => {
   const { user } = route.params;
-  console.log(user);
   const [modalVisible, setModalVisible] = useState(false);
   const [feeModalVisible, setFeeModalVisible] = useState(false);
   const [years, setYears] = useState([]);

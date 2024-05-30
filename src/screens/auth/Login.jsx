@@ -14,8 +14,9 @@ import {
 } from 'react-native';
 import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
 import {signInWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth';
-import {doc, getDoc} from 'firebase/firestore';
+import {doc, getDoc, getDocs, collection, query, where} from 'firebase/firestore';
 import 'firebase/firestore';
+
 
 const Login = ({navigation}) => {
   const [user, setUser] = useState(null);
@@ -36,6 +37,41 @@ const Login = ({navigation}) => {
   //     }
   //   });
   // }, [user]);
+
+
+  const getTeacherIdByEmail = async email => {
+    try {
+      // Reference to the teachers collection
+      const teachersCollectionRef = collection(FIREBASE_DB, 'teachers');
+  
+      // Create a query against the collection where the email matches
+      const q = query(teachersCollectionRef, where('email', '==', email));
+  
+      // Execute the query
+      const querySnapshot = await getDocs(q);
+  
+      // Check if we got any results
+      if (!querySnapshot.empty) {
+        // Get the document (there should be only one match if emails are unique)
+        const doc = querySnapshot.docs[0];
+        const teacherId = doc.id; // This is the ID of the document
+        const teacherData = doc.data(); // This is the data within the document
+  
+        console.log('Teacher ID:', teacherId);
+        console.log('Teacher Data:', teacherData);
+  
+        return {teacherId, teacherData};
+      } else {
+        // No document found with the given email
+        console.log('No teacher found with the given email.');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching teacher ID by email:', error);
+      return null;
+    }
+  };
+  
 
   const handleLogin = async () => {
     ToastAndroid.show('Logging in...', ToastAndroid.SHORT);
@@ -81,18 +117,39 @@ const Login = ({navigation}) => {
             navigation.navigate('StudentNavigator', { screen: 'StudentDashboard', params: { user: studentData } });
           } 
           else {
+            setShowLoginModal(false);
             console.error('Student document not found');
             ToastAndroid.show('Student record not found.', ToastAndroid.SHORT);
           }
         } 
+
         // Handle teacher role
         else if (userData.role === 'teacher') {
-          Alert.alert("You don't have permission to access this page");
+          const result = await getTeacherIdByEmail(email);
+          const {teacherId, teacherData} = result;
+          console.log('Teacher ID found:', teacherId);
+          const teacherDoc = await getDoc(doc(FIREBASE_DB, 'teachers', teacherId));
+
+  
+          if (teacherDoc.exists()) {
+            const teacherData = teacherDoc.data();
+            console.log('Welcome, Teacher:', teacherData);
+            setShowLoginModal(false);
+            ToastAndroid.show('Welcome!', ToastAndroid.SHORT);
+            navigation.navigate('TeacherNavigator', { screen: 'TeacherDashboard', params: { user: teacherData } });
+          } 
+          else {
+            setShowLoginModal(false);
+            console.error('Student document not found');
+            ToastAndroid.show('Student record not found.', ToastAndroid.SHORT);
+          }
         }
       } else {
+        setShowLoginModal(false);
         ToastAndroid.show('User not found', ToastAndroid.SHORT);
       }
     } catch (error) {
+      setShowLoginModal(false);
       console.error('Login Error:', error);
       ToastAndroid.show('Login failed. Please check your credentials.', ToastAndroid.SHORT);
     }

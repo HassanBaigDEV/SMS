@@ -21,7 +21,7 @@ import RoleSelectionScreen from '../screens/auth/roleSelectionScreen.jsx';
 import SplashScreen from '../screens/splashScreen.jsx';
 
 
-import StudentLogin from '../screens/auth/studentLogin.jsx';
+// import StudentLogin from '../screens/auth/studentLogin.jsx';
 import StudentList from '../screens/admin/student/StudentList.jsx';
 import StudentDetail from '../screens/admin/student/StudentDetails.jsx';
 import EditStudent from '../screens/admin/student/EditStudent.jsx';
@@ -40,8 +40,9 @@ import StudentAgeRecord from '../screens/admin/StudentAgeRecod.jsx';
 import FeeStatusForm from '../screens/admin/feeStatus/FeeStatusForm.jsx';
 import FeeStatus from '../screens/admin/feeStatus/index.jsx';
 
-import TeacherLogin from '../screens/auth/teacherLogin.jsx';
-import TeacherScreen from '../screens/teacher/TeacherDashboard';
+// import TeacherLogin from '../screens/auth/teacherLogin.jsx';
+// import TeacherScreen from '../screens/teacher/TeacherDashboardTest.jsx';
+import TeacherScreen from '../screens/teacher/teacherDashboard.jsx';
 import StudentMarks from '../screens/teacher/StudentMarks.jsx';
 import EditMarks from '../screens/teacher/EditMarks.jsx';
 import StudentReport from '../screens/admin/reportTwo.jsx';
@@ -281,7 +282,9 @@ const AdminNavigator = () => {
   );
 };
 
-const TeacherNavigator = () => {
+const TeacherNavigator = ({ route }) => {
+  const { teacherUser } = route.params;
+
   return (
     <Stack.Navigator initialRouteName="TeacherDashboard">
       <Stack.Screen
@@ -294,7 +297,7 @@ const TeacherNavigator = () => {
         component={StudentMarks}
         options={{headerShown: false}}
       />
-            <Stack.Screen
+       <Stack.Screen
         name="EditMarks"
         component={EditMarks}
         options={{headerShown: false}}
