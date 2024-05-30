@@ -15,6 +15,10 @@ import AdminDashboard from '../screens/admin/AdminDashboard.jsx';
 import StudentDashboard from '../screens/student/studentDashboard.jsx';
 import AcademicProfile from '../screens/student/academicProfile.jsx';
 import ViewFeeStatus from '../screens/student/viewFeeStatus.jsx';
+import ClassSyllabus from '../screens/student/classSyllabus.jsx';
+import StudentTimeTable from '../screens/student/timeTable.jsx';
+import RoleSelectionScreen from '../screens/auth/roleSelectionScreen.jsx';
+
 
 import StudentLogin from '../screens/auth/studentLogin.jsx';
 import StudentList from '../screens/admin/student/StudentList.jsx';
@@ -53,6 +57,50 @@ const AcademicProfileScreenOptions = ({route}) => {
 
   return {
     title: `Academic Profile Report (${selectedYear})`,
+    headerStyle: {
+      backgroundColor: '#000', // Background color of the header
+    },
+    headerTitleStyle: {
+      fontSize: 18,
+      color: '#fff', // Text color of the header title
+      fontFamily: 'Arial',
+      letterSpacing: 1,
+    },
+    headerBackTitleVisible: false, // To hide the back button title
+    headerTintColor: '#fff', // Color of the back button
+  };
+};
+
+const SyllabusScreenOptions = ({route}) => {
+  const {user, selectedYear} = route.params;
+  const classEnrolled = user.classEnrolled;
+  const parts = classEnrolled.split('/');
+  const className = parts[1];
+
+  return {
+    title: `Academic Syllabus (${className})`,
+    headerStyle: {
+      backgroundColor: '#000', // Background color of the header
+    },
+    headerTitleStyle: {
+      fontSize: 18,
+      color: '#fff', // Text color of the header title
+      fontFamily: 'Arial',
+      letterSpacing: 1,
+    },
+    headerBackTitleVisible: false, // To hide the back button title
+    headerTintColor: '#fff', // Color of the back button
+  };
+};
+
+const TimeTableScreenOptions = ({route}) => {
+  const {user, selectedYear} = route.params;
+  const classEnrolled = user.classEnrolled;
+  const parts = classEnrolled.split('/');
+  const className = parts[1];
+
+  return {
+    title: `Time Table`,
     headerStyle: {
       backgroundColor: '#000', // Background color of the header
     },
@@ -109,16 +157,16 @@ const StudentNavigator = () => {
         component={ViewFeeStatus}
         options={FeeStatusScreenOptions}
       />
-      {/* <Stack.Screen
-        name="Timetable"
-        component={Timetable}
-        options={{ title: 'Timetable' }}
-      />
       <Stack.Screen
-        name="Syllabus"
-        component={Syllabus}
-        options={{ title: 'Syllabus' }}
-      />   */}
+        name="ClassSyllabus"
+        component={ClassSyllabus}
+        options={{headerShown: false}}
+      />  
+      <Stack.Screen
+        name="StudentTimeTable"
+        component={StudentTimeTable}
+        options={{headerShown: false}}
+      />  
     </Stack.Navigator>
   );
 };
@@ -312,7 +360,12 @@ const TeacherNavigator = () => {
 const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="TeacherNavigator">
+      <Stack.Navigator initialRouteName="RoleSelectionScreen">
+        <Stack.Screen
+          name="RoleSelectionScreen"
+          component={RoleSelectionScreen}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name="StudentNavigator"
           component={StudentNavigator}

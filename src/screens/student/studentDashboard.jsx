@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, Modal, FlatList, Alert
 import { FIREBASE_AUTH } from '../../firebase/firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { ActivityIndicator } from 'react-native';
+import Header from '../../components/header';
 
 const StudentDashboard = ({ navigation, route }) => {
   const { user } = route.params;
@@ -58,45 +59,83 @@ const StudentDashboard = ({ navigation, route }) => {
 
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate('StudentDashboard', { user })}>
-          <Text style={styles.headerText}>HOME</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.userInfo}>
-        <View style={styles.greetingContainer}>
-          <Text style={styles.smallGreetingText}>GOOD EVENING,</Text>
-          <Text style={styles.bigNameText}>{user.studentName ? user.studentName.toUpperCase() : 'STUDENT'}!</Text>
+    <>
+    <Header title='Student Dashboard' nav={ false} />
+      <View style={styles.container}>
+        <View style={styles.userInfo}>
+          <View style={styles.greetingContainer}>
+            <Text style={styles.smallGreetingText}>GOOD EVENING,</Text>
+            <Text style={styles.bigNameText}>{user.studentName ? user.studentName.toUpperCase() : 'STUDENT'}!</Text>
+          </View>
+          <View style={styles.genderIconContainer}>
+            {user.gender === 'male' && <Image source={require('../../images/male.jpg')} style={styles.genderIcon} />}
+            {user.gender === 'female' && <Image source={require('../../images/female.jpg')} style={styles.genderIcon} />}
+          </View>
         </View>
-        <View style={styles.genderIconContainer}>
-          {user.gender === 'male' && <Image source={require('../../images/male.jpg')} style={styles.genderIcon} />}
-          {user.gender === 'female' && <Image source={require('../../images/female.jpg')} style={styles.genderIcon} />}
-        </View>
-      </View>
-      <View style={styles.content}>
+
         <View style={styles.separator}></View>
         <Text style={[styles.boldText, styles.registrationNumberText]}>REGISTRATION NUMBER: <Text style={styles.userInfoText}>{user.registrationNumber ? user.registrationNumber : 'N/A'}</Text></Text>
         <View style={styles.separator}></View>
-        <TouchableOpacity style={[styles.optionButton, { backgroundColor: '#8A2BE2' }]} onPress={() => setModalVisible(true)}>
-          <Text style={styles.optionButtonText}>VIEW CLASS SYLLABUS</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.optionButton, { backgroundColor: '#8A2BE2' }]} onPress={() => setModalVisible(true)}>
-          <Text style={styles.optionButtonText}>VIEW ACADEMIC RECORD</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.optionButton, { backgroundColor: '#8A2BE2' }]} onPress={() => setFeeModalVisible(true)}>
-          <Text style={styles.optionButtonText}>VIEW FEE STATUS</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-            style={[styles.optionButton, { backgroundColor: '#8A2BE2' }]} 
+
+        <View style={styles.cardsContainer}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('ClassSyllabus', { user })}>
+            <Image
+              source={require('../../assets/icons/syllabus-icon.jpg')}
+              style={styles.cardImage}
+            />
+            <Text style={styles.cardText}>View Class Syllabus</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => setModalVisible(true)}>
+            <Image
+              source={require('../../assets/icons/academic-record.png')}
+              style={styles.cardImage}
+            />
+            <Text style={styles.cardText}>View Academic Record</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => setFeeModalVisible(true)}>
+            <Image
+              source={require('../../assets/icons/fee-status.jpeg')}
+              style={styles.cardImage}
+            />
+            <Text style={styles.cardText}>View Fee Status</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('StudentTimeTable', { user })}>
+            <Image
+              source={require('../../assets/icons/time-table.jpeg')}
+              style={styles.cardImage}
+            />
+            <Text style={styles.cardText}>View Time table</Text>
+          </TouchableOpacity>
+          
+        </View>
+
+        <View style={styles.logoutButtonContainer}>
+          <TouchableOpacity style={styles.signOutButton}
             onPress={() => {
                 setShowLogoutModal(true);
                 handleLogout(); 
             }}>
-            <Text style={styles.optionButtonText}>LOG OUT</Text>
-        </TouchableOpacity>
-
+            <View style={styles.buttonContent}>
+              <Image
+                style={styles.logoutIcon}
+                source={require('../../assets/icons/logout_icon.png')}
+              />
+              <Text style={styles.signOutText}>LOG OUT</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
+
+
+
 
       {/* Loading Modal */}
       <Modal visible={showLogoutModal} transparent={false} animationType="fade">
@@ -106,6 +145,7 @@ const StudentDashboard = ({ navigation, route }) => {
         </View>
       </Modal>
 
+      {/* Show Year selection model */}
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -131,6 +171,7 @@ const StudentDashboard = ({ navigation, route }) => {
         </View>
       </Modal>
 
+      {/* Show Fee Year selection*/}
       <Modal
         visible={feeModalVisible}
         transparent={true}
@@ -155,7 +196,8 @@ const StudentDashboard = ({ navigation, route }) => {
           </View>
         </View>
       </Modal>
-    </View>
+
+    </>
   );
 };
 
@@ -163,15 +205,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-  },
-  header: {
-    padding: 15,
-    backgroundColor: 'black',
-    alignItems: 'center',
-  },
-  headerText: {
-    fontSize: 20,
-    color: '#FFFFFF',
   },
   userInfo: {
     flexDirection: 'row',
@@ -290,6 +323,78 @@ const styles = StyleSheet.create({
   modalCloseButtonText: {
     fontSize: 18,
     color: '#fff',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  cardsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  card: {
+    width: '48%',
+    backgroundColor: '#fff',
+    marginBottom: 16,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  cardImage: {
+    width: 80,
+    height: 80,
+    marginBottom: 10,
+    borderRadius: 40,
+  },
+  cardText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  signOutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: 'black',
+    marginVertical: 40,
+    width: '50%',
+    alignSelf: 'center',
+    justifyContent: 'center',
+    elevation: 2, // for Android shadow
+    shadowColor: '#000', // for iOS shadow
+    shadowOffset: { width: 0, height: 2 }, // for iOS shadow
+    shadowOpacity: 0.25, // for iOS shadow
+    shadowRadius: 3.84, // for iOS shadow
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoutIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+  },
+  signOutText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
 });
 

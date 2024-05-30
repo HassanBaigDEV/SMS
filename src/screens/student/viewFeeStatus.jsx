@@ -42,6 +42,7 @@ const ViewFeeStatus = ({ route }) => {
   };
 
   return (
+    
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.imageContainer}>
         <Image

@@ -3,7 +3,7 @@ import {initializeApp} from 'firebase/app';
 import {getAnalytics} from 'firebase/analytics';
 import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
 import {getFirestore, setDoc, doc} from 'firebase/firestore';
-import storage from 'firebase/storage';
+import {getStorage, ref} from 'firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import firebase from '@react-native-firebase/app';
 
@@ -27,6 +27,9 @@ const firebaseConfig = {
 export const FIREBASE_APP = initializeApp(firebaseConfig);
 export const FIREBASE_AUTH = getAuth(FIREBASE_APP);
 export const FIREBASE_DB = getFirestore(FIREBASE_APP);
+
+const storage = getStorage(FIREBASE_APP);
+
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
@@ -66,11 +69,46 @@ export const signUp = async (email, password, role) => {
 
 // import {handleUpdateMarks} from '../utils/updateMarks';
 // handleUpdateMarks(
-//   'Class 4',
-//   589,
-//   2020,
+//   'Class 5',
+//   1122,
+//   2024,
 //   {
 //     English: {
+//       firstTerm: 0,
+//       midTerm: 0,
+//       finalTerm: 0,
+//     },
+//     'Computer (Part 1)': {
+//       firstTerm: 50,
+//       midTerm: 100,
+//       finalTerm: 10,
+//     },
+//     'Computer (Part 2)': {
+//       firstTerm: 50,
+//       midTerm: 100,
+//       finalTerm: 10,
+//     },
+//     Islamiat: {
+//       firstTerm: 50,
+//       midTerm: 100,
+//       finalTerm: 10,
+//     },
+//     Math: {
+//       firstTerm: 50,
+//       midTerm: 100,
+//       finalTerm: 10,
+//     },
+//     'Social Study': {
+//       firstTerm: 50,
+//       midTerm: 100,
+//       finalTerm: 10,
+//     },
+//     Urdu: {
+//       firstTerm: 50,
+//       midTerm: 100,
+//       finalTerm: 10,
+//     },
+//     'General Knowledge': {
 //       firstTerm: 50,
 //       midTerm: 100,
 //       finalTerm: 10,

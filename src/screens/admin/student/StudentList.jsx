@@ -47,7 +47,6 @@ const StudentList = ({navigation}) => {
             .includes(searchQuery.toLowerCase()) ||
           student?.studentName
             ?.toLowerCase()
-
             .includes(searchQuery.toLowerCase()),
       );
       setFilteredStudents(filtered);
@@ -89,7 +88,7 @@ const StudentList = ({navigation}) => {
           })
         }>
         <Image
-          source={require('../../../assets/icons/eye.png')}
+          source={require('../../../assets/icons/pwd_eye.png')}
           style={styles.editIcon}
         />
       </TouchableOpacity>
@@ -113,7 +112,7 @@ const StudentList = ({navigation}) => {
           <Text>No students found. Add a student to get started.</Text>
         )}
         <FlatList
-          data={students}
+          data={filteredStudents}
           renderItem={renderItem}
           keyExtractor={item => item.id}
           // contentContainerStyle={styles.flatListContent}
