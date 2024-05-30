@@ -88,7 +88,7 @@ const StudentList = ({navigation}) => {
           })
         }>
         <Image
-          source={require('../../../assets/icons/eye.png')}
+          source={require('../../../assets/icons/pwd_eye.png')}
           style={styles.editIcon}
         />
       </TouchableOpacity>

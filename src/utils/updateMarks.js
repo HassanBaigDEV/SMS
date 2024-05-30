@@ -24,7 +24,11 @@ export const handleUpdateMarks = async (
       const currentMarks = classData.marks || {};
       const updatedMarks = {
         ...currentMarks,
-        ...newMarks,
+        [year]: {
+          ...currentMarks[year],
+          ...newMarks,
+          yearlyRemarks: remarks,
+        },
       };
       await updateDoc(classRef, {marks: updatedMarks});
     }
@@ -68,7 +72,7 @@ export const handleUpdateMarks = async (
 //   'average performance',
 // );
 
-import {doc, getDoc, updateDoc} from 'firebase/firestore'; // Ensure to import necessary Firestore functions
+// Ensure to import necessary Firestore functions
 
 export const handleUpdateAllMarks = async (
   classId,
@@ -136,8 +140,8 @@ export const handleUpdateAllMarks = async (
   }
 };
 
-const classId = 'Class 4';
-const registrationNumber = '12345';
+const classId = 'Class 5';
+const registrationNumber = '589';
 const year = 2023;
 const newMarks = {
   English: {

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   StyleSheet,
   Alert,
   ToastAndroid,
+  Image,
+  Animated,
 } from 'react-native';
 import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
 import {signInWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth';
@@ -17,6 +19,11 @@ const Login = ({navigation}) => {
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const emailBorderAnim = useRef(new Animated.Value(0)).current;
+  const passwordBorderAnim = useRef(new Animated.Value(0)).current;
+  const emailPlaceholderAnim = useRef(new Animated.Value(0)).current;
+  const passwordPlaceholderAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, user => {
@@ -53,13 +60,10 @@ const Login = ({navigation}) => {
           Alert.alert("You don't have permission to access this page");
         }
       } else {
-        // Alert.alert('Error', 'User not found');
-        // console.error('User not found');
         ToastAndroid.show('User not found', ToastAndroid.SHORT);
       }
     } catch (error) {
       console.error('Login Error:', error);
-      // Alert.alert('Error', 'Login failed. Please check your credentials.');
       ToastAndroid.show(
         'Login failed. Please check your credentials.',
         ToastAndroid.SHORT,
@@ -67,25 +71,143 @@ const Login = ({navigation}) => {
     }
   };
 
+  const handleFocus = (anim, placeholderAnim) => {
+    Animated.parallel([
+      Animated.timing(anim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+      Animated.timing(placeholderAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+
+  const handleBlur = (anim, placeholderAnim, value) => {
+    if (!value) {
+      Animated.parallel([
+        Animated.timing(anim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(placeholderAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    }
+  };
+
+  const borderColor = anim =>
+    anim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['#cccccc', '#007bff'],
+    });
+
+  const placeholderTranslateY = anim =>
+    anim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [22, -10],
+    });
+
+  const placeholderFontSize = anim =>
+    anim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [16, 12],
+    });
+
   return (
     <View style={styles.container}>
+      <Image
+        source={require('../../images/image2-nobg.png')}
+        style={styles.logo}
+      />
       <View style={styles.loginBox}>
-        <Text style={styles.title}>Login</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        <View style={styles.inputContainer}>
+          <Animated.Text
+            style={[
+              styles.placeholder,
+              {
+                transform: [
+                  {translateY: placeholderTranslateY(emailPlaceholderAnim)},
+                ],
+                fontSize: placeholderFontSize(emailPlaceholderAnim),
+              },
+            ]}>
+            Email
+          </Animated.Text>
+          <Animated.View
+            style={{
+              borderBottomColor: borderColor(emailBorderAnim),
+              borderBottomWidth: 2,
+            }}>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onFocus={() => handleFocus(emailBorderAnim, emailPlaceholderAnim)}
+              onBlur={() =>
+                handleBlur(emailBorderAnim, emailPlaceholderAnim, email)
+              }
+            />
+          </Animated.View>
+        </View>
+        <View style={styles.inputContainer}>
+          <Animated.Text
+            style={[
+              styles.placeholder,
+              {
+                transform: [
+                  {translateY: placeholderTranslateY(passwordPlaceholderAnim)},
+                ],
+                fontSize: placeholderFontSize(passwordPlaceholderAnim),
+              },
+            ]}>
+            Password
+          </Animated.Text>
+          <Animated.View
+            style={{
+              borderBottomColor: borderColor(passwordBorderAnim),
+              borderBottomWidth: 2,
+            }}>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              onFocus={() =>
+                handleFocus(passwordBorderAnim, passwordPlaceholderAnim)
+              }
+              onBlur={() =>
+                handleBlur(
+                  passwordBorderAnim,
+                  passwordPlaceholderAnim,
+                  password,
+                )
+              }
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}
+              onPressOut={() => setShowPassword(false)}>
+              <Image
+                source={
+                  !showPassword
+                    ? require('../../assets/icons/pwd_eye.png')
+                    : require('../../assets/icons/hide_pwd_eye.png')
+                }
+                style={styles.eyeIconImage}
+              />
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
@@ -101,35 +223,48 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#f7f7f7',
   },
+  logo: {
+    width: 320,
+    height: 320,
+    justifyContent: 'flex-start',
+    alignSelf: 'center',
+    resizeMode: 'contain',
+    tintColor: '#000',
+  },
   loginBox: {
-    backgroundColor: '#ffffff',
     borderRadius: 10,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#333333',
+  inputContainer: {
+    marginBottom: 16,
+    position: 'relative',
   },
   input: {
     height: 50,
-    borderColor: '#cccccc',
-    borderWidth: 1,
-    marginBottom: 16,
     paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: '#f9f9f9',
+    borderRadius: 30,
+    backgroundColor: 'transparent',
+    borderBottomWidth: 0,
+  },
+  placeholder: {
+    position: 'absolute',
+    left: 16,
+    color: '#999',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 16,
+    top: 14,
+  },
+  eyeIconImage: {
+    width: 24,
+    height: 24,
+    tintColor: '#999',
   },
   button: {
     backgroundColor: '#007bff',
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 30,
     alignItems: 'center',
   },
   buttonText: {
