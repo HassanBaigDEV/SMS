@@ -12,6 +12,7 @@ import {
 import {getDocs, collection} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
 import Header from '../../../components/header';
+import {ActivityIndicator} from 'react-native-paper';
 
 const FeeStatus = ({navigation}) => {
   const [students, setStudents] = useState([]);
@@ -20,13 +21,34 @@ const FeeStatus = ({navigation}) => {
   const [years, setYears] = useState([]);
   const [months, setMonths] = useState([]);
   const [student, setStudent] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredStudents, setFilteredStudents] = useState([]);
 
   useEffect(() => {
     fetchStudents();
   }, []);
 
+  useEffect(() => {
+    if (searchQuery == '') {
+      setFilteredStudents(students);
+    } else {
+      const filtered = students.filter(
+        student =>
+          student?.registrationNumber
+            ?.toString()
+            .includes(searchQuery.toLowerCase()) ||
+          student?.studentName
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()),
+      );
+      setFilteredStudents(filtered);
+    }
+  }, [searchQuery]);
+
   const fetchStudents = async () => {
     try {
+      setLoading(true);
       const studentsCollection = collection(FIREBASE_DB, 'students');
       const studentSnapshot = await getDocs(studentsCollection);
       const studentList = studentSnapshot.docs.map(doc => ({
@@ -34,6 +56,8 @@ const FeeStatus = ({navigation}) => {
         ...doc.data(),
       }));
       setStudents(studentList);
+      setFilteredStudents(studentList);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching students:', error);
     }
@@ -77,7 +101,9 @@ const FeeStatus = ({navigation}) => {
   const renderItem = ({item}) => (
     <TouchableOpacity onPress={() => handleShowYears(item)}>
       <View style={styles.item}>
-        <Text style={styles.itemText}>{item.studentName}</Text>
+        <Text style={styles.itemText}>
+          {item.registrationNumber} - {item.studentName}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -100,19 +126,23 @@ const FeeStatus = ({navigation}) => {
   return (
     <>
       <Header title="Fee Status" />
-      <ScrollView style={styles.container}>
+
+      <View style={styles.container}>
         <TextInput
           style={styles.input}
-          value={searchTerm}
-          onChangeText={setSearchTerm}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
           placeholder="Search by Student Registration Number"
           placeholderTextColor="#888"
         />
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+        {/* <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
           <Text style={styles.searchButtonText}>Search</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        {loading && (
+          <ActivityIndicator animating={true} color="#007BFF" size="large" />
+        )}
         <FlatList
-          data={students}
+          data={filteredStudents}
           renderItem={renderItem}
           keyExtractor={item => item.id}
         />
@@ -171,7 +201,7 @@ const FeeStatus = ({navigation}) => {
             </View>
           </View>
         </Modal>
-      </ScrollView>
+      </View>
     </>
   );
 };
@@ -187,7 +217,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     padding: 12,
-    marginBottom: 10,
+    marginBottom: 30,
     backgroundColor: '#fff',
   },
   searchButton: {

@@ -84,7 +84,6 @@ const StudentLogin = ({navigation}) => {
       }, 2000);
     }
   };
-
   return (
     <SafeAreaView style={styles.background}>
       <View style={styles.topContainer}>

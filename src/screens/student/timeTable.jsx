@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import Header from '../../components/header';
 
@@ -43,12 +51,14 @@ const StudentTimetable = ({ route, navigation }) => {
     <ScrollView contentContainerStyle={styles.container}>
       {timetableUrl ? (
         <View style={styles.imageContainer}>
-          <Image source={{ uri: timetableUrl }} style={styles.timetableImage} />
+          <Image source={{uri: timetableUrl}} style={styles.timetableImage} />
         </View>
       ) : (
         <Text style={styles.errorText}>Timetable not available</Text>
       )}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}>
         <Text style={styles.backButtonText}>Back to Dashboard</Text>
       </TouchableOpacity>
     </ScrollView>

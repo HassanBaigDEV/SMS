@@ -69,11 +69,11 @@ const AcademicProfileScreenOptions = ({route}) => {
   };
 };
 
-const SyllabusScreenOptions = ({ route }) => {
-  const { user, selectedYear } = route.params;
+const SyllabusScreenOptions = ({route}) => {
+  const {user, selectedYear} = route.params;
   const classEnrolled = user.classEnrolled;
-  const parts = classEnrolled.split('/'); 
-  const className = parts[1]; 
+  const parts = classEnrolled.split('/');
+  const className = parts[1];
 
   return {
     title: `Academic Syllabus (${className})`,
@@ -91,11 +91,11 @@ const SyllabusScreenOptions = ({ route }) => {
   };
 };
 
-const TimeTableScreenOptions = ({ route }) => {
-  const { user, selectedYear } = route.params;
+const TimeTableScreenOptions = ({route}) => {
+  const {user, selectedYear} = route.params;
   const classEnrolled = user.classEnrolled;
-  const parts = classEnrolled.split('/'); 
-  const className = parts[1]; 
+  const parts = classEnrolled.split('/');
+  const className = parts[1];
 
   return {
     title: `Time Table`,

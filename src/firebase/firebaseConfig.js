@@ -3,7 +3,7 @@ import {initializeApp} from 'firebase/app';
 import {getAnalytics} from 'firebase/analytics';
 import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
 import {getFirestore, setDoc, doc} from 'firebase/firestore';
-import { getStorage, ref} from 'firebase/storage';
+import {getStorage, ref} from 'firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import firebase from '@react-native-firebase/app';
 
@@ -73,42 +73,42 @@ export const signUp = async (email, password, role) => {
 //   1122,
 //   2024,
 //   {
-//     "English": {
+//     English: {
 //       firstTerm: 0,
 //       midTerm: 0,
 //       finalTerm: 0,
 //     },
-//     "Computer (Part 1)": {
+//     'Computer (Part 1)': {
 //       firstTerm: 50,
 //       midTerm: 100,
 //       finalTerm: 10,
 //     },
-//     "Computer (Part 2)": {
+//     'Computer (Part 2)': {
 //       firstTerm: 50,
 //       midTerm: 100,
 //       finalTerm: 10,
 //     },
-//     "Islamiat": {
+//     Islamiat: {
 //       firstTerm: 50,
 //       midTerm: 100,
 //       finalTerm: 10,
 //     },
-//     "Math": {
+//     Math: {
 //       firstTerm: 50,
 //       midTerm: 100,
 //       finalTerm: 10,
 //     },
-//     "Social Study": {
+//     'Social Study': {
 //       firstTerm: 50,
 //       midTerm: 100,
 //       finalTerm: 10,
 //     },
-//     "Urdu": {
+//     Urdu: {
 //       firstTerm: 50,
 //       midTerm: 100,
 //       finalTerm: 10,
 //     },
-//     "General Knowledge": {
+//     'General Knowledge': {
 //       firstTerm: 50,
 //       midTerm: 100,
 //       finalTerm: 10,

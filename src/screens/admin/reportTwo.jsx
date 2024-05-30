@@ -7,13 +7,15 @@ import {
   StyleSheet,
   ToastAndroid,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import {collection, getDocs} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../firebase/firebaseConfig';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import moment from 'moment';
 import Header from '../../components/header';
-
+import {Picker} from '@react-native-picker/picker';
+const _years = ['2019', '2020', '2021', '2022', '2023', '2024'];
 // Helper function to calculate age
 const calculateAge = dob => {
   const birthDate = moment(dob, 'YYYY-MM-DD');
@@ -225,6 +227,9 @@ const generateResultReportPDF = async (students, year) => {
 };
 
 const StudentReport = () => {
+  const [year, setYear] = useState(_years[_years.length - 1]);
+  const [showModal, setShowModal] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [reportType, setReportType] = useState(''); // 'age' or 'result'
 
@@ -235,7 +240,8 @@ const StudentReport = () => {
       const data = await fetchAndProcessStudentDataForAgeReport();
       await generateAgeReportPDF(data);
     } else if (reportType === 'result') {
-      const year = '2024'; // Example year, you can make this dynamic
+      // const year = '2024'; // Example year, you can make this dynamic
+
       const students = await fetchAndProcessStudentDataForResultReport(year);
       await generateResultReportPDF(students, year);
     }
@@ -269,7 +275,10 @@ const StudentReport = () => {
               styles.button,
               reportType === 'result' && styles.selectedButton,
             ]}
-            onPress={() => setReportType('result')}>
+            onPress={() => {
+              setReportType('result');
+              setShowModal(true);
+            }}>
             <Text
               style={[
                 reportType === 'result'
@@ -290,6 +299,33 @@ const StudentReport = () => {
           />
         )}
       </View>
+      {/* closs modal when clicked on fade */}
+
+      <Modal
+        visible={showModal}
+        transparent={true}
+        animationType="fade"
+        // onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          {/* <Text style={styles.modalText}>Downloading report...</Text> */}
+          {/* select YEar */}
+          <View style={styles.yearContainer}>
+            <Text style={styles.yearText}>Select Year:</Text>
+            <Picker
+              selectedValue={year}
+              style={styles.yearPicker}
+              onValueChange={itemValue => {
+                setYear(itemValue);
+                setShowModal(false);
+              }}>
+              {_years.map(year => (
+                <Picker.Item key={year} label={year} value={year}  />
+              ))}
+            </Picker>
+          </View>
+        </View>
+      </Modal>
     </>
   );
 };
@@ -331,6 +367,25 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#000',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  yearContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+  },
+  yearText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  yearPicker: {
+    width: 200,
+    height: 40,
   },
 });
 
