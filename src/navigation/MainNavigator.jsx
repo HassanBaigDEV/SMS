@@ -112,50 +112,6 @@ const TimeTableScreenOptions = ({ route }) => {
   };
 };
 
-const SyllabusScreenOptions = ({ route }) => {
-  const { user, selectedYear } = route.params;
-  const classEnrolled = user.classEnrolled;
-  const parts = classEnrolled.split('/'); 
-  const className = parts[1]; 
-
-  return {
-    title: `Academic Syllabus (${className})`,
-    headerStyle: {
-      backgroundColor: '#000', // Background color of the header
-    },
-    headerTitleStyle: {
-      fontSize: 18,
-      color: '#fff', // Text color of the header title
-      fontFamily: 'Arial',
-      letterSpacing: 1,
-    },
-    headerBackTitleVisible: false, // To hide the back button title
-    headerTintColor: '#fff', // Color of the back button
-  };
-};
-
-const TimeTableScreenOptions = ({ route }) => {
-  const { user, selectedYear } = route.params;
-  const classEnrolled = user.classEnrolled;
-  const parts = classEnrolled.split('/'); 
-  const className = parts[1]; 
-
-  return {
-    title: `Time Table`,
-    headerStyle: {
-      backgroundColor: '#000', // Background color of the header
-    },
-    headerTitleStyle: {
-      fontSize: 18,
-      color: '#fff', // Text color of the header title
-      fontFamily: 'Arial',
-      letterSpacing: 1,
-    },
-    headerBackTitleVisible: false, // To hide the back button title
-    headerTintColor: '#fff', // Color of the back button
-  };
-};
-
 const FeeStatusScreenOptions = ({route}) => {
   const {user, feeYear} = route.params;
 
