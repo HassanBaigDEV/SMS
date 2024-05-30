@@ -36,7 +36,9 @@ import FeeStatusForm from '../screens/admin/feeStatus/FeeStatusForm.jsx';
 import FeeStatus from '../screens/admin/feeStatus/index.jsx';
 
 import TeacherLogin from '../screens/auth/teacherLogin.jsx';
-import TeacherScreen from '../screens/teacher/teacherDashboard.jsx';
+import TeacherScreen from '../screens/teacher/TeacherDashboard';
+import StudentMarks from '../screens/teacher/StudentMarks.jsx';
+import EditMarks from '../screens/teacher/EditMarks.jsx';
 import StudentReport from '../screens/admin/reportTwo.jsx';
 import TimeTable from '../screens/admin/TimeTable.jsx';
 
@@ -272,6 +274,17 @@ const TeacherNavigator = () => {
         component={TeacherScreen}
         options={{headerShown: false}}
       />
+       <Stack.Screen
+        name="StudentMarks"
+        component={StudentMarks}
+        options={{headerShown: false}}
+      />
+            <Stack.Screen
+        name="EditMarks"
+        component={EditMarks}
+        options={{headerShown: false}}
+      />
+      
       {/*    <Stack.Screen
         name="Marks"
         component={Marks}

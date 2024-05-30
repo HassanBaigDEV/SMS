@@ -1,6 +1,6 @@
 // import * as React from "react";
 import React, {useEffect, useState} from 'react';
-import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity , Alert, Modal, ActivityIndicator} from "react-native";
+import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity , Alert, Modal, ActivityIndicator, KeyboardAvoidingView} from "react-native";
 import { FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
 import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
 import {signInWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth';
@@ -208,6 +208,10 @@ const TeacherLogin = ({ navigation }) => {
 
 
     return (
+     
+       
+       
+      
     <View style={styles.background}>
       <View style={styles.upperContainer}>
         <Image
@@ -218,6 +222,7 @@ const TeacherLogin = ({ navigation }) => {
         <Text style={[styles.aura, styles.auraTypo]}>Aura</Text>
         <Text style={[styles.signIn, styles.auraTypo]}>Sign In</Text>
       </View>
+     
       <View style={styles.bottomContainer}>
         <Text style={[styles.phoneNumber, styles.textTypo]}>Email</Text>
         <View style={[styles.androidLarge1Item, styles.androidLayout]} />
@@ -241,6 +246,7 @@ const TeacherLogin = ({ navigation }) => {
           autoCapitalize="none"
           placeholderTextColor={Color.placeholderTextColor} // Set placeholder text color
         />
+
         <TouchableOpacity 
           style={styles.button}
           onPress={handleLogin}

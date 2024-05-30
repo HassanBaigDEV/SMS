@@ -18,8 +18,8 @@ const HeaderContainer = styled(LinearGradient)`
 `;
 
 const BackButton = styled.Image`
-  color: white;
-  font-size: 18px;
+  /* color: white;
+  font-size: 18px; */
 `;
 
 const Header = ({title, nav = true}) => {
@@ -53,5 +53,4 @@ const Header = ({title, nav = true}) => {
     </>
   );
 };
-
 export default Header;
