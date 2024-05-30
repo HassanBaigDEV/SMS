@@ -24,6 +24,7 @@ const FeeStatus = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredStudents, setFilteredStudents] = useState([]);
+  const [year, setYear] = useState('');
 
   useEffect(() => {
     fetchStudents();
@@ -108,13 +109,19 @@ const FeeStatus = ({navigation}) => {
     </TouchableOpacity>
   );
 
-  const openStatusForm = (year, month = null) => {
+  const openStatusForm = (month = null) => {
     // get current month if month is not provided
     if (!month) {
       const currentMonth = new Date().toLocaleString('default', {
         month: 'long',
       });
       month = currentMonth;
+      console.log(month);
+    }
+    if (year == '') {
+      // get current year
+      let _year = new Date().getFullYear().toString();
+      setYear(_year);
     }
     navigation.navigate('FeeStatusForm', {
       year,
@@ -132,7 +139,7 @@ const FeeStatus = ({navigation}) => {
           style={styles.input}
           value={searchQuery}
           onChangeText={setSearchQuery}
-          placeholder="Search by Student Registration Number"
+          placeholder="Search Student"
           placeholderTextColor="#888"
         />
         {/* <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
@@ -162,7 +169,10 @@ const FeeStatus = ({navigation}) => {
                     renderItem={({item}) => (
                       <TouchableOpacity
                         style={styles.yearItem}
-                        onPress={() => handleShowMonths(item)}>
+                        onPress={() => {
+                          setYear(item);
+                          handleShowMonths(item);
+                        }}>
                         <Text style={styles.yearText}>{item}</Text>
                       </TouchableOpacity>
                     )}
@@ -174,9 +184,7 @@ const FeeStatus = ({navigation}) => {
                       renderItem={({item}) => (
                         <TouchableOpacity
                           style={styles.monthItem}
-                          onPress={() =>
-                            openStatusForm(student.feeStatus, item)
-                          }>
+                          onPress={() => openStatusForm(item)}>
                           <Text style={styles.monthText}>{item}</Text>
                         </TouchableOpacity>
                       )}
