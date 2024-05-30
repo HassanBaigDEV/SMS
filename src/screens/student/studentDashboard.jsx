@@ -7,6 +7,7 @@ import Header from '../../components/header';
 
 const StudentDashboard = ({ navigation, route }) => {
   const { user } = route.params;
+  console.log(user);
   const [modalVisible, setModalVisible] = useState(false);
   const [feeModalVisible, setFeeModalVisible] = useState(false);
   const [years, setYears] = useState([]);
@@ -52,7 +53,7 @@ const StudentDashboard = ({ navigation, route }) => {
     } finally {
         setTimeout(() => {
           setShowLogoutModal(false);
-          navigation.navigate('StudentLogin'); 
+          navigation.navigate('Login'); 
       }, 3000); // 2 seconds
     }
   };

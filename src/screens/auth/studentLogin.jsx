@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {
   View,
   Text,
@@ -6,28 +6,31 @@ import {
   TouchableOpacity,
   Alert,
   StyleSheet,
-  SafeAreaView,
+  ToastAndroid,
   Image,
   Modal,
-  ActivityIndicator,
+  Animated,
 } from 'react-native';
 import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-} from 'firebase/auth';
+import {signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth';
 import {doc, getDoc, setDoc} from 'firebase/firestore';
 import schoolIcon1 from '../../images/image2-nobg.png';
+import 'firebase/firestore';
 
 const StudentLogin = ({navigation}) => {
   const [user, setUser] = useState(null);
   const [registrationNumber, setRegistrationNumber] = useState('');
   const [password, setPassword] = useState('');
-  const [registrationNumberFocused, setRegistrationNumberFocused] =
-    useState(false);
+  const [email, setEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [registrationNumberFocused, setRegistrationNumberFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const emailBorderAnim = useRef(new Animated.Value(0)).current;
+  const passwordBorderAnim = useRef(new Animated.Value(0)).current;
+  const emailPlaceholderAnim = useRef(new Animated.Value(0)).current;
+  const passwordPlaceholderAnim = useRef(new Animated.Value(0)).current;
+
 
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, user => {
@@ -49,6 +52,7 @@ const StudentLogin = ({navigation}) => {
         password,
       );
       setUser(userCredential.user);
+      setEmail(registrationNumber+'@student.com');
       const user = userCredential.user;
       const uid = userCredential.user.uid;
       const userDoc = await getDoc(
@@ -70,10 +74,7 @@ const StudentLogin = ({navigation}) => {
       } else {
         Alert.alert('Error', 'User not found.');
       }
-    } 
-    
-    
-    
+    }
     catch (error) {
       console.log('Error signing in:', error.message);
       Alert.alert('Login failed', 'Please check your credentials.');
@@ -84,157 +85,210 @@ const StudentLogin = ({navigation}) => {
       }, 2000);
     }
   };
+
+  const handleFocus = (anim, placeholderAnim) => {
+    Animated.parallel([
+      Animated.timing(anim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+      Animated.timing(placeholderAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+
+  const handleBlur = (anim, placeholderAnim, value) => {
+    if (!value) {
+      Animated.parallel([
+        Animated.timing(anim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(placeholderAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    }
+  };
+
+  const borderColor = anim =>
+    anim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['#cccccc', '#007bff'],
+    });
+
+  const placeholderTranslateY = anim =>
+    anim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [22, -10],
+    });
+
+  const placeholderFontSize = anim =>
+    anim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [16, 12],
+    });
+
+
+
+
   return (
-    <SafeAreaView style={styles.background}>
-      <View style={styles.topContainer}>
-        <Image source={schoolIcon1} style={styles.icon} />
-        <Text style={styles.appTitle}>STELLAR TACTFUL EDU</Text>
-        <Text style={styles.tagline}>
-          Navigating Brilliance, Building Futures
-        </Text>
-      </View>
-      <View style={styles.bottomContainer}>
-        <Text style={styles.title}>STUDENT LOGIN</Text>
-        <TextInput
-          style={[
-            styles.input,
-            registrationNumberFocused && styles.inputFocused,
-          ]}
-          placeholder="Registration Number"
-          value={registrationNumber}
-          onChangeText={setRegistrationNumber}
-          keyboardType="default"
-          autoCapitalize="none"
-          placeholderTextColor="#aaa"
-          onFocus={() => setRegistrationNumberFocused(true)}
-          onBlur={() => setRegistrationNumberFocused(false)}
-        />
-        <TextInput
-          style={[styles.input, passwordFocused && styles.inputFocused]}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          placeholderTextColor="#aaa"
-          onFocus={() => setPasswordFocused(true)}
-          onBlur={() => setPasswordFocused(false)}
-        />
+    // 
+    <View style={styles.container}>
+      <Image
+        source={require('../../images/image2-nobg.png')}
+        style={styles.logo}
+      />
+      <View style={styles.loginBox}>
+        <View style={styles.inputContainer}>
+          <Animated.Text
+            style={[
+              styles.placeholder,
+              {
+                transform: [
+                  {translateY: placeholderTranslateY(emailPlaceholderAnim)},
+                ],
+                fontSize: placeholderFontSize(emailPlaceholderAnim),
+              },
+            ]}>
+            Email
+          </Animated.Text>
+          <Animated.View
+            style={{
+              borderBottomColor: borderColor(emailBorderAnim),
+              borderBottomWidth: 2,
+            }}>
+            <TextInput
+              style={styles.input}
+              value={registrationNumber}
+              onChangeText={setRegistrationNumber}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onFocus={() => handleFocus(emailBorderAnim, emailPlaceholderAnim)}
+              onBlur={() =>
+                handleBlur(emailBorderAnim, emailPlaceholderAnim, email)
+              }
+            />
+          </Animated.View>
+        </View>
+        <View style={styles.inputContainer}>
+          <Animated.Text
+            style={[
+              styles.placeholder,
+              {
+                transform: [
+                  {translateY: placeholderTranslateY(passwordPlaceholderAnim)},
+                ],
+                fontSize: placeholderFontSize(passwordPlaceholderAnim),
+              },
+            ]}>
+            Password
+          </Animated.Text>
+          <Animated.View
+            style={{
+              borderBottomColor: borderColor(passwordBorderAnim),
+              borderBottomWidth: 2,
+            }}>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              onFocus={() =>
+                handleFocus(passwordBorderAnim, passwordPlaceholderAnim)
+              }
+              onBlur={() =>
+                handleBlur(
+                  passwordBorderAnim,
+                  passwordPlaceholderAnim,
+                  password,
+                )
+              }
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}
+              onPressOut={() => setShowPassword(false)}>
+              <Image
+                source={
+                  !showPassword
+                    ? require('../../assets/icons/pwd_eye.png')
+                    : require('../../assets/icons/hide_pwd_eye.png')
+                }
+                style={styles.eyeIconImage}
+              />
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Loading Modal */}
-      <Modal visible={showLogoutModal} transparent={false} animationType="fade">
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4CAF50" />
-          <Text style={styles.loadingText}>LOGGING IN...</Text>
-        </View>
-      </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    backgroundColor: '#000000',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  topContainer: {
-    flex: 0.5,
-    alignItems: 'center',
-    fontFamily: 'Arial',
-  },
-  tagline: {
-    fontSize: 16,
-    color: '#ddd', // Light gray
-    textAlign: 'center',
-    fontFamily: 'serif',
-    fontStyle: 'italic', // Apply italic style
-  },
-  appTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#fff', // White
-    textAlign: 'center',
-    textShadowColor: '#aaa',
-    textShadowOffset: {width: 2, height: 2},
-    textShadowRadius: 4,
-    marginBottom: 10,
-  },
-  bottomContainer: {
-    flex: 0.8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '80%',
-    padding: 20,
-    marginTop: '25%',
-    marginBottom: '10%',
-    borderRadius: 10,
-    backgroundColor: 'rgba(211, 211, 211, 0.9)',
-  },
-  icon: {
-    width: 250,
-    height: 150,
-    resizeMode: 'contain',
-  },
   container: {
-    width: '80%',
-    backgroundColor: 'rgba(211, 211, 211, 0.9)',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 50,
+    flex: 1,
+    justifyContent: 'center',
+    padding: 16,
+    backgroundColor: '#f7f7f7',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#333333',
-    marginTop: 20,
-    textAlign: 'center',
-    textShadowColor: '#aaa',
-    textShadowOffset: {width: 2, height: 2},
-    textShadowRadius: 4,
-    marginBottom: 10,
+  logo: {
+    width: 320,
+    height: 320,
+    justifyContent: 'flex-start',
+    alignSelf: 'center',
+    resizeMode: 'contain',
+    tintColor: '#000',
+  },
+  loginBox: {
+    borderRadius: 10,
+    padding: 20,
+  },
+  inputContainer: {
+    marginBottom: 16,
+    position: 'relative',
   },
   input: {
-    width: '100%',
-    height: 40,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: '#fff',
+    height: 50,
+    paddingHorizontal: 12,
+    borderRadius: 30,
+    backgroundColor: 'transparent',
+    borderBottomWidth: 0,
   },
-  inputFocused: {
-    borderColor: '#4CAF50',
-    borderWidth: 2,
+  placeholder: {
+    position: 'absolute',
+    left: 16,
+    color: '#999',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 16,
+    top: 14,
+  },
+  eyeIconImage: {
+    width: 24,
+    height: 24,
+    tintColor: '#999',
   },
   button: {
-    width: '100%',
-    height: 40,
-    backgroundColor: '#4CAF50',
-    justifyContent: 'center',
+    backgroundColor: '#007bff',
+    paddingVertical: 12,
+    borderRadius: 30,
     alignItems: 'center',
-    borderRadius: 5,
-    marginBottom: '5%',
   },
   buttonText: {
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 18,
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: '100%',
-  },
-  loadingText: {
-    marginTop: 10,
-    color: 'black',
-    fontSize: 20,
     fontWeight: 'bold',
   },
 });

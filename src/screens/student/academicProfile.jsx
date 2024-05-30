@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Header from '../../components/header';
 
 import maleImage from '../../images/male.jpg';
 import femaleImage from '../../images/female.jpg';
@@ -46,6 +47,8 @@ const AcademicProfile = ({ route, navigation }) => {
 
 
   return (
+    <>
+    <Header title={`Academic Profile Report (${selectedYear})`} />
     <FlatList
       data={subjects}
       keyExtractor={(item) => item}
@@ -114,6 +117,7 @@ const AcademicProfile = ({ route, navigation }) => {
         </View>
       }     
     />
+    </>
   );
 };
 

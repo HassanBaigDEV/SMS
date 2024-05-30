@@ -8,13 +8,14 @@ const RoleSelectionScreen = () => {
   const navigation = useNavigation();
 
   const handleProceed = () => {
-    if (selectedRole === 'student') {
-      navigation.navigate('StudentNavigator');
-    } else if (selectedRole === 'teacher') {
-      navigation.navigate('TeacherNavigator');
-    } else if (selectedRole === 'admin') {
-      navigation.navigate('AdminNavigator');
-    }
+    // if (selectedRole === 'student') {
+    //   navigation.navigate('StudentNavigator');
+    // } else if (selectedRole === 'teacher') {
+    //   navigation.navigate('TeacherNavigator');
+    // } else if (selectedRole === 'admin') {
+    //   navigation.navigate('AdminNavigator');
+    // }
+    navigation.navigate('Login');
   };
 
   return (

@@ -9,6 +9,8 @@ import {
   ToastAndroid,
   Image,
   Animated,
+  Modal,
+  ActivityIndicator
 } from 'react-native';
 import {FIREBASE_AUTH, FIREBASE_DB} from '../../firebase/firebaseConfig';
 import {signInWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth';
@@ -20,43 +22,71 @@ const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const emailBorderAnim = useRef(new Animated.Value(0)).current;
   const passwordBorderAnim = useRef(new Animated.Value(0)).current;
   const emailPlaceholderAnim = useRef(new Animated.Value(0)).current;
   const passwordPlaceholderAnim = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    onAuthStateChanged(FIREBASE_AUTH, user => {
-      console.log('USER IS STILL LOGGED IN: ', user);
-      if (user) {
-        setUser(user);
-      }
-    });
-  }, [user]);
+  // useEffect(() => {
+  //   onAuthStateChanged(FIREBASE_AUTH, user => {
+  //     console.log('USER IS STILL LOGGED IN: ', user);
+  //     if (user) {
+  //       setUser(user);
+  //     }
+  //   });
+  // }, [user]);
 
   const handleLogin = async () => {
     ToastAndroid.show('Logging in...', ToastAndroid.SHORT);
+  
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        FIREBASE_AUTH,
-        email,
-        password,
-      );
-      setUser(userCredential.user);
-      const uid = userCredential.user.uid;
+      setShowLoginModal(true);
+      // Authenticate user with email and password
+      const userCredential = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
+      const user = userCredential.user;
+      setUser(user);
+  
+      // Log the signed-in user
       console.log('User signed in:', user);
+  
+      // Get user document from Firestore
+      const uid = user.uid;
       const userDoc = await getDoc(doc(FIREBASE_DB, 'users', uid));
-
       const userData = userDoc.data();
+  
       if (userDoc.exists()) {
         console.log('userRole:', userData);
+  
+        // Handle admin role
         if (userData.role === 'admin') {
           console.log('Welcome, Admin!');
           ToastAndroid.show('Welcome!', ToastAndroid.SHORT);
-          navigation.navigate('AdminDashboard');
-        } else if (userData.role === 'student') {
-          Alert.alert("You don't have permission to access this page");
-        } else if (userData.role === 'teacher') {
+          // navigation.navigate('AdminDashboard');
+          setShowLoginModal(false);
+          navigation.navigate('AdminNavigator', { screen: 'AdminDashboard', params: { user: userData } });
+
+        } 
+        // Handle student role
+        else if (userData.role === 'student') {
+          const studentEmailPrefix = email.split('@')[0];
+          const studentDoc = await getDoc(doc(FIREBASE_DB, 'students', studentEmailPrefix));
+  
+          if (studentDoc.exists()) {
+            const studentData = studentDoc.data();
+            console.log('Welcome, Student:', studentData);
+  
+            setShowLoginModal(false);
+            ToastAndroid.show('Welcome!', ToastAndroid.SHORT);
+            navigation.navigate('StudentNavigator', { screen: 'StudentDashboard', params: { user: studentData } });
+          } 
+          else {
+            console.error('Student document not found');
+            ToastAndroid.show('Student record not found.', ToastAndroid.SHORT);
+          }
+        } 
+        // Handle teacher role
+        else if (userData.role === 'teacher') {
           Alert.alert("You don't have permission to access this page");
         }
       } else {
@@ -64,12 +94,10 @@ const Login = ({navigation}) => {
       }
     } catch (error) {
       console.error('Login Error:', error);
-      ToastAndroid.show(
-        'Login failed. Please check your credentials.',
-        ToastAndroid.SHORT,
-      );
+      ToastAndroid.show('Login failed. Please check your credentials.', ToastAndroid.SHORT);
     }
   };
+  
 
   const handleFocus = (anim, placeholderAnim) => {
     Animated.parallel([
@@ -212,6 +240,15 @@ const Login = ({navigation}) => {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
+
+
+      {/* Loading Modal */}
+      <Modal visible={showLoginModal} transparent={false} animationType="fade">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4CAF50" />
+          <Text style={styles.loadingText}>LOGGING IN...</Text>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -271,6 +308,17 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#fff',
   },
 });
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import Header from '../../components/header';
 
 const ViewFeeStatus = ({ route }) => {
   const { user, feeYear } = route.params;
@@ -42,7 +43,8 @@ const ViewFeeStatus = ({ route }) => {
   };
 
   return (
-    
+    <>
+    <Header title={`Fee Status (${feeYear})`} />
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.imageContainer}>
         <Image
@@ -79,6 +81,7 @@ const ViewFeeStatus = ({ route }) => {
       {/* Render fee details for the selected month */}
       {renderFeeDetails(filteredFeeDetails)}
     </ScrollView>
+    </>
   );
 };
 
