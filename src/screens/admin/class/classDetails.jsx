@@ -772,7 +772,7 @@ const ClassDetails = ({route, navigation}) => {
               onChangeText={text => setNewTeacher(text)}
               editable={true}
             />
-            {/* <View style={styles.input}>
+            <View style={styles.input}>
               <Dropdown
                 label="Select Teacher"
                 data={allTeachers.map(teacher => ({
@@ -781,7 +781,7 @@ const ClassDetails = ({route, navigation}) => {
                 }))}
                 onSelect={handleSelectTeacher}
               />
-            </View> */}
+            </View>
             <TextInput
               style={styles.input}
               placeholder="Subject"

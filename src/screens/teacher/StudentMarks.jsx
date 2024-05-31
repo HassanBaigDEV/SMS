@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -11,6 +10,7 @@ import {
   TextInput,
   Button,
 } from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import {doc, getDoc, deleteDoc, updateDoc} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../firebase/firebaseConfig';
 import {ToastAndroid} from 'react-native';
@@ -41,6 +41,7 @@ const StudentMarks = ({route, navigation}) => {
   });
   const [marks, setMarks] = useState({});
   const [loading, setLoading] = useState(false);
+  const [selectedTerm, setSelectedTerm] = useState('firstTerm');
 
   const fetchStudentData = async () => {
     try {
@@ -199,9 +200,18 @@ const StudentMarks = ({route, navigation}) => {
           <Text style={styles.label}>Name:</Text>
           <Text style={styles.value}>{student.studentName}</Text>
         </View>
-        {renderTable('firstTerm')}
-        {renderTable('midTerm')}
-        {renderTable('finalTerm')}
+        <View style={styles.pickerContainer}>
+          <Text style={styles.label}>Select Term:</Text>
+          <Picker
+            selectedValue={selectedTerm}
+            onValueChange={itemValue => setSelectedTerm(itemValue)}
+            style={styles.picker}>
+            <Picker.Item label="First Term" value="firstTerm" />
+            <Picker.Item label="Mid Term" value="midTerm" />
+            <Picker.Item label="Final Term" value="finalTerm" />
+          </Picker>
+        </View>
+        {renderTable(selectedTerm)}
         <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={handleEditStudent}>
             <Image
@@ -295,6 +305,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     width: '33%',
     textAlign: 'center',
+  },
+  pickerContainer: {
+    marginBottom: 20,
+  },
+  picker: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 2,
   },
 });
 

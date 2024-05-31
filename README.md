@@ -1,3 +1,27 @@
+## Required Changes from evaluator
+
+### 1. Assign Teacher using name and Id both. 
+   
+   ### Implementation:
+    Added A dropdown select for teacher name that also dynamically updates based on matching Ids from Teacher record.
+
+
+### 2. Make Student Marks Screen conditionally render from a dropdown of academic terms instead of having to scroll them. 
+   
+   ### Implementation:
+    Added the Picker component to conditionally render the marks table based on the selected term.
+         
+
+
+
+
+
+
+
+
+
+
+
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # USE YARN 
