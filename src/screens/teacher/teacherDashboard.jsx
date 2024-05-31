@@ -9,11 +9,14 @@ import {
   FlatList,
   TouchableOpacity,
   ScrollView,
+  Modal
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {collection, getDocs} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../firebase/firebaseConfig';
 import Header from '../../components/header';
+import { FIREBASE_AUTH } from '../../firebase/firebaseConfig';
+import { signOut } from 'firebase/auth';
 
 const TeacherScreen = ({route, navigation}) => {
   const {teacher} = route.params;
@@ -22,6 +25,7 @@ const TeacherScreen = ({route, navigation}) => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredClassData, setFilteredClassData] = useState({});
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const academicYearDetails = Object.keys(teacher.academicYear).map(year => ({
     label: year,
@@ -34,6 +38,23 @@ const TeacherScreen = ({route, navigation}) => {
         classObj => classObj.classId,
       ) || []
     );
+  };
+
+
+  const handleLogout = async () => {
+    try {
+      setShowLogoutModal(true); 
+      await signOut(FIREBASE_AUTH); // Sign out user
+    //   Alert.alert('SUCCESSFUL!', 'You have logged out successfully!');
+      console.log('Logout Succesful!');
+    } catch (error) {
+        console.error('Logout Error:', error.message);
+    } finally {
+        setTimeout(() => {
+          setShowLogoutModal(false);
+          navigation.navigate('Login'); 
+      }, 3000); // 2 seconds
+    }
   };
 
   const fetchStudents = async year => {
@@ -164,6 +185,32 @@ const TeacherScreen = ({route, navigation}) => {
           <Text>No students found. Add a student to get started.</Text>
         )}
       </View>
+
+      <View style={styles.logoutButtonContainer}>
+          <TouchableOpacity style={styles.signOutButton}
+            onPress={() => {
+                setShowLogoutModal(true);
+                handleLogout(); 
+            }}>
+            <View style={styles.buttonContent}>
+              <Image
+                style={styles.logoutIcon}
+                source={require('../../assets/icons/logout_icon.png')}
+              />
+              <Text style={styles.signOutText}>LOG OUT</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+
+        {/* Loading Modal */}
+      <Modal visible={showLogoutModal} transparent={false} animationType="fade">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4CAF50" />
+          <Text style={styles.loadingText}>LOGGING OUT...</Text>
+        </View>
+      </Modal>
+
     </View>
   );
 };
@@ -232,6 +279,48 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginBottom: 20,
     backgroundColor: '#fff',
+  },
+  signOutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: 'black',
+    marginVertical: 40,
+    width: '50%',
+    alignSelf: 'center',
+    justifyContent: 'center',
+    elevation: 2, // for Android shadow
+    shadowColor: '#000', // for iOS shadow
+    shadowOffset: { width: 0, height: 2 }, // for iOS shadow
+    shadowOpacity: 0.25, // for iOS shadow
+    shadowRadius: 3.84, // for iOS shadow
+    marginBottom: '30%',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoutIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+  },
+  signOutText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#fff',
   },
 });
 

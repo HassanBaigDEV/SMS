@@ -221,7 +221,7 @@ const Login = ({navigation}) => {
 
   const placeholderFontSize = anim =>
     anim.interpolate({
-      inputRange: [0, 1],
+      inputRange: [0, 5],
       outputRange: [16, 12],
     });
 
