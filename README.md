@@ -1,4 +1,4 @@
-## Required Changes from evaluator
+## Required Changes by evaluator
 
 ### 1. Assign Teacher using name and Id both. 
    
