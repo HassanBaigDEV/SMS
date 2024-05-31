@@ -33,10 +33,10 @@ const StudentDetail = ({route, navigation}) => {
         student => student.registrationNumber == registrationNumber,
       );
       if (foundStudent) {
-        let _date = new Date(foundStudent.dateOfBirth);
-        let _date2 = new Date(foundStudent.dateOfAdmission);
-        foundStudent.dateOfBirth = _date.toDateString();
-        foundStudent.dateOfAdmission = _date2.toDateString();
+        // let _date = new Date(foundStudent.dateOfBirth);
+        // let _date2 = new Date(foundStudent.dateOfAdmission);
+        // foundStudent.dateOfBirth = _date.toDateString();
+        // foundStudent.dateOfAdmission = _date2.toDateString();
         setStudent(foundStudent);
       }
     } catch (error) {

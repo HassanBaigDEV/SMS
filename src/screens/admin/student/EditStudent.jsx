@@ -10,6 +10,7 @@ import {
   Platform,
   TouchableOpacity,
   ScrollView,
+  ToastAndroid,
 } from 'react-native';
 import {doc, getDoc, updateDoc} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
@@ -66,6 +67,7 @@ const EditStudent = ({route, navigation}) => {
       return;
     }
 
+    ToastAndroid.show('Updating student details...', ToastAndroid.SHORT);
     try {
       const studentRef = doc(FIREBASE_DB, 'students', student.id);
       await updateDoc(studentRef, {
@@ -76,7 +78,11 @@ const EditStudent = ({route, navigation}) => {
           .split('T')[0],
       });
 
-      Alert.alert('Success', 'Student details updated successfully');
+      // Alert.alert('Success', 'Student details updated successfully');
+      ToastAndroid.show(
+        'Student details updated successfully',
+        ToastAndroid.SHORT,
+      );
       navigation.goBack();
     } catch (error) {
       console.error('Error updating student:', error);
@@ -178,12 +184,17 @@ const EditStudent = ({route, navigation}) => {
           value={studentData.remarks}
           onChangeText={text => handleInputChange('remarks', text)}
         />
-
-        <View style={styles.buttonContainer}>
-          <Button title="Save" onPress={handleSave} />
-          <Button title="Cancel" onPress={() => navigation.goBack()} />
-        </View>
       </ScrollView>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.addButton} onPress={handleSave}>
+          <Text style={styles.buttonText}>Save</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => navigation.goBack()}>
+          <Text style={styles.buttonText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
     </>
   );
 };
@@ -214,7 +225,33 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
+    marginVertical: 20,
+    marginHorizontal: 20,
+    paddingHorizontal: 20,
+    backgroundColor: 'transparent',
+  },
+  addButton: {
+    backgroundColor: '#007BFF',
+    padding: 15,
+    borderRadius: 8,
+    flex: 1,
+    alignItems: 'center',
+    width: '48%',
+    marginRight: 10,
+  },
+  cancelButton: {
+    backgroundColor: '#dc3545',
+    padding: 15,
+    borderRadius: 8,
+    flex: 1,
+    alignItems: 'center',
+    width: '48%',
+    marginLeft: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

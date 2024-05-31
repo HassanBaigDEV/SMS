@@ -60,8 +60,8 @@ const TeacherList = ({navigation}) => {
         navigation.navigate('TeacherDetails', {teacherId: item.id})
       }
       style={styles.teacherItem}>
-      <Text style={styles.teacherName}>{item.teacherName}</Text>
       <Text style={styles.teacherIdNumber}>{item.idNumber}</Text>
+      <Text style={styles.teacherName}>{item.teacherName}</Text>
       {/* <Text style={styles.teacherClassAssigned}>
         Class Assigned: {item.classAssigned.join(', ')}
       </Text> */}
@@ -138,14 +138,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   teacherName: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
+    textAlign: 'left',
   },
   teacherIdNumber: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666',
     marginTop: 4,
   },

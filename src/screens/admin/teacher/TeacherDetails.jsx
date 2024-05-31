@@ -7,6 +7,7 @@ import {
   Alert,
   TouchableOpacity,
   Image,
+  ToastAndroid,
 } from 'react-native';
 import {doc, getDoc, deleteDoc} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
@@ -40,7 +41,8 @@ const TeacherDetail = ({route, navigation}) => {
   const handleDeleteTeacher = async () => {
     try {
       await deleteDoc(doc(FIREBASE_DB, 'teachers', teacherId));
-      Alert.alert('Success', 'Teacher deleted successfully');
+      // Alert.alert('Success', 'Teacher deleted successfully');
+      ToastAndroid.show('Teacher deleted successfully', ToastAndroid.SHORT);
       navigation.goBack();
     } catch (error) {
       console.error('Error deleting teacher:', error);

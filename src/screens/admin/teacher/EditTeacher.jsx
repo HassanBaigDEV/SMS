@@ -13,9 +13,12 @@ import {doc, getDoc, setDoc, updateDoc, collection} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../../firebase/firebaseConfig';
 import {years} from '../../../data/academicYear';
 import Header from '../../../components/header';
+import {set} from 'firebase/database';
+import {ActivityIndicator} from 'react-native-paper';
 
 const EditTeacher = ({route, navigation}) => {
   const {teacherId, isNew} = route.params;
+  const [loading, setLoading] = useState(true);
 
   const [teacherData, setTeacherData] = useState({
     teacherName: '',
@@ -43,7 +46,7 @@ const EditTeacher = ({route, navigation}) => {
           console.error('Error fetching teacher:', error);
         }
       };
-
+      setLoading(false);
       fetchTeacher();
     }
   }, [teacherId, isNew, navigation]);
@@ -86,62 +89,70 @@ const EditTeacher = ({route, navigation}) => {
     }
   };
 
-  return (
-    <>
-      <Header title="Edit Teacher" />
-      <ScrollView style={styles.container}>
-        {/* <Text style={styles.label}>Edit Teacher Details</Text> */}
-
-        <TextInput
-          style={styles.input}
-          placeholder="Name"
-          value={teacherData.teacherName}
-          onChangeText={text => handleInputChange('teacherName', text)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={teacherData.email}
-          onChangeText={text => handleInputChange('email', text)}
-        />
-
-        {years.map(year => (
-          <View key={year} style={styles.yearSection}>
-            <Text style={styles.yearLabel}>{year}</Text>
-            <Text style={styles.yearLabel}>Class Assigned</Text>
-            <TextInput
-              style={styles.input}
-              value={teacherData?.academicYear[year]?.classAssigned || ''}
-              placeholder="Format: Class 5"
-              onChangeText={text =>
-                handleYearInputChange(year, 'classAssigned', text)
-              }
-            />
-            <Text style={styles.yearLabel}>Subject</Text>
-            <TextInput
-              style={styles.input}
-              value={teacherData?.academicYear[year]?.subject || ''}
-              placeholder="Subject"
-              onChangeText={text =>
-                handleYearInputChange(year, 'subject', text)
-              }
-            />
-          </View>
-        ))}
-      </ScrollView>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleSave}>
-          <Text style={styles.buttonText}>Save</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, styles.cancelButton]}
-          onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator color="#007bff" size="large" />
       </View>
-    </>
-  );
+    );
+  } else {
+    return (
+      <>
+        <Header title="Edit Teacher" />
+        <ScrollView style={styles.container}>
+          {/* <Text style={styles.label}>Edit Teacher Details</Text> */}
+
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            value={teacherData.teacherName}
+            onChangeText={text => handleInputChange('teacherName', text)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={teacherData.email}
+            onChangeText={text => handleInputChange('email', text)}
+          />
+          {teacherData?.academicYear &&
+            years?.map(year => (
+              <View key={year} style={styles.yearSection}>
+                <Text style={styles.yearLabel}>{year}</Text>
+                <Text style={styles.yearLabel}>Class Assigned</Text>
+                <TextInput
+                  style={styles.input}
+                  value={teacherData?.academicYear[year]?.classAssigned || ''}
+                  placeholder="Class 5"
+                  onChangeText={text =>
+                    handleYearInputChange(year, 'classAssigned', text)
+                  }
+                />
+                <Text style={styles.yearLabel}>Subject</Text>
+                <TextInput
+                  style={styles.input}
+                  value={teacherData?.academicYear[year]?.subject || ''}
+                  placeholder="Subject"
+                  onChangeText={text =>
+                    handleYearInputChange(year, 'subject', text)
+                  }
+                />
+              </View>
+            ))}
+        </ScrollView>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleSave}>
+            <Text style={styles.buttonText}>Save</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.cancelButton]}
+            onPress={() => navigation.goBack()}>
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
