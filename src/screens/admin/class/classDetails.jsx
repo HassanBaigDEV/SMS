@@ -245,7 +245,7 @@ const ClassDetails = ({route, navigation}) => {
 
   const saveImageURLToFirestore = async url => {
     try {
-      await setDoc(
+      setDoc(
         doc(FIREBASE_DB, 'syllabus', `${classId}`),
         {
           syllabus: url,

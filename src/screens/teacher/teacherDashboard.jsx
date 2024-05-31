@@ -2,55 +2,66 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
   TextInput,
   ActivityIndicator,
   Image,
   FlatList,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {collection, getDocs} from 'firebase/firestore';
 import {FIREBASE_DB} from '../../firebase/firebaseConfig';
+import Header from '../../components/header';
 
 const TeacherScreen = ({route, navigation}) => {
   const {teacher} = route.params;
 
-  const [students, setStudents] = useState([]);
+  const [classData, setClassData] = useState({});
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredStudents, setFilteredStudents] = useState([]);
+  const [filteredClassData, setFilteredClassData] = useState({});
 
   const academicYearDetails = Object.keys(teacher.academicYear).map(year => ({
     label: year,
     value: year,
   }));
 
-  const getClassForYear = year => {
-    return teacher.academicYear[year]?.classAssigned || '';
+  const getClassesForYear = year => {
+    return (
+      teacher.academicYear[year]?.classAssigned.map(
+        classObj => classObj.classId,
+      ) || []
+    );
   };
 
   const fetchStudents = async year => {
     try {
       setLoading(true);
-      const classId = getClassForYear(year);
-      const studentsCollectionRef = collection(
-        FIREBASE_DB,
-        `classes/${classId}/${year}`,
-      );
-      const studentsSnapshot = await getDocs(studentsCollectionRef);
-      const studentsList = studentsSnapshot.docs.map(doc => doc.data());
-      setStudents(studentsList);
-      setFilteredStudents(studentsList);
+      const classIds = getClassesForYear(year);
+      const newClassData = {};
+
+      for (const classId of classIds) {
+        const studentsCollectionRef = collection(
+          FIREBASE_DB,
+          `classes/${classId}/${year}`,
+        );
+        const studentsSnapshot = await getDocs(studentsCollectionRef);
+        newClassData[classId] = studentsSnapshot.docs.map(doc => doc.data());
+      }
+
+      setClassData(newClassData);
+      setFilteredClassData(newClassData);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching students:', error);
       setLoading(false);
     }
   };
+
   const [selectedYear, setSelectedYear] = useState(
-    academicYearDetails.length > 5 ? academicYearDetails[5].value : null,
+    academicYearDetails.length > 0 ? academicYearDetails[0].value : null,
   );
 
   useEffect(() => {
@@ -61,35 +72,34 @@ const TeacherScreen = ({route, navigation}) => {
 
   useEffect(() => {
     if (searchQuery === '') {
-      setFilteredStudents(students);
+      setFilteredClassData(classData);
     } else {
-      const filtered = students.filter(
-        student =>
-          student?.registrationNumber
-            ?.toString()
-            .includes(searchQuery.toLowerCase()) ||
-          student?.studentName
-            ?.toLowerCase()
-            .includes(searchQuery.toLowerCase()),
-      );
-      setFilteredStudents(filtered);
+      const filtered = {};
+      Object.keys(classData).forEach(classId => {
+        filtered[classId] = classData[classId].filter(
+          student =>
+            student?.registrationNumber
+              ?.toString()
+              .includes(searchQuery.toLowerCase()) ||
+            student?.studentName
+              ?.toLowerCase()
+              .includes(searchQuery.toLowerCase()),
+        );
+      });
+      setFilteredClassData(filtered);
     }
-  }, [searchQuery, students]);
+  }, [searchQuery, classData]);
 
-  const renderItem = ({item}) => (
+  const renderStudentItem = ({item, classId}) => (
     <TouchableOpacity
       style={styles.listItem}
-      // console
-      onPress={
-        () =>
-          navigation.navigate('StudentMarks', {
-            registrationNumber: item.registrationNumber,
-            student: item,
-            selectedYear: selectedYear,
-          })
-        // {console.log("regnum")
-        //   console.log(item.registrationNumber)
-        // }
+      onPress={() =>
+        navigation.navigate('StudentMarks', {
+          registrationNumber: item.registrationNumber,
+          student: item,
+          selectedYear: selectedYear,
+          classId: classId,
+        })
       }>
       <View style={styles.listItemTextContainer}>
         <Text style={styles.listItemText}>
@@ -103,15 +113,24 @@ const TeacherScreen = ({route, navigation}) => {
     </TouchableOpacity>
   );
 
+  const renderClassSection = (classId, students) => (
+    <View key={classId} style={styles.classSection}>
+      <Text style={styles.classHeaderText}>Class: {classId}</Text>
+      <FlatList
+        data={students}
+        renderItem={({item}) => renderStudentItem({item, classId})}
+        keyExtractor={(item, index) => index.toString()}
+        style={styles.flatList}
+      />
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Welcome, {teacher.teacherName}</Text>
-        </View>
-      </View>
+      <Header title={`Welcome, ${teacher.teacherName}`} nav={false} />
       <Text style={styles.classText}>
-        Academic Year {selectedYear}: {getClassForYear(selectedYear)}
+        Academic Year {selectedYear}:{' '}
+        {getClassesForYear(selectedYear).join(', ')}
       </Text>
       <Picker
         selectedValue={selectedYear}
@@ -135,14 +154,13 @@ const TeacherScreen = ({route, navigation}) => {
         {loading ? (
           <ActivityIndicator size="large" color="blue" />
         ) : (
-          <FlatList
-            data={filteredStudents}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => index.toString()}
-            style={styles.flatList}
-          />
+          <ScrollView>
+            {Object.keys(filteredClassData).map(classId =>
+              renderClassSection(classId, filteredClassData[classId]),
+            )}
+          </ScrollView>
         )}
-        {!loading && students.length === 0 && (
+        {!loading && Object.keys(classData).length === 0 && (
           <Text>No students found. Add a student to get started.</Text>
         )}
       </View>
@@ -154,28 +172,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    backgroundColor: '#473f97',
-    width: '100%',
-    height: 80,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    color: 'white',
-  },
   classText: {
     fontSize: 18,
     marginLeft: 20,
+    marginTop: 20,
   },
   picker: {
     width: '30%',
@@ -183,9 +183,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
   },
-  studentName: {
+  classSection: {
+    marginBottom: 20,
+  },
+  classHeaderText: {
+    fontSize: 18,
     fontWeight: 'bold',
-    fontSize: 16,
     marginBottom: 10,
   },
   flatList: {

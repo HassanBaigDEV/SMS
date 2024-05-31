@@ -71,7 +71,7 @@ export const signUp = async (email, password, role) => {
 // handleUpdateMarks(
 //   'Class 5',
 //   1122,
-//   2024,
+//   2023,
 //   {
 //     English: {
 //       firstTerm: 0,
